@@ -1,0 +1,18 @@
+.tools/
+.cache/
+.venv/
+.local/
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+__pycache__/
+.pytest_cache/
+*.pyc
+*.tsbuildinfo
+
+# Credentials generated for local deployment or added by the developer.
+.secrets/
+*.pem
+*.key

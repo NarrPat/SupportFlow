@@ -1,0 +1,14 @@
+# Linux/amd64 manifests (not the multi-platform index digests).
+FROM ghcr.io/astral-sh/uv:0.13.7@sha256:c7db1d63057f268a8b6da8af9077850a60461f98d23db23c676a82089a050c91 AS uv
+FROM python:3.12.14-slim-bookworm@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a
+
+COPY --from=uv /uv /usr/local/bin/uv
+WORKDIR /opt/supportflow
+ENV UV_PYTHON_DOWNLOADS=never \
+    PATH="/opt/supportflow/.venv/bin:${PATH}"
+
+COPY .python-version pyproject.toml uv.lock ./
+RUN uv sync --locked --python /usr/local/bin/python3.12 --no-cache
+
+COPY tools/check_python_env.py tools/
+CMD ["python", "tools/check_python_env.py"]

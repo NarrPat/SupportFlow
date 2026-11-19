@@ -1,0 +1,5 @@
+# Add after web/worker/diagnosis/rag. No new service or public control hook.
+services:
+  api:
+    environment:
+      SF_GRAPH_VERSION: clarification-diagnosis-v1

@@ -1,0 +1,33 @@
+* text=auto eol=lf
+# Sealed tool output must retain the original bytes, including CRLF and spaces.
+artifacts/** -text -whitespace
+tools/evidence_archive.py -text
+# These evaluation contracts pin the exact fixture bytes, not normalized text.
+evals/fixtures/supportflow/prior_events/*.json -text
+evals/fixtures/supportflow/dispatch_joint/*.json -text
+evals/fixtures/supportflow/rag_live/*.json -text
+evals/fixtures/supportflow/graph_spike/connection-units.json -text
+# Preserve the already measured bytes of these inherited fixture contracts.
+evals/fixtures/supportflow/grant_proposal/cases.json -text
+evals/fixtures/supportflow/rag/cases.json -text
+evals/fixtures/supportflow/rag/browser-run-view-v2.json -text
+evals/fixtures/supportflow/approval/*.json -text
+evals/fixtures/supportflow/grant_execution/*.json -text
+evals/fixtures/supportflow/six_views/*.json -text
+evals/fixtures/supportflow/public_reply/*.json -text
+evals/fixtures/supportflow/eval_accounting/*.json -text
+evals/fixtures/supportflow/eval_boundaries/*.json -text
+evals/fixtures/supportflow/capacity/*.json -text
+evals/fixtures/supportflow/eval_catalog/*.json -text
+evals/data/supportflow/** -text
+# Holdout registration binds these exact reviewed bytes on every checkout.
+evals/reviews/supportflow/holdout-*.json -text
+evals/registrations/supportflow/*.json -text
+# Immutable execution bindings hash these exact source bytes across checkouts.
+tests/supportflow/h0_graph.py -text
+tests/supportflow/h1_strategy.py -text
+tests/supportflow/evaluation_binding.py -text
+apps/supportflow/agent/assets/deepseek-v41-tokenizer.json -text
+
+# Keep the original CRLF fixture bytes and allow CR at line endings in diffs.
+evals/fixtures/supportflow/rag/cases.json whitespace=cr-at-eol

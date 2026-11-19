@@ -1,0 +1,15 @@
+# Opt-in repository scope. The credential is mounted only in the worker.
+services:
+  api:
+    environment:
+      SF_GITHUB_ALLOWED_REPOSITORIES: ${SF_GITHUB_ALLOWED_REPOSITORIES:?trusted GitHub repository scopes required}
+    volumes:
+      - ../../apps/supportflow/tools:/work/apps/supportflow/tools:ro
+  worker:
+    environment:
+      SF_GITHUB_ALLOWED_REPOSITORIES: ${SF_GITHUB_ALLOWED_REPOSITORIES:?trusted GitHub repository scopes required}
+      SF_GITHUB_TOKEN_FILE: /run/secrets/github_token
+    secrets: [github_token]
+secrets:
+  github_token:
+    file: ./.secrets/github_token

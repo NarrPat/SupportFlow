@@ -1,0 +1,5 @@
+# Ordinary product profile. Existing runs retain their original graph snapshot.
+services:
+  api:
+    environment:
+      SF_GRAPH_VERSION: grant-approval-v1

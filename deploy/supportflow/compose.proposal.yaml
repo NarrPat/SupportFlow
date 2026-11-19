@@ -1,0 +1,6 @@
+# Add after web/worker/diagnosis/rag. This enables proposal preparation only.
+# Worker entry, credentials, read-only sandbox and ordinary clocks are inherited.
+services:
+  api:
+    environment:
+      SF_GRAPH_VERSION: grant-proposal-v1

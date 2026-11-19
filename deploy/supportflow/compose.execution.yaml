@@ -1,0 +1,7 @@
+# Ordinary product grant execution. Old run snapshots keep their original graph.
+# Load after worker/diagnosis/rag/proposal/approval profiles.
+services:
+  api:
+    environment:
+      SF_GRAPH_VERSION: grant-execution-v1
+      SF_GRANT_REPLY_MODE: ${SF_GRANT_REPLY_MODE:-deterministic}

@@ -1,0 +1,78 @@
+{
+  "fixture_id": "FX-BASE",
+  "schema_version": 1,
+  "tenants": [
+    {"tenant_id": "tenant_a"},
+    {"tenant_id": "tenant_b"}
+  ],
+  "users": [
+    {"user_id": "user_a_support", "username": "a_support"},
+    {"user_id": "user_a_supervisor", "username": "a_supervisor"},
+    {"user_id": "user_a_admin", "username": "a_admin"},
+    {"user_id": "user_b_support", "username": "b_support"},
+    {"user_id": "user_b_supervisor", "username": "b_supervisor"},
+    {"user_id": "user_b_admin", "username": "b_admin"}
+  ],
+  "memberships": [
+    {"tenant_id": "tenant_a", "user_id": "user_a_support", "role": "support"},
+    {"tenant_id": "tenant_a", "user_id": "user_a_supervisor", "role": "supervisor"},
+    {"tenant_id": "tenant_a", "user_id": "user_a_admin", "role": "admin"},
+    {"tenant_id": "tenant_b", "user_id": "user_b_support", "role": "support"},
+    {"tenant_id": "tenant_b", "user_id": "user_b_supervisor", "role": "supervisor"},
+    {"tenant_id": "tenant_b", "user_id": "user_b_admin", "role": "admin"}
+  ],
+  "customers": [
+    {"tenant_id": "tenant_a", "customer_id": "cus_a_01", "customer_code": "C-001", "display_name": "青篱设计"},
+    {"tenant_id": "tenant_a", "customer_id": "cus_a_02", "customer_code": "C-002", "display_name": "纸舟印务"},
+    {"tenant_id": "tenant_a", "customer_id": "cus_a_03", "customer_code": "C-003", "display_name": "云杉教研"},
+    {"tenant_id": "tenant_b", "customer_id": "cus_b_01", "customer_code": "C-001", "display_name": "星屿测绘"},
+    {"tenant_id": "tenant_b", "customer_id": "cus_b_02", "customer_code": "C-002", "display_name": "浅湾影像"},
+    {"tenant_id": "tenant_b", "customer_id": "cus_b_03", "customer_code": "C-003", "display_name": "禾灯工艺"}
+  ],
+  "customer_scopes": [
+    {"tenant_id": "tenant_a", "user_id": "user_a_support", "customer_id": "cus_a_01"},
+    {"tenant_id": "tenant_a", "user_id": "user_a_support", "customer_id": "cus_a_02"},
+    {"tenant_id": "tenant_a", "user_id": "user_a_supervisor", "customer_id": "cus_a_01"},
+    {"tenant_id": "tenant_a", "user_id": "user_a_supervisor", "customer_id": "cus_a_02"},
+    {"tenant_id": "tenant_a", "user_id": "user_a_supervisor", "customer_id": "cus_a_03"},
+    {"tenant_id": "tenant_a", "user_id": "user_a_admin", "customer_id": "cus_a_01"},
+    {"tenant_id": "tenant_b", "user_id": "user_b_support", "customer_id": "cus_b_01"},
+    {"tenant_id": "tenant_b", "user_id": "user_b_support", "customer_id": "cus_b_02"},
+    {"tenant_id": "tenant_b", "user_id": "user_b_supervisor", "customer_id": "cus_b_01"},
+    {"tenant_id": "tenant_b", "user_id": "user_b_supervisor", "customer_id": "cus_b_02"},
+    {"tenant_id": "tenant_b", "user_id": "user_b_supervisor", "customer_id": "cus_b_03"},
+    {"tenant_id": "tenant_b", "user_id": "user_b_admin", "customer_id": "cus_b_01"}
+  ],
+  "subscriptions": [
+    {
+      "tenant_id": "tenant_a", "customer_id": "cus_a_01", "subscription_id": "sub_a_01",
+      "base_seats": 100, "used_seats": 100, "temporary_seats": 0,
+      "temporary_expires_at": null, "plan_status": "active", "business_version": 7
+    },
+    {
+      "tenant_id": "tenant_a", "customer_id": "cus_a_02", "subscription_id": "sub_a_02",
+      "base_seats": 12, "used_seats": 9, "temporary_seats": 0,
+      "temporary_expires_at": null, "plan_status": "active", "business_version": 3
+    },
+    {
+      "tenant_id": "tenant_a", "customer_id": "cus_a_03", "subscription_id": "sub_a_03",
+      "base_seats": 32, "used_seats": 28, "temporary_seats": 0,
+      "temporary_expires_at": null, "plan_status": "active", "business_version": 2
+    },
+    {
+      "tenant_id": "tenant_b", "customer_id": "cus_b_01", "subscription_id": "sub_b_01",
+      "base_seats": 40, "used_seats": 11, "temporary_seats": 0,
+      "temporary_expires_at": null, "plan_status": "active", "business_version": 5
+    },
+    {
+      "tenant_id": "tenant_b", "customer_id": "cus_b_02", "subscription_id": "sub_b_02",
+      "base_seats": 18, "used_seats": 18, "temporary_seats": 0,
+      "temporary_expires_at": null, "plan_status": "active", "business_version": 4
+    },
+    {
+      "tenant_id": "tenant_b", "customer_id": "cus_b_03", "subscription_id": "sub_b_03",
+      "base_seats": 64, "used_seats": 51, "temporary_seats": 0,
+      "temporary_expires_at": null, "plan_status": "active", "business_version": 1
+    }
+  ]
+}

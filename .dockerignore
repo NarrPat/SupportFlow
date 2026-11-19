@@ -1,0 +1,8 @@
+# Allow only inputs to the Python dev image. Keep host envs and secrets local.
+**
+!.python-version
+!pyproject.toml
+!uv.lock
+!tools/
+tools/**
+!tools/check_python_env.py

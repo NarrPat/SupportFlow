@@ -1,0 +1,59 @@
+name: sf-local
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16@sha256:c0cd736fe8b8b5d408db56b780570bac404fe518e66e39de624aa46f9aabc60a
+    platform: linux/amd64
+    environment:
+      POSTGRES_DB: postgres
+      SF_APP_DB: sf_app
+      SF_SANDBOX_DB: sf_sandbox
+      POSTGRES_USER: sf_bootstrap
+      POSTGRES_PASSWORD_FILE: /run/secrets/bootstrap_password
+      POSTGRES_INITDB_ARGS: --auth-local=scram-sha-256 --auth-host=scram-sha-256
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres-init.sql:/docker-entrypoint-initdb.d/10-supportflow.sql:ro
+      - ./check-postgres.sh:/opt/supportflow/check-postgres.sh:ro
+    secrets:
+      - bootstrap_password
+      - app_migrator_password
+      - sandbox_migrator_password
+      - app_runtime_password
+      - sandbox_runtime_password
+    healthcheck:
+      test: [CMD-SHELL, 'PGPASSWORD="$$(cat /run/secrets/app_runtime_password)" psql -X -h 127.0.0.1 -U sf_app_runtime -d "$$SF_APP_DB" -v ON_ERROR_STOP=1 -c "SELECT ''[1]''::vector" >/dev/null']
+      interval: 5s
+      timeout: 3s
+      retries: 15
+      start_period: 15s
+
+  redis:
+    image: redis:7-alpine@sha256:ec1c2d3603c3d7d65b153bedda0248b641aa3bd7684503406b27b9e870ac0796
+    platform: linux/amd64
+    command: [redis-server, --aclfile, /run/secrets/redis_acl, --appendonly, 'yes']
+    volumes:
+      - redisdata:/data
+    secrets: [redis_acl, redis_password]
+    healthcheck:
+      test: [CMD-SHELL, 'REDISCLI_AUTH="$$(cat /run/secrets/redis_password)" redis-cli ping | grep -qx PONG']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+networks:
+  default:
+    internal: true
+
+volumes:
+  pgdata: {}
+  redisdata: {}
+
+secrets:
+  bootstrap_password: {file: ./.secrets/bootstrap}
+  app_migrator_password: {file: ./.secrets/app_migrator}
+  app_runtime_password: {file: ./.secrets/app_runtime}
+  sandbox_migrator_password: {file: ./.secrets/sandbox_migrator}
+  sandbox_runtime_password: {file: ./.secrets/sandbox_runtime}
+  redis_password: {file: ./.secrets/redis_password}
+  redis_acl: {file: ./.secrets/redis.acl}

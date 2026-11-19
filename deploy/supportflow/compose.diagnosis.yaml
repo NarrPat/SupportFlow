@@ -1,0 +1,68 @@
+# Extend compose.worker for the bounded read-only diagnosis graph.
+services:
+  api:
+    environment:
+      SF_GRAPH_VERSION: readonly-diagnosis-v1
+  worker:
+    environment:
+      SF_SANDBOX_BASE_URL: http://sandbox:8001
+      SF_SANDBOX_TOKEN_FILE: /run/secrets/sandbox_service_token
+    volumes:
+      - ../../apps/supportflow/domain:/work/apps/supportflow/domain:ro
+      - ../../apps/supportflow/tools:/work/apps/supportflow/tools:ro
+    secrets: [sandbox_service_token]
+    depends_on:
+      sandbox: {condition: service_healthy}
+  sandbox:
+    image: sf-local-python-dev:env
+    pull_policy: never
+    platform: linux/amd64
+    working_dir: /work
+    read_only: true
+    tmpfs: [/tmp]
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PGHOST: postgres
+      PGDATABASE: ${SF_WEB_SANDBOX_DB:-sf_sandbox}
+      PGUSER: sf_sandbox_runtime
+      PGPASSWORD_FILE: /run/secrets/sandbox_runtime_password
+      SF_SANDBOX_TOKEN_FILE: /run/secrets/sandbox_service_token
+    volumes:
+      - ../../apps/supportflow/sandbox:/work/apps/supportflow/sandbox:ro
+      - ../../apps/supportflow/domain:/work/apps/supportflow/domain:ro
+      - ../../apps/supportflow/knowledge/documents:/work/apps/supportflow/knowledge/documents:ro
+    secrets: [sandbox_runtime_password, sandbox_service_token]
+    command: [python, -B, -m, uvicorn, apps.supportflow.sandbox.app:app, --host, "0.0.0.0", --port, "8001", --no-access-log]
+    healthcheck:
+      test: [CMD, python, -c, "from urllib.request import urlopen; assert urlopen('http://127.0.0.1:8001/health', timeout=2).status == 200"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  scanner:
+    environment:
+      SF_SANDBOX_BASE_URL: http://sandbox:8001
+      SF_SANDBOX_TOKEN_FILE: /run/secrets/sandbox_service_token
+    secrets: [sandbox_service_token]
+    depends_on:
+      sandbox: {condition: service_healthy}
+    volumes:
+      - ../../apps/supportflow/domain:/work/apps/supportflow/domain:ro
+      - ../../apps/supportflow/tools:/work/apps/supportflow/tools:ro
+  sandbox-setup:
+    profiles: [setup]
+    image: sf-local-python-dev:env
+    pull_policy: never
+    working_dir: /work
+    read_only: true
+    tmpfs: [/tmp]
+    environment:
+      PGHOST: postgres
+      PGDATABASE: ${SF_WEB_SANDBOX_DB:-sf_sandbox}
+    volumes:
+      - ../../apps/supportflow/db:/work/apps/supportflow/db:ro
+      - ../../apps/supportflow/domain:/work/apps/supportflow/domain:ro
+      - ../../evals/fixtures/supportflow/fx_base:/work/fixture:ro
+    secrets: [sandbox_migrator_password]
+    command: [sh, -ec, 'export PGPASSWORD="$$(cat /run/secrets/sandbox_migrator_password)"; python -B -m apps.supportflow.db.manage migrate --target sandbox; python -B -m apps.supportflow.db.manage seed --target sandbox --fixture /work/fixture/seed.json']
+secrets:
+  sandbox_service_token: {file: ./.secrets/sandbox_service_token}

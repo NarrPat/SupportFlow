@@ -1,0 +1,97 @@
+{
+  "fixture_id": "SF-FX-EVENT-UI",
+  "schema_version": 1,
+  "test_refs": ["SF-T097", "SF-T102", "COM-T033", "COM-T035", "COM-T043", "COM-T044", "COM-T045"],
+  "scope": "Independent deterministic client projection cases plus real browser subscription and invitation checks. These cases do not establish the full six-view UI, approval, business writes, RAG, notification subscribe-gap, or server connection-pool guarantees.",
+  "envelope": {
+    "required": ["schema_version", "run_id", "seq", "type", "status_version", "spec_version", "occurred_at", "payload"],
+    "supported_major": 1,
+    "spec_version": null,
+    "timestamp": "2026-11-07T00:00:00Z"
+  },
+  "base_snapshot": {"run_id": "run-ui-a", "thread_id": "thread-ui-a", "status": "running", "message": "只读核查", "version": 2, "last_event_seq": 2, "created_at": "2026-11-07T00:00:00Z", "reason_code": null, "result": null},
+  "projection_cases": [
+    {
+      "id": "same_run_sequence_duplicate_is_applied_once",
+      "events": [
+        {"run_id": "run-ui-a", "seq": 3, "type": "stage.changed", "status_version": 2, "payload": {"stage": "observe"}},
+        {"run_id": "run-ui-a", "seq": 3, "type": "stage.changed", "status_version": 2, "payload": {"stage": "duplicate-must-not-replace"}}
+      ],
+      "expected": {"cursor": 3, "version": 2, "status": "running", "event_seqs": [3], "recovery": null, "snapshot_required": false}
+    },
+    {
+      "id": "foreign_run_late_event_is_ignored",
+      "events": [{"run_id": "run-ui-b", "seq": 3, "type": "run.status_changed", "status_version": 99, "payload": {"status": "succeeded"}}],
+      "expected": {"cursor": 2, "version": 2, "status": "running", "event_seqs": [], "recovery": null, "snapshot_required": false}
+    },
+    {
+      "id": "lower_status_version_does_not_regress_state",
+      "events": [{"run_id": "run-ui-a", "seq": 3, "type": "run.status_changed", "status_version": 1, "payload": {"status": "queued"}}],
+      "expected": {"cursor": 3, "version": 2, "status": "running", "event_seqs": [3], "recovery": null, "snapshot_required": false}
+    },
+    {
+      "id": "new_status_requires_complete_server_snapshot",
+      "events": [{"run_id": "run-ui-a", "seq": 3, "type": "run.status_changed", "status_version": 3, "payload": {"status": "handoff", "reason_code": "EVIDENCE_REQUIRED"}}],
+      "expected": {"cursor": 3, "version": 3, "status": "handoff", "event_seqs": [3], "recovery": null, "snapshot_required": true}
+    },
+    {
+      "id": "sequence_gap_stops_before_unseen_events",
+      "events": [{"run_id": "run-ui-a", "seq": 4, "type": "run.status_changed", "status_version": 3, "payload": {"status": "succeeded"}}],
+      "expected": {"cursor": 2, "version": 2, "status": "running", "event_seqs": [], "recovery": "sequence_gap", "snapshot_required": true}
+    },
+    {
+      "id": "unknown_major_stops_without_applying_success",
+      "events": [{"schema_version": 2, "run_id": "run-ui-a", "seq": 3, "type": "run.status_changed", "status_version": 3, "payload": {"status": "succeeded"}}],
+      "expected": {"cursor": 2, "version": 2, "status": "running", "event_seqs": [], "recovery": "unsupported_schema", "snapshot_required": true}
+    },
+    {
+      "id": "unknown_spec_version_requires_snapshot",
+      "events": [{"spec_version": 1, "run_id": "run-ui-a", "seq": 3, "type": "stage.changed", "status_version": 2, "payload": {"stage": "observe"}}],
+      "expected": {"cursor": 2, "version": 2, "status": "running", "event_seqs": [], "recovery": "unsupported_spec", "snapshot_required": true}
+    },
+    {
+      "id": "stable_message_id_final_replaces_deltas",
+      "events": [
+        {"run_id": "run-ui-a", "seq": 3, "type": "message.delta", "status_version": 2, "payload": {"message_id": "reply-a", "delta": "客户"}},
+        {"run_id": "run-ui-a", "seq": 4, "type": "message.delta", "status_version": 2, "payload": {"message_id": "reply-a", "delta": "核查中"}},
+        {"run_id": "run-ui-a", "seq": 5, "type": "message.final", "status_version": 2, "payload": {"message_id": "reply-a", "text": "缺少排障证据，需要人工核查。"}},
+        {"run_id": "run-ui-a", "seq": 5, "type": "message.final", "status_version": 2, "payload": {"message_id": "reply-a", "text": "缺少排障证据，需要人工核查。"}},
+        {"run_id": "run-ui-a", "seq": 6, "type": "message.delta", "status_version": 2, "payload": {"message_id": "reply-a", "delta": "迟到增量不得拼接"}}
+      ],
+      "expected": {"cursor": 6, "version": 2, "status": "running", "event_seqs": [3, 4, 5, 6], "recovery": null, "snapshot_required": false, "messages": [{"message_id": "reply-a", "text": "缺少排障证据，需要人工核查。", "final": true}]}
+    },
+    {
+      "id": "late_snapshot_cannot_regress_version_or_cursor",
+      "events": [{"run_id": "run-ui-a", "seq": 3, "type": "run.status_changed", "status_version": 3, "payload": {"status": "handoff", "reason_code": "EVIDENCE_REQUIRED"}}],
+      "snapshot": {"run_id": "run-ui-a", "version": 2, "last_event_seq": 2, "status": "running"},
+      "expected": {"cursor": 3, "version": 3, "status": "handoff", "event_seqs": [3], "recovery": null, "snapshot_required": true}
+    },
+    {
+      "id": "foreign_snapshot_cannot_replace_current_run",
+      "events": [],
+      "snapshot": {"run_id": "run-ui-b", "version": 99, "last_event_seq": 99, "status": "succeeded"},
+      "expected": {"cursor": 2, "version": 2, "status": "running", "event_seqs": [], "recovery": null, "snapshot_required": false}
+    },
+    {
+      "id": "gap_snapshot_recovery_resumes_at_exact_snapshot_cursor",
+      "events": [{"run_id": "run-ui-a", "seq": 5, "type": "run.status_changed", "status_version": 3, "payload": {"status": "succeeded"}}],
+      "snapshot": {"run_id": "run-ui-a", "version": 3, "last_event_seq": 5, "status": "handoff", "reason_code": "EVIDENCE_REQUIRED"},
+      "after_snapshot_events": [{"run_id": "run-ui-a", "seq": 6, "type": "stage.changed", "status_version": 3, "payload": {"stage": "finished"}}],
+      "expected": {"cursor": 6, "version": 3, "status": "handoff", "event_seqs": [6], "recovery": null, "snapshot_required": false}
+    }
+  ],
+  "client_cases": [
+    {"id": "disconnect_reconnect_only_reads", "initial_cursor": 2, "expected_first_path": "/api/v1/runs/run-ui-a/events?after=2", "recovery_snapshot_cursor": 5, "expected_second_path": "/api/v1/runs/run-ui-a/events?after=5", "expected_post_count": 0, "expected_close_count": 2},
+    {"id": "dispose_closes_and_late_callbacks_are_ignored", "expected_post_count": 0, "expected_projection_callbacks_after_dispose": 0}
+  ],
+  "browser": {
+    "fixture_customer_id": "cus_a_01",
+    "deadline_seconds_per_run": 60,
+    "cases": [
+      {"id": "subscription_status", "message": "请只读查询当前客户的订阅状态和席位使用情况。", "expected_status": "succeeded", "expected_intent": "subscription_status", "expected_post_count": 1},
+      {"id": "invitation_diagnosis", "message": "请只读核查 member@example.com 的邀请失败原因，不要扩容或重新邀请。", "expected_status": "handoff", "expected_intent": "invitation_diagnosis", "expected_reason_code": "EVIDENCE_REQUIRED", "expected_post_count": 1}
+    ],
+    "assertions": ["Terminal result arrives over SSE with no refresh button click.", "Every visible timeline sequence is unique and belongs to the current run.", "Server history and visible timeline agree after paging finishes.", "Reload reads persisted facts and does not POST a run or cancel.", "A single stable message_id displays final text once.", "Subscription facts, invitation blockers and unknowns are compared to frozen sandbox fixtures.", "EVIDENCE_REQUIRED does not appear as a successful invitation diagnosis."],
+    "artifacts": ["diagnosis-browser.json", "diagnosis-subscription.png", "diagnosis-invitation.png", "diagnosis-failure.png"]
+  }
+}

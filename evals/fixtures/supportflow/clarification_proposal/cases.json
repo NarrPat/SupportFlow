@@ -1,0 +1,1673 @@
+{
+  "fixture_id": "SF-FX-CLARIFICATION-PROPOSAL",
+  "schema_version": 1,
+  "status": "design_only",
+  "reference_time": "2026-11-03T04:00:00Z",
+  "source_rules": [
+    "SF-D01",
+    "SF-D08",
+    "SF-D09",
+    "SF-D10",
+    "SF-D15",
+    "SF-D16",
+    "SF-D18",
+    "SF-F13",
+    "SF-F14",
+    "SF-F15",
+    "COM-F08"
+  ],
+  "scope": {
+    "business_data": "synthetic",
+    "generation_model": "scripted",
+    "quality_eligible": false,
+    "formal_quality_experiment": false,
+    "business_tasks_added": 0,
+    "current_graph_clarifies_only": [
+      "customer_id"
+    ],
+    "component_answer_fields": [
+      "customer_id",
+      "invitation_email",
+      "seats",
+      "days"
+    ],
+    "proposal_surface": "private server-side component; no public proposal mutation, decision or execution endpoint"
+  },
+  "clock_contract": {
+    "business_time": "2026-11-03T04:00:00Z",
+    "wait_ttl_seconds": 900,
+    "proposal_ttl_seconds": 900,
+    "valid_interval": "created_at <= now < expires_at",
+    "performance_time": "real UTC plus monotonic; advancing business time never creates elapsed wait milliseconds",
+    "waiting_union": "only persisted real waiting intervals are deducted; failed 429 leaves the current interval open"
+  },
+  "limits": {
+    "logical_queued": 10,
+    "active_reserved": 2,
+    "budget_ms": 90000,
+    "model_attempts": 8,
+    "tool_rounds": 6
+  },
+  "trusted_context": {
+    "tenant_id": "tenant_a",
+    "actor_id": "user_a_support",
+    "customer_id": "cus_a_01",
+    "subscription_id": "sub_a_01",
+    "allowed_customer_ids": [
+      "cus_a_01",
+      "cus_a_02"
+    ],
+    "foreign_customer_id": "cus_b_01",
+    "other_actor_id": "user_a_supervisor"
+  },
+  "request_contract": {
+    "method": "POST",
+    "path_template": "/api/v1/runs/{run_id}/clarifications",
+    "body_fields": [
+      "input_id",
+      "answers",
+      "expected_version",
+      "client_request_id"
+    ],
+    "answer_fields": [
+      "customer_id",
+      "invitation_email",
+      "seats",
+      "days"
+    ],
+    "expected_version_subject": "input.version",
+    "strict_integer_fields": [
+      "expected_version",
+      "seats",
+      "days"
+    ],
+    "expected_version_min": 1,
+    "seats_bounds": [
+      1,
+      20
+    ],
+    "days_bounds": [
+      1,
+      7
+    ],
+    "unknown_fields": "reject",
+    "answer_scope": "only fields listed in current input.required_fields; missing the sole required field is rejected",
+    "operation": "submit_clarification",
+    "key_scope": [
+      "app",
+      "tenant_id",
+      "actor_id",
+      "operation",
+      "client_request_id"
+    ],
+    "key_ascii_range": [
+      32,
+      126
+    ],
+    "key_length_bounds": [
+      1,
+      128
+    ],
+    "all_whitespace_key": "reject",
+    "header_alias": "Idempotency-Key; both sources must match exactly",
+    "ordering": [
+      "current authentication and CSRF",
+      "DTO validation and current object/customer scope",
+      "successful idempotency replay or conflicting hash",
+      "current waiting input and input.version",
+      "compatibility and waiting TTL",
+      "atomic queued admission and answer/resume commit"
+    ],
+    "canonical_fields": [
+      "schema_version",
+      "operation",
+      "run_id",
+      "input_id",
+      "expected_version",
+      "answers"
+    ],
+    "canonical_json": "{\"answers\":{\"customer_id\":\"cus_a_01\"},\"expected_version\":1,\"input_id\":\"input_clarification_a_1\",\"operation\":\"submit_clarification\",\"run_id\":\"run_clarification_a\",\"schema_version\":1}",
+    "canonical_sha256": "91475521ac1787f2f5ff0b44a39b518e04b1e93f0b93efbbbfd4f1ce3059a4f1",
+    "same_key_changed_visible_run_or_input": "409 IDEMPOTENCY_CONFLICT",
+    "replay_status": 202,
+    "accept_status": 202,
+    "response_fields": [
+      "run_id",
+      "status"
+    ],
+    "initial_accepted_status": "resume_queued",
+    "replay_status_value": "current status of the original run"
+  },
+  "proposal_contract": {
+    "intent": "grant_temporary_seats",
+    "action_type": "grant_temporary_seats",
+    "identity_unique": [
+      "run_id",
+      "proposal_seq"
+    ],
+    "proposal_seq_initial": 1,
+    "stable_fields": [
+      "proposal_id",
+      "action_id",
+      "proposal_seq",
+      "created_at",
+      "expires_at",
+      "canonical_args_hash"
+    ],
+    "canonical_fields": [
+      "schema_version",
+      "action_type",
+      "command_schema_version",
+      "tenant_id",
+      "customer_id",
+      "subscription_id",
+      "seats",
+      "days",
+      "policy_version",
+      "business_version",
+      "created_at",
+      "expires_at"
+    ],
+    "canonical_example": {
+      "schema_version": 1,
+      "action_type": "grant_temporary_seats",
+      "command_schema_version": 1,
+      "tenant_id": "tenant_a",
+      "customer_id": "cus_a_01",
+      "subscription_id": "sub_a_01",
+      "seats": 10,
+      "days": 3,
+      "policy_version": "v1",
+      "business_version": 7,
+      "created_at": "2026-11-03T04:00:00Z",
+      "expires_at": "2026-11-03T04:15:00Z"
+    },
+    "canonical_json": "{\"action_type\":\"grant_temporary_seats\",\"business_version\":7,\"command_schema_version\":1,\"created_at\":\"2026-11-03T04:00:00Z\",\"customer_id\":\"cus_a_01\",\"days\":3,\"expires_at\":\"2026-11-03T04:15:00Z\",\"policy_version\":\"v1\",\"schema_version\":1,\"seats\":10,\"subscription_id\":\"sub_a_01\",\"tenant_id\":\"tenant_a\"}",
+    "canonical_sha256": "c4ff8ae5c577c7413b2fcbaf4e5efced9d766c27c1e50602b9b0af852c4ffc34",
+    "canonical_encoding": "UTF-8 JSON; sorted keys; ensure_ascii=False; compact comma/colon; allow_nan=False",
+    "time_encoding": "UTC RFC3339 with Z; omit fraction if zero, otherwise exactly six microsecond digits",
+    "times_source": "trusted server business clock once at creation; replay never recomputes times",
+    "excluded_hash_fields": [
+      "proposal_id",
+      "action_id",
+      "approval_id",
+      "run_id",
+      "proposal_seq",
+      "client_request_id",
+      "cookie",
+      "trace_id"
+    ],
+    "trusted_bindings": [
+      "tenant_id",
+      "customer_id",
+      "subscription_id",
+      "policy_version",
+      "business_version"
+    ],
+    "proposal_state": "immutable",
+    "approval_initial_decision": "pending",
+    "sandbox_effects": 0,
+    "business_before": {
+      "subscription_id": "sub_a_01",
+      "base_seats": 100,
+      "used_seats": 100,
+      "temporary_seats": 0,
+      "temporary_expires_at": null,
+      "plan_status": "active",
+      "business_version": 7
+    },
+    "policy_preconditions": [
+      "explicit confirmed grant intent",
+      "current customer scope and active subscription",
+      "confirmed capacity shortage with no other unresolved blocker",
+      "current approved policy section hash and structural constants",
+      "current business version and trustworthy grant history",
+      "strict candidate seats/days"
+    ]
+  },
+  "unit_cases": {
+    "canonical_proposal": {
+      "test_ids": [
+        "SF-T061"
+      ],
+      "input": {
+        "schema_version": 1,
+        "action_type": "grant_temporary_seats",
+        "command_schema_version": 1,
+        "tenant_id": "tenant_a",
+        "customer_id": "cus_a_01",
+        "subscription_id": "sub_a_01",
+        "seats": 10,
+        "days": 3,
+        "policy_version": "v1",
+        "business_version": 7,
+        "created_at": "2026-11-03T04:00:00Z",
+        "expires_at": "2026-11-03T04:15:00Z"
+      },
+      "equivalent_inputs": [
+        {
+          "expires_at": "2026-11-03T04:15:00Z",
+          "created_at": "2026-11-03T04:00:00Z",
+          "business_version": 7,
+          "policy_version": "v1",
+          "days": 3,
+          "seats": 10,
+          "subscription_id": "sub_a_01",
+          "customer_id": "cus_a_01",
+          "tenant_id": "tenant_a",
+          "command_schema_version": 1,
+          "action_type": "grant_temporary_seats",
+          "schema_version": 1
+        },
+        {
+          "schema_version": 1,
+          "action_type": "grant_temporary_seats",
+          "command_schema_version": 1,
+          "tenant_id": "tenant_a",
+          "customer_id": "cus_a_01",
+          "subscription_id": "sub_a_01",
+          "seats": 10,
+          "days": 3,
+          "policy_version": "v1",
+          "business_version": 7,
+          "created_at": "2026-11-03T12:00:00+08:00",
+          "expires_at": "2026-11-03T12:15:00+08:00"
+        }
+      ],
+      "expected": {
+        "accepted": true,
+        "canonical_json": "{\"action_type\":\"grant_temporary_seats\",\"business_version\":7,\"command_schema_version\":1,\"created_at\":\"2026-11-03T04:00:00Z\",\"customer_id\":\"cus_a_01\",\"days\":3,\"expires_at\":\"2026-11-03T04:15:00Z\",\"policy_version\":\"v1\",\"schema_version\":1,\"seats\":10,\"subscription_id\":\"sub_a_01\",\"tenant_id\":\"tenant_a\"}",
+        "sha256": "c4ff8ae5c577c7413b2fcbaf4e5efced9d766c27c1e50602b9b0af852c4ffc34",
+        "expires_at": "2026-11-03T04:15:00Z"
+      }
+    },
+    "canonical_clarification": {
+      "test_ids": [
+        "SF-T059",
+        "COM-T031"
+      ],
+      "input": {
+        "schema_version": 1,
+        "operation": "submit_clarification",
+        "run_id": "run_clarification_a",
+        "input_id": "input_clarification_a_1",
+        "expected_version": 1,
+        "answers": {
+          "customer_id": "cus_a_01"
+        }
+      },
+      "equivalent_inputs": [
+        {
+          "answers": {
+            "customer_id": "cus_a_01"
+          },
+          "expected_version": 1,
+          "input_id": "input_clarification_a_1",
+          "run_id": "run_clarification_a",
+          "operation": "submit_clarification",
+          "schema_version": 1
+        }
+      ],
+      "expected": {
+        "accepted": true,
+        "canonical_json": "{\"answers\":{\"customer_id\":\"cus_a_01\"},\"expected_version\":1,\"input_id\":\"input_clarification_a_1\",\"operation\":\"submit_clarification\",\"run_id\":\"run_clarification_a\",\"schema_version\":1}",
+        "sha256": "91475521ac1787f2f5ff0b44a39b518e04b1e93f0b93efbbbfd4f1ce3059a4f1"
+      }
+    },
+    "canonical_binding": {
+      "test_ids": [
+        "SF-T061",
+        "SF-T063"
+      ],
+      "input": {
+        "schema_version": 1,
+        "action_type": "grant_temporary_seats",
+        "command_schema_version": 1,
+        "tenant_id": "tenant_a",
+        "customer_id": "cus_a_01",
+        "subscription_id": "sub_a_01",
+        "seats": 10,
+        "days": 3,
+        "policy_version": "v1",
+        "business_version": 7,
+        "created_at": "2026-11-03T04:00:00Z",
+        "expires_at": "2026-11-03T04:15:00Z"
+      },
+      "variants": [
+        {
+          "field": "seats",
+          "value": 11,
+          "canonical_json": "{\"action_type\":\"grant_temporary_seats\",\"business_version\":7,\"command_schema_version\":1,\"created_at\":\"2026-11-03T04:00:00Z\",\"customer_id\":\"cus_a_01\",\"days\":3,\"expires_at\":\"2026-11-03T04:15:00Z\",\"policy_version\":\"v1\",\"schema_version\":1,\"seats\":11,\"subscription_id\":\"sub_a_01\",\"tenant_id\":\"tenant_a\"}",
+          "sha256": "3d621bdf3a7b7dc64fd50c8652bdd1969d6a5b4129dd6080c20810cff63fd356"
+        },
+        {
+          "field": "days",
+          "value": 4,
+          "canonical_json": "{\"action_type\":\"grant_temporary_seats\",\"business_version\":7,\"command_schema_version\":1,\"created_at\":\"2026-11-03T04:00:00Z\",\"customer_id\":\"cus_a_01\",\"days\":4,\"expires_at\":\"2026-11-03T04:15:00Z\",\"policy_version\":\"v1\",\"schema_version\":1,\"seats\":10,\"subscription_id\":\"sub_a_01\",\"tenant_id\":\"tenant_a\"}",
+          "sha256": "ce32f8dab4a6122c888ae734f6fdc38363b6f54c45b8dcc6d5e358c694114b39"
+        },
+        {
+          "field": "customer_id",
+          "value": "cus_a_02",
+          "canonical_json": "{\"action_type\":\"grant_temporary_seats\",\"business_version\":7,\"command_schema_version\":1,\"created_at\":\"2026-11-03T04:00:00Z\",\"customer_id\":\"cus_a_02\",\"days\":3,\"expires_at\":\"2026-11-03T04:15:00Z\",\"policy_version\":\"v1\",\"schema_version\":1,\"seats\":10,\"subscription_id\":\"sub_a_01\",\"tenant_id\":\"tenant_a\"}",
+          "sha256": "79f487499b687f7d9450ab58f263eed331b2c95fb0ffb3382ff8a148e6c69fd6"
+        },
+        {
+          "field": "subscription_id",
+          "value": "sub_a_02",
+          "canonical_json": "{\"action_type\":\"grant_temporary_seats\",\"business_version\":7,\"command_schema_version\":1,\"created_at\":\"2026-11-03T04:00:00Z\",\"customer_id\":\"cus_a_01\",\"days\":3,\"expires_at\":\"2026-11-03T04:15:00Z\",\"policy_version\":\"v1\",\"schema_version\":1,\"seats\":10,\"subscription_id\":\"sub_a_02\",\"tenant_id\":\"tenant_a\"}",
+          "sha256": "575bbef5aab676cc61fe967cf0811cad71557291130932243a232c26485d63ee"
+        },
+        {
+          "field": "tenant_id",
+          "value": "tenant_b",
+          "canonical_json": "{\"action_type\":\"grant_temporary_seats\",\"business_version\":7,\"command_schema_version\":1,\"created_at\":\"2026-11-03T04:00:00Z\",\"customer_id\":\"cus_a_01\",\"days\":3,\"expires_at\":\"2026-11-03T04:15:00Z\",\"policy_version\":\"v1\",\"schema_version\":1,\"seats\":10,\"subscription_id\":\"sub_a_01\",\"tenant_id\":\"tenant_b\"}",
+          "sha256": "1e05314c4a8b4f0ecca0dcb6e4d7b1dc540078803e5117308beeedc2315519b1"
+        },
+        {
+          "field": "policy_version",
+          "value": "v2",
+          "canonical_json": "{\"action_type\":\"grant_temporary_seats\",\"business_version\":7,\"command_schema_version\":1,\"created_at\":\"2026-11-03T04:00:00Z\",\"customer_id\":\"cus_a_01\",\"days\":3,\"expires_at\":\"2026-11-03T04:15:00Z\",\"policy_version\":\"v2\",\"schema_version\":1,\"seats\":10,\"subscription_id\":\"sub_a_01\",\"tenant_id\":\"tenant_a\"}",
+          "sha256": "857861da63ac43d33ea67e050a1622e10bdd661872bc0fe9836bc3df89c702fd"
+        },
+        {
+          "field": "business_version",
+          "value": 8,
+          "canonical_json": "{\"action_type\":\"grant_temporary_seats\",\"business_version\":8,\"command_schema_version\":1,\"created_at\":\"2026-11-03T04:00:00Z\",\"customer_id\":\"cus_a_01\",\"days\":3,\"expires_at\":\"2026-11-03T04:15:00Z\",\"policy_version\":\"v1\",\"schema_version\":1,\"seats\":10,\"subscription_id\":\"sub_a_01\",\"tenant_id\":\"tenant_a\"}",
+          "sha256": "2b26dec3588156a37adc61e856b828785e9e529da83f1ce0876215aaa71ec09a"
+        },
+        {
+          "field": "created_at",
+          "value": "2026-11-03T04:00:01Z",
+          "canonical_json": "{\"action_type\":\"grant_temporary_seats\",\"business_version\":7,\"command_schema_version\":1,\"created_at\":\"2026-11-03T04:00:01Z\",\"customer_id\":\"cus_a_01\",\"days\":3,\"expires_at\":\"2026-11-03T04:15:00Z\",\"policy_version\":\"v1\",\"schema_version\":1,\"seats\":10,\"subscription_id\":\"sub_a_01\",\"tenant_id\":\"tenant_a\"}",
+          "sha256": "bc5f4fc8a9b316c3c6bcbc32e4853f492360d7a277f76c8c6541c97d4ec0c86b"
+        },
+        {
+          "field": "expires_at",
+          "value": "2026-11-03T04:15:01Z",
+          "canonical_json": "{\"action_type\":\"grant_temporary_seats\",\"business_version\":7,\"command_schema_version\":1,\"created_at\":\"2026-11-03T04:00:00Z\",\"customer_id\":\"cus_a_01\",\"days\":3,\"expires_at\":\"2026-11-03T04:15:01Z\",\"policy_version\":\"v1\",\"schema_version\":1,\"seats\":10,\"subscription_id\":\"sub_a_01\",\"tenant_id\":\"tenant_a\"}",
+          "sha256": "a2c75cad82d30e3184620e9bdd343e729c5b82cdb2e19acd6e8281ded5799e31"
+        },
+        {
+          "field": "action_type",
+          "value": "other_action",
+          "canonical_json": "{\"action_type\":\"other_action\",\"business_version\":7,\"command_schema_version\":1,\"created_at\":\"2026-11-03T04:00:00Z\",\"customer_id\":\"cus_a_01\",\"days\":3,\"expires_at\":\"2026-11-03T04:15:00Z\",\"policy_version\":\"v1\",\"schema_version\":1,\"seats\":10,\"subscription_id\":\"sub_a_01\",\"tenant_id\":\"tenant_a\"}",
+          "sha256": "ff3431182ed318b9c484ea1b7176c1e8636ef9c04c74ba2a6e34fabc1af11f73"
+        },
+        {
+          "field": "command_schema_version",
+          "value": 2,
+          "canonical_json": "{\"action_type\":\"grant_temporary_seats\",\"business_version\":7,\"command_schema_version\":2,\"created_at\":\"2026-11-03T04:00:00Z\",\"customer_id\":\"cus_a_01\",\"days\":3,\"expires_at\":\"2026-11-03T04:15:00Z\",\"policy_version\":\"v1\",\"schema_version\":1,\"seats\":10,\"subscription_id\":\"sub_a_01\",\"tenant_id\":\"tenant_a\"}",
+          "sha256": "36ce2b8f144d720fa0b2a956fc7a2169285ea0eb8a382bb53b2ec220d3545d13"
+        },
+        {
+          "field": "schema_version",
+          "value": 2,
+          "canonical_json": "{\"action_type\":\"grant_temporary_seats\",\"business_version\":7,\"command_schema_version\":1,\"created_at\":\"2026-11-03T04:00:00Z\",\"customer_id\":\"cus_a_01\",\"days\":3,\"expires_at\":\"2026-11-03T04:15:00Z\",\"policy_version\":\"v1\",\"schema_version\":2,\"seats\":10,\"subscription_id\":\"sub_a_01\",\"tenant_id\":\"tenant_a\"}",
+          "sha256": "28665994e65233a099404ce21b840e87ac42d5b282e887295ce53a961df7a5eb"
+        }
+      ],
+      "expected": {
+        "each_field_hash_changes": true,
+        "unknown_action_and_schema_execution": "not authorized; canonical binding test is not execution acceptance"
+      }
+    },
+    "strict_action_parameters": {
+      "test_ids": [
+        "SF-T062"
+      ],
+      "valid": [
+        {
+          "seats": 1,
+          "days": 1
+        },
+        {
+          "seats": 20,
+          "days": 7
+        },
+        {
+          "seats": 10,
+          "days": 3
+        }
+      ],
+      "invalid": [
+        {
+          "id": "seats_0",
+          "field": "seats",
+          "value": true,
+          "expected_error": "VALIDATION"
+        },
+        {
+          "id": "seats_1",
+          "field": "seats",
+          "value": false,
+          "expected_error": "VALIDATION"
+        },
+        {
+          "id": "seats_2",
+          "field": "seats",
+          "value": 0,
+          "expected_error": "VALIDATION"
+        },
+        {
+          "id": "seats_3",
+          "field": "seats",
+          "value": -1,
+          "expected_error": "VALIDATION"
+        },
+        {
+          "id": "seats_4",
+          "field": "seats",
+          "value": 21,
+          "expected_error": "VALIDATION"
+        },
+        {
+          "id": "seats_5",
+          "field": "seats",
+          "value": 1.0,
+          "expected_error": "VALIDATION"
+        },
+        {
+          "id": "seats_6",
+          "field": "seats",
+          "value": 7.0,
+          "expected_error": "VALIDATION"
+        },
+        {
+          "id": "seats_7",
+          "field": "seats",
+          "value": 1.5,
+          "expected_error": "VALIDATION"
+        },
+        {
+          "id": "seats_8",
+          "field": "seats",
+          "value": "10",
+          "expected_error": "VALIDATION"
+        },
+        {
+          "id": "seats_9",
+          "field": "seats",
+          "value": null,
+          "expected_error": "VALIDATION"
+        },
+        {
+          "id": "seats_10",
+          "field": "seats",
+          "value": [],
+          "expected_error": "VALIDATION"
+        },
+        {
+          "id": "seats_11",
+          "field": "seats",
+          "value": {},
+          "expected_error": "VALIDATION"
+        },
+        {
+          "id": "days_0",
+          "field": "days",
+          "value": true,
+          "expected_error": "VALIDATION"
+        },
+        {
+          "id": "days_1",
+          "field": "days",
+          "value": false,
+          "expected_error": "VALIDATION"
+        },
+        {
+          "id": "days_2",
+          "field": "days",
+          "value": 0,
+          "expected_error": "VALIDATION"
+        },
+        {
+          "id": "days_3",
+          "field": "days",
+          "value": -1,
+          "expected_error": "VALIDATION"
+        },
+        {
+          "id": "days_4",
+          "field": "days",
+          "value": 8,
+          "expected_error": "VALIDATION"
+        },
+        {
+          "id": "days_5",
+          "field": "days",
+          "value": 1.0,
+          "expected_error": "VALIDATION"
+        },
+        {
+          "id": "days_6",
+          "field": "days",
+          "value": 7.0,
+          "expected_error": "VALIDATION"
+        },
+        {
+          "id": "days_7",
+          "field": "days",
+          "value": 1.5,
+          "expected_error": "VALIDATION"
+        },
+        {
+          "id": "days_8",
+          "field": "days",
+          "value": "3",
+          "expected_error": "VALIDATION"
+        },
+        {
+          "id": "days_9",
+          "field": "days",
+          "value": null,
+          "expected_error": "VALIDATION"
+        },
+        {
+          "id": "days_10",
+          "field": "days",
+          "value": [],
+          "expected_error": "VALIDATION"
+        },
+        {
+          "id": "days_11",
+          "field": "days",
+          "value": {},
+          "expected_error": "VALIDATION"
+        }
+      ],
+      "expected": {
+        "invalid_creates_proposal": 0,
+        "invalid_creates_action": 0
+      }
+    },
+    "strict_answers": {
+      "test_ids": [
+        "SF-T058"
+      ],
+      "valid": [
+        {
+          "required_fields": [
+            "customer_id"
+          ],
+          "answers": {
+            "customer_id": "cus_a_01"
+          }
+        },
+        {
+          "required_fields": [
+            "invitation_email"
+          ],
+          "answers": {
+            "invitation_email": "member@example.com"
+          }
+        },
+        {
+          "required_fields": [
+            "seats"
+          ],
+          "answers": {
+            "seats": 10
+          }
+        },
+        {
+          "required_fields": [
+            "days"
+          ],
+          "answers": {
+            "days": 3
+          }
+        }
+      ],
+      "invalid": [
+        {
+          "id": "unknown_answer_key",
+          "required_fields": [
+            "customer_id"
+          ],
+          "answers": {
+            "customer_id": "cus_a_01",
+            "tenant_id": "tenant_b"
+          }
+        },
+        {
+          "id": "unexpected_known_field",
+          "required_fields": [
+            "customer_id"
+          ],
+          "answers": {
+            "customer_id": "cus_a_01",
+            "seats": 10
+          }
+        },
+        {
+          "id": "empty_answers",
+          "required_fields": [
+            "customer_id"
+          ],
+          "answers": {}
+        },
+        {
+          "id": "customer_bool",
+          "required_fields": [
+            "customer_id"
+          ],
+          "answers": {
+            "customer_id": true
+          }
+        },
+        {
+          "id": "customer_number",
+          "required_fields": [
+            "customer_id"
+          ],
+          "answers": {
+            "customer_id": 1
+          }
+        },
+        {
+          "id": "customer_empty",
+          "required_fields": [
+            "customer_id"
+          ],
+          "answers": {
+            "customer_id": ""
+          }
+        },
+        {
+          "id": "email_bool",
+          "required_fields": [
+            "invitation_email"
+          ],
+          "answers": {
+            "invitation_email": true
+          }
+        },
+        {
+          "id": "email_invalid",
+          "required_fields": [
+            "invitation_email"
+          ],
+          "answers": {
+            "invitation_email": "not-an-email"
+          }
+        },
+        {
+          "id": "seats_bool_True",
+          "required_fields": [
+            "seats"
+          ],
+          "answers": {
+            "seats": true
+          }
+        },
+        {
+          "id": "seats_float_1.0",
+          "required_fields": [
+            "seats"
+          ],
+          "answers": {
+            "seats": 1.0
+          }
+        },
+        {
+          "id": "seats_str_1",
+          "required_fields": [
+            "seats"
+          ],
+          "answers": {
+            "seats": "1"
+          }
+        },
+        {
+          "id": "seats_int_0",
+          "required_fields": [
+            "seats"
+          ],
+          "answers": {
+            "seats": 0
+          }
+        },
+        {
+          "id": "days_bool_True",
+          "required_fields": [
+            "days"
+          ],
+          "answers": {
+            "days": true
+          }
+        },
+        {
+          "id": "days_float_1.0",
+          "required_fields": [
+            "days"
+          ],
+          "answers": {
+            "days": 1.0
+          }
+        },
+        {
+          "id": "days_str_1",
+          "required_fields": [
+            "days"
+          ],
+          "answers": {
+            "days": "1"
+          }
+        },
+        {
+          "id": "days_int_0",
+          "required_fields": [
+            "days"
+          ],
+          "answers": {
+            "days": 0
+          }
+        }
+      ],
+      "expected_error": "VALIDATION"
+    },
+    "request_version_validation": {
+      "test_ids": [
+        "SF-T058",
+        "SF-T059"
+      ],
+      "valid": [
+        1,
+        2
+      ],
+      "invalid": [
+        true,
+        false,
+        0,
+        -1,
+        1.0,
+        "1",
+        null
+      ],
+      "expected_error": "VALIDATION"
+    },
+    "request_key_validation": {
+      "test_ids": [
+        "SF-T058"
+      ],
+      "valid": [
+        "k",
+        "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "  visible  "
+      ],
+      "invalid": [
+        "",
+        "    ",
+        "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "non-ascii-é",
+        "tab\tkey",
+        "line\nkey",
+        ""
+      ],
+      "header_alias_cases": [
+        {
+          "body": "k",
+          "header": "k",
+          "accepted": true
+        },
+        {
+          "body": null,
+          "header": "k",
+          "accepted": true
+        },
+        {
+          "body": "k",
+          "header": "different",
+          "accepted": false
+        }
+      ]
+    }
+  },
+  "runtime_cases": {
+    "clarification_wait": {
+      "test_ids": [
+        "SF-T057",
+        "COM-T029"
+      ],
+      "kind": "graph",
+      "planned_status": "not_run",
+      "phases": [
+        "before",
+        "waiting"
+      ],
+      "expected": {
+        "status": "awaiting_input",
+        "input_count_delta": 1,
+        "input_status": "pending",
+        "input_version": 1,
+        "required_fields": [
+          "customer_id"
+        ],
+        "admission_state": "none",
+        "active_delta": -1,
+        "queued_delta": 0,
+        "clarification_required_events": 1,
+        "pending_checkpoint": "same input id",
+        "new_proposals": 0,
+        "sandbox_writes": 0
+      }
+    },
+    "authorized_answer": {
+      "test_ids": [
+        "SF-T057",
+        "COM-T030"
+      ],
+      "kind": "resume",
+      "planned_status": "not_run",
+      "phases": [
+        "waiting",
+        "accepted",
+        "after"
+      ],
+      "expected": {
+        "http_statuses": [
+          202
+        ],
+        "same_run_id": true,
+        "accepted_status": "resume_queued",
+        "input_status": "answered",
+        "input_version_delta": 1,
+        "generation_delta": 1,
+        "queued_delta_at_accept": 1,
+        "active_delta_at_accept": 0,
+        "resume_outbox_delta": 1,
+        "success_key_delta": 1,
+        "confirmed_answers": {
+          "customer_id": "cus_a_01"
+        },
+        "budget_origin_unchanged": true,
+        "config_snapshot_unchanged": true,
+        "sandbox_writes": 0
+      }
+    },
+    "invalid_answer": {
+      "test_ids": [
+        "SF-T058"
+      ],
+      "kind": "http_variants",
+      "planned_status": "not_run",
+      "phases": [
+        "waiting",
+        "after"
+      ],
+      "expected": {
+        "http_status": 422,
+        "input_run_keys_outbox_limits_unchanged": true,
+        "sandbox_writes": 0
+      },
+      "variant_source": "unit_cases.strict_answers.invalid"
+    },
+    "foreign_customer": {
+      "test_ids": [
+        "SF-T058"
+      ],
+      "kind": "authorization",
+      "planned_status": "not_run",
+      "phases": [
+        "waiting",
+        "after"
+      ],
+      "expected": {
+        "http_statuses": [
+          404
+        ],
+        "answers": {
+          "customer_id": "cus_b_01"
+        },
+        "input_run_keys_outbox_limits_unchanged": true,
+        "foreign_resource_not_disclosed": true
+      }
+    },
+    "revoked_scope_replay": {
+      "test_ids": [
+        "SF-T059",
+        "COM-T031"
+      ],
+      "kind": "authorization",
+      "planned_status": "not_run",
+      "phases": [
+        "accepted",
+        "revoked",
+        "after"
+      ],
+      "expected": {
+        "http_statuses": [
+          404
+        ],
+        "original_key_replay_after_revocation": true,
+        "no_new_state_events_or_dispatch": true,
+        "response_contains_original_run_details": false
+      }
+    },
+    "same_key_replay": {
+      "test_ids": [
+        "SF-T059",
+        "COM-T031"
+      ],
+      "kind": "idempotency",
+      "planned_status": "not_run",
+      "phases": [
+        "waiting",
+        "accepted",
+        "after"
+      ],
+      "expected": {
+        "http_statuses": [
+          202,
+          202
+        ],
+        "same_run_id": true,
+        "old_expected_version_allowed_for_original_success": true,
+        "generation_delta_total": 1,
+        "resume_outbox_delta_total": 1,
+        "answer_merge_count": 1,
+        "success_key_delta_total": 1
+      }
+    },
+    "same_key_other_answer": {
+      "test_ids": [
+        "SF-T059"
+      ],
+      "kind": "idempotency",
+      "planned_status": "not_run",
+      "phases": [
+        "accepted",
+        "after"
+      ],
+      "expected": {
+        "http_statuses": [
+          409
+        ],
+        "error_code": "IDEMPOTENCY_CONFLICT",
+        "changed_answer": {
+          "customer_id": "cus_a_02"
+        },
+        "no_new_state_events_or_dispatch": true
+      }
+    },
+    "same_key_other_visible_input": {
+      "test_ids": [
+        "SF-T059"
+      ],
+      "kind": "idempotency",
+      "planned_status": "not_run",
+      "phases": [
+        "accepted",
+        "after"
+      ],
+      "expected": {
+        "http_statuses": [
+          409
+        ],
+        "error_code": "IDEMPOTENCY_CONFLICT",
+        "same_actor_other_visible_run_input": true,
+        "no_new_state_events_or_dispatch": true
+      }
+    },
+    "stale_input_version": {
+      "test_ids": [
+        "SF-T059"
+      ],
+      "kind": "version",
+      "planned_status": "not_run",
+      "phases": [
+        "waiting",
+        "after"
+      ],
+      "expected": {
+        "http_statuses": [
+          409
+        ],
+        "request_uses_new_key": true,
+        "actual_submitted_expected_version": 1,
+        "current_input_version": 2,
+        "no_new_state_events_or_dispatch": true
+      }
+    },
+    "concurrent_same_answer": {
+      "test_ids": [
+        "SF-T059",
+        "COM-T031"
+      ],
+      "kind": "concurrency",
+      "planned_status": "not_run",
+      "phases": [
+        "waiting",
+        "after"
+      ],
+      "expected": {
+        "clients": 8,
+        "api_processes": 2,
+        "http_statuses": [
+          202,
+          202,
+          202,
+          202,
+          202,
+          202,
+          202,
+          202
+        ],
+        "unique_run_ids": 1,
+        "generation_delta": 1,
+        "resume_outbox_delta": 1,
+        "success_key_delta": 1,
+        "answer_merge_count": 1
+      },
+      "repetitions": 3
+    },
+    "queue_full_then_retry": {
+      "test_ids": [
+        "SF-T060",
+        "COM-T019"
+      ],
+      "kind": "admission",
+      "planned_status": "not_run",
+      "phases": [
+        "waiting",
+        "rejected",
+        "capacity_released",
+        "accepted"
+      ],
+      "expected": {
+        "initial_active_reserved": 2,
+        "initial_logical_queued": 10,
+        "http_statuses": [
+          429,
+          202
+        ],
+        "rejected_preserves_input_run_wait_key_outbox": true,
+        "rejected_caches_key": false,
+        "accepted_generation_delta": 1,
+        "accepted_resume_outbox_delta": 1,
+        "accepted_success_key_delta": 1,
+        "accepted_logical_queued": 10,
+        "accepted_active_reserved": 2
+      }
+    },
+    "cancel_waiting_when_full": {
+      "test_ids": [
+        "COM-T019"
+      ],
+      "kind": "control",
+      "planned_status": "not_run",
+      "phases": [
+        "waiting",
+        "after"
+      ],
+      "expected": {
+        "initial_logical_queued": 10,
+        "http_statuses": [
+          200
+        ],
+        "status": "cancelled",
+        "resume_outbox_delta": 0,
+        "model_attempt_delta": 0,
+        "queued_delta": 0,
+        "active_delta": 0,
+        "sandbox_writes": 0
+      }
+    },
+    "expiry_equal": {
+      "test_ids": [
+        "COM-T031"
+      ],
+      "kind": "ttl",
+      "planned_status": "not_run",
+      "phases": [
+        "waiting",
+        "after"
+      ],
+      "expected": {
+        "request_business_time": "2026-11-03T04:15:00Z",
+        "http_statuses": [
+          409
+        ],
+        "status": "expired",
+        "input_status": "expired",
+        "resume_outbox_delta": 0,
+        "success_key_delta": 0,
+        "admission_state": "none",
+        "model_attempt_delta": 0,
+        "same_key_previous_success": "covered separately; this is an unanswered input"
+      }
+    },
+    "incompatible_resume": {
+      "test_ids": [
+        "COM-T032"
+      ],
+      "kind": "compatibility",
+      "planned_status": "not_run",
+      "phases": [
+        "waiting",
+        "after"
+      ],
+      "expected": {
+        "http_statuses": [
+          409
+        ],
+        "error_code": "CONFIG_VERSION_UNSUPPORTED",
+        "status": "handoff",
+        "reason_code": "CONFIG_VERSION_UNSUPPORTED",
+        "checkpoint_content_hash_unchanged": true,
+        "resume_outbox_delta": 0,
+        "success_key_delta": 0,
+        "model_attempt_delta": 0,
+        "sandbox_writes": 0
+      }
+    },
+    "resume_commit_rollback": {
+      "test_ids": [
+        "COM-T030"
+      ],
+      "kind": "fault",
+      "planned_status": "not_run",
+      "phases": [
+        "waiting",
+        "fault",
+        "after"
+      ],
+      "expected": {
+        "http_statuses": [
+          503
+        ],
+        "all_acceptance_columns_unchanged": true,
+        "retry_same_key_http_status": 202
+      },
+      "fault_point": "before_resume_commit",
+      "repetitions": 3
+    },
+    "resume_committed_response_lost": {
+      "test_ids": [
+        "COM-T030"
+      ],
+      "kind": "fault",
+      "planned_status": "not_run",
+      "phases": [
+        "waiting",
+        "fault",
+        "after"
+      ],
+      "expected": {
+        "client_received_response": false,
+        "upstream_status": 202,
+        "retry_same_key_http_status": 202,
+        "total_resume_outbox_delta": 1,
+        "total_generation_delta": 1
+      },
+      "fault_point": "after_resume_commit_before_response",
+      "repetitions": 3
+    },
+    "resume_committed_publish_gap": {
+      "test_ids": [
+        "COM-T030"
+      ],
+      "kind": "fault",
+      "planned_status": "not_run",
+      "phases": [
+        "waiting",
+        "fault",
+        "after"
+      ],
+      "expected": {
+        "http_statuses": [
+          202
+        ],
+        "accepted_status": "resume_queued",
+        "outbox_persisted": true,
+        "eventual_same_run_resumed_once": true
+      },
+      "fault_point": "after_resume_commit_before_publish",
+      "repetitions": 3
+    },
+    "input_before_checkpoint": {
+      "test_ids": [
+        "COM-T024",
+        "COM-T029",
+        "SF-T057"
+      ],
+      "kind": "checkpoint_fault",
+      "planned_status": "not_run",
+      "phases": [
+        "before",
+        "fault",
+        "recovered",
+        "rescanned"
+      ],
+      "expected": {
+        "pending_kind": "input",
+        "stable_pending_id": true,
+        "stable_action_id": false,
+        "waiting_status": "awaiting_input",
+        "one_pending_object": true,
+        "new_resume_outbox": 0,
+        "waiting_projection_has_real_interrupt": true,
+        "active_released_exactly_once": true,
+        "generation_after_interrupt_unchanged": false,
+        "model_calls_after_saved_interrupt": 0,
+        "no_scan_after_stable_waiting_change": true,
+        "sandbox_writes": 0
+      },
+      "fault_point": "before_checkpoint_commit",
+      "repetitions": 3
+    },
+    "input_checkpoint_gap": {
+      "test_ids": [
+        "COM-T024",
+        "COM-T029",
+        "SF-T057"
+      ],
+      "kind": "checkpoint_fault",
+      "planned_status": "not_run",
+      "phases": [
+        "before",
+        "fault",
+        "recovered",
+        "rescanned"
+      ],
+      "expected": {
+        "pending_kind": "input",
+        "stable_pending_id": true,
+        "stable_action_id": false,
+        "waiting_status": "awaiting_input",
+        "one_pending_object": true,
+        "new_resume_outbox": 0,
+        "waiting_projection_has_real_interrupt": true,
+        "active_released_exactly_once": true,
+        "generation_after_interrupt_unchanged": true,
+        "model_calls_after_saved_interrupt": 0,
+        "no_scan_after_stable_waiting_change": true,
+        "sandbox_writes": 0
+      },
+      "fault_point": "after_checkpoint_before_wait_projection",
+      "repetitions": 3
+    },
+    "input_after_wait_commit": {
+      "test_ids": [
+        "COM-T024",
+        "COM-T029",
+        "SF-T057"
+      ],
+      "kind": "checkpoint_fault",
+      "planned_status": "not_run",
+      "phases": [
+        "before",
+        "fault",
+        "recovered",
+        "rescanned"
+      ],
+      "expected": {
+        "pending_kind": "input",
+        "stable_pending_id": true,
+        "stable_action_id": false,
+        "waiting_status": "awaiting_input",
+        "one_pending_object": true,
+        "new_resume_outbox": 0,
+        "waiting_projection_has_real_interrupt": true,
+        "active_released_exactly_once": true,
+        "generation_after_interrupt_unchanged": true,
+        "model_calls_after_saved_interrupt": 0,
+        "no_scan_after_stable_waiting_change": true,
+        "sandbox_writes": 0
+      },
+      "fault_point": "after_wait_projection_commit",
+      "repetitions": 3
+    },
+    "proposal_before_checkpoint": {
+      "test_ids": [
+        "COM-T024",
+        "COM-T029",
+        "SF-T064"
+      ],
+      "kind": "checkpoint_fault",
+      "planned_status": "not_run",
+      "phases": [
+        "before",
+        "fault",
+        "recovered",
+        "rescanned"
+      ],
+      "expected": {
+        "pending_kind": "proposal",
+        "stable_pending_id": true,
+        "stable_action_id": true,
+        "waiting_status": "awaiting_approval",
+        "one_pending_object": true,
+        "new_resume_outbox": 0,
+        "waiting_projection_has_real_interrupt": true,
+        "active_released_exactly_once": true,
+        "generation_after_interrupt_unchanged": false,
+        "model_calls_after_saved_interrupt": 0,
+        "no_scan_after_stable_waiting_change": true,
+        "sandbox_writes": 0
+      },
+      "fault_point": "after_proposal_commit_before_checkpoint",
+      "repetitions": 3
+    },
+    "proposal_checkpoint_gap": {
+      "test_ids": [
+        "COM-T024",
+        "COM-T029",
+        "SF-T064"
+      ],
+      "kind": "checkpoint_fault",
+      "planned_status": "not_run",
+      "phases": [
+        "before",
+        "fault",
+        "recovered",
+        "rescanned"
+      ],
+      "expected": {
+        "pending_kind": "proposal",
+        "stable_pending_id": true,
+        "stable_action_id": true,
+        "waiting_status": "awaiting_approval",
+        "one_pending_object": true,
+        "new_resume_outbox": 0,
+        "waiting_projection_has_real_interrupt": true,
+        "active_released_exactly_once": true,
+        "generation_after_interrupt_unchanged": true,
+        "model_calls_after_saved_interrupt": 0,
+        "no_scan_after_stable_waiting_change": true,
+        "sandbox_writes": 0
+      },
+      "fault_point": "after_checkpoint_before_wait_projection",
+      "repetitions": 3
+    },
+    "waiting_and_terminal_scan_noop": {
+      "test_ids": [
+        "COM-T024"
+      ],
+      "kind": "scanner",
+      "planned_status": "not_run",
+      "phases": [
+        "before",
+        "after"
+      ],
+      "expected": {
+        "statuses": [
+          "awaiting_input",
+          "awaiting_approval",
+          "succeeded",
+          "handoff",
+          "rejected",
+          "expired",
+          "failed",
+          "cancelled"
+        ],
+        "state_events_generation_outbox_unchanged": true,
+        "model_attempt_delta": 0,
+        "tool_round_delta": 0,
+        "sandbox_writes": 0
+      }
+    },
+    "proposal_stable_private_builder": {
+      "test_ids": [
+        "SF-T061",
+        "SF-T064"
+      ],
+      "kind": "private_component",
+      "planned_status": "not_run",
+      "phases": [
+        "before",
+        "created",
+        "reentered"
+      ],
+      "expected": {
+        "proposal_delta": 1,
+        "action_delta": 1,
+        "approval_delta": 1,
+        "proposal_seq": 1,
+        "proposal_canonical_sha256": "c4ff8ae5c577c7413b2fcbaf4e5efced9d766c27c1e50602b9b0af852c4ffc34",
+        "created_at": "2026-11-03T04:00:00Z",
+        "expires_at": "2026-11-03T04:15:00Z",
+        "later_reentry_business_time": "2026-11-03T04:02:00Z",
+        "same_proposal_action_approval_ids": true,
+        "sandbox_writes": 0
+      }
+    },
+    "proposal_parameters_rejected": {
+      "test_ids": [
+        "SF-T062"
+      ],
+      "kind": "private_component_variants",
+      "planned_status": "not_run",
+      "phases": [
+        "before",
+        "after"
+      ],
+      "expected": {
+        "proposal_delta": 0,
+        "action_delta": 0,
+        "approval_delta": 0,
+        "sandbox_writes": 0
+      },
+      "variant_source": "unit_cases.strict_action_parameters.invalid"
+    },
+    "same_key_replay_after_terminal": {
+      "test_ids": [
+        "SF-T059",
+        "COM-T031"
+      ],
+      "kind": "idempotency",
+      "planned_status": "not_run",
+      "phases": [
+        "accepted",
+        "terminal",
+        "after"
+      ],
+      "expected": {
+        "http_statuses": [
+          202
+        ],
+        "same_run_id": true,
+        "response_status": "current terminal status",
+        "request_business_time": "2026-11-03T04:16:00Z",
+        "current_authorization_required": true,
+        "no_new_state_events_or_dispatch": true,
+        "old_expected_version_and_expired_input_do_not_override_successful_replay": true
+      }
+    }
+  },
+  "facts_contract": {
+    "top_level": [
+      "fixture_id",
+      "mode",
+      "cases"
+    ],
+    "modes": [
+      "offline_component",
+      "runtime_integration"
+    ],
+    "no_aggregate_pass_flags": true,
+    "aliases": "SQL SELECT column aliases may align the following projections; values must come from actual rows, never product-computed success flags",
+    "unit_case": {
+      "input": "exact submitted value including types, not normalized by collector",
+      "outcome": "returned value or captured exception type/message/error_code; no invented DB rows",
+      "canonical": "actual returned canonical JSON string and SHA256 when accepted",
+      "mutations": "explicit field/value change plus actual new canonical string/hash; independent oracle recomputes both"
+    },
+    "runtime_case_fields": [
+      "requests",
+      "snapshots",
+      "business",
+      "calls"
+    ],
+    "requests_fields": [
+      "request_id",
+      "actor_id",
+      "method",
+      "path",
+      "body",
+      "http_status",
+      "response"
+    ],
+    "snapshot_tables": [
+      "runs",
+      "inputs",
+      "proposals",
+      "approvals",
+      "actions",
+      "idempotency",
+      "outbox",
+      "events",
+      "limits",
+      "wait_intervals"
+    ],
+    "runs_fields": [
+      "run_id",
+      "tenant_id",
+      "actor_id",
+      "thread_id",
+      "status",
+      "version",
+      "execution_generation",
+      "admission_state",
+      "config_snapshot",
+      "api_received_at",
+      "budget_origin_at",
+      "budget_ms",
+      "waiting_since",
+      "wait_expires_at",
+      "accumulated_wait_ms",
+      "model_attempts",
+      "tool_rounds",
+      "last_event_seq"
+    ],
+    "inputs_fields": [
+      "input_id",
+      "run_id",
+      "tenant_id",
+      "input_seq",
+      "required_fields",
+      "answers",
+      "status",
+      "version",
+      "created_at",
+      "expires_at",
+      "answered_at",
+      "checkpoint_id"
+    ],
+    "proposal_fields": [
+      "proposal_id",
+      "run_id",
+      "tenant_id",
+      "proposal_seq",
+      "action_id",
+      "canonical_args",
+      "canonical_args_hash",
+      "created_at",
+      "expires_at"
+    ],
+    "approval_fields": [
+      "approval_id",
+      "run_id",
+      "proposal_id",
+      "status",
+      "version",
+      "decision"
+    ],
+    "action_fields": [
+      "action_id",
+      "run_id",
+      "proposal_id",
+      "canonical_args_hash",
+      "status"
+    ],
+    "idempotency_fields": [
+      "app",
+      "tenant_id",
+      "actor_id",
+      "operation",
+      "client_request_id",
+      "request_hash",
+      "run_id",
+      "input_id"
+    ],
+    "wait_intervals_fields": [
+      "run_id",
+      "input_id",
+      "started_at",
+      "ended_at"
+    ],
+    "checkpoints": "per phase actual saver checkpoint id, parent id, content/state SHA256, execution generation, decoded pending interrupt kind/id and next task/node; IDs alone cannot prove resumable interrupt or unchanged content",
+    "barrier": "raw container/worker PID/backend PID, session advisory pg_locks rows and arrived/fault/released timestamps; eight clients use two real API processes; no sleep-only assertion",
+    "fault": "known test-only hook point, real process/connection identity, before/after raw checkpoint+SQL, exception/exit or SQLSTATE; commit failures include backend marker proving reached commit",
+    "calls": "raw reserved model/tool attempts, worker outcomes, actual sandbox HTTP method/path/status; absent trace is not equivalent to zero calls",
+    "business": "raw sandbox before/after subscription fields and action_receipts or explicit to_regclass absence, plus invocation traces; app proposal/action rows are not sandbox effects",
+    "repetitions": "runtime critical concurrency/fault cases require three separately reset namespaces; repetitions never increase authored case count"
+  },
+  "deferred": [
+    {
+      "test_ids": [
+        "SF-T063"
+      ],
+      "scope": "public execute request with tampered proposal parameters returning409; no execution API in this stage; component hash/immutability controls are only partial evidence"
+    },
+    {
+      "test_ids": [
+        "SF-T065",
+        "SF-T066",
+        "SF-T067",
+        "SF-T068",
+        "SF-T069",
+        "SF-T070"
+      ],
+      "scope": "approval/rejection endpoints, authorization linearization and full F16 behavior"
+    },
+    {
+      "test_ids": [
+        "COM-T019",
+        "COM-T031"
+      ],
+      "scope": "approval/rejection variants; this stage covers clarification plus existing cancellation only"
+    },
+    {
+      "test_ids": [
+        "SF-T071",
+        "SF-T072",
+        "SF-T073",
+        "SF-T074",
+        "SF-T075",
+        "SF-T076",
+        "SF-T077",
+        "SF-T078",
+        "SF-T079",
+        "SF-T080"
+      ],
+      "scope": "sandbox grant execution, policy transaction and action receipt"
+    },
+    {
+      "test_ids": [
+        "SF-T057",
+        "SF-T058"
+      ],
+      "scope": "graph-produced email/seats/days clarification; only strict DTO/component support this stage"
+    },
+    {
+      "test_ids": [],
+      "scope": "actual DB/worker/browser/provider execution while DataPilot owns the shared runtime window; all runtime rows remain not_run until collected"
+    }
+  ],
+  "runtime_common_assertions": [
+    "current auth precedes replay; no foreign details",
+    "all raw table sets present, including empty sets",
+    "limits independently recomputed from each run.admission_state",
+    "queued<=10 and active<=2 at every snapshot",
+    "run and input ids remain linked to tenant/actor",
+    "accepted resume joins answer/idempotency/generation/outbox/event in the same committed result",
+    "no wait interval ends on failed429; successful end contributes exactly once to real interval union",
+    "budget origin/config/model/tool counters never reset",
+    "event seq unique and continuous with last_event_seq",
+    "proposal canonical hash independently recomputed from trusted immutable columns",
+    "business subscription/version and sandbox receipt set unchanged",
+    "no private component result is represented as live runtime evidence"
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "fixture_id": "SF-DEMO-INVITATIONS",
+  "schema_version": 1,
+  "scenarios": [
+    {
+      "tenant_id": "tenant_a",
+      "customer_id": "cus_a_01",
+      "subscription_id": "sub_a_01",
+      "invitation_policy": {
+        "allowed_domains": ["example.com"],
+        "allow_subdomains": false,
+        "invitation_permission": true
+      },
+      "invitation": {
+        "invitation_id": "inv_demo_a_member",
+        "email": "member@example.com",
+        "email_domain": "example.com",
+        "status": "pending",
+        "reason_code": null,
+        "created_seconds_ago": 300,
+        "lifetime_seconds": 2592000
+      },
+      "service_status": {
+        "component": "invitations",
+        "status": "operational",
+        "updated_seconds_ago": 60
+      }
+    },
+    {
+      "tenant_id": "tenant_b",
+      "customer_id": "cus_b_01",
+      "subscription_id": "sub_b_01",
+      "invitation_policy": {
+        "allowed_domains": ["example.net"],
+        "allow_subdomains": false,
+        "invitation_permission": true
+      },
+      "invitation": {
+        "invitation_id": "inv_demo_b_analyst",
+        "email": "analyst@example.net",
+        "email_domain": "example.net",
+        "status": "pending",
+        "reason_code": null,
+        "created_seconds_ago": 300,
+        "lifetime_seconds": 2592000
+      },
+      "service_status": {
+        "component": "invitations",
+        "status": "operational",
+        "updated_seconds_ago": 60
+      }
+    }
+  ]
+}

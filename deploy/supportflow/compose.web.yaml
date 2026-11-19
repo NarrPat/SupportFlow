@@ -1,0 +1,73 @@
+# Same-origin local HTTP profile. Only the gateway publishes a loopback port.
+services:
+  api:
+    image: sf-local-python-dev:env
+    pull_policy: never
+    platform: linux/amd64
+    working_dir: /work
+    read_only: true
+    tmpfs: [/tmp]
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PGHOST: postgres
+      PGDATABASE: ${SF_WEB_APP_DB:-sf_app}
+      PGPASSWORD_FILE: /run/secrets/app_runtime_password
+      SF_PROFILE: dev
+      SF_PUBLIC_ORIGIN: http://127.0.0.1:18080
+    volumes:
+      - ../../apps/supportflow/api:/work/apps/supportflow/api:ro
+      - ../../apps/supportflow/jobs:/work/apps/supportflow/jobs:ro
+      - ../../apps/supportflow/agent:/work/apps/supportflow/agent:ro
+      - ../../apps/supportflow/domain:/work/apps/supportflow/domain:ro
+      - ../../apps/supportflow/retrieval:/work/apps/supportflow/retrieval:ro
+      - ../../apps/supportflow/knowledge:/work/apps/supportflow/knowledge:ro
+      - ./published-reports:/data/evaluation:ro
+    secrets: [app_runtime_password]
+    command: [python, -B, -m, uvicorn, apps.supportflow.api.main:app, --host, "0.0.0.0", --port, "8000", --no-access-log]
+    depends_on:
+      postgres: {condition: service_healthy}
+
+  web:
+    image: nginx:stable-alpine@sha256:583b7f2fce1cdb8da5ad5c39ebd3c33b98b87d493190e548bdee1fa8c619c311
+    platform: linux/amd64
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ../../apps/supportflow/web/dist/product:/usr/share/nginx/html:ro
+    networks: [default, edge]
+    ports: ["127.0.0.1:18080:8080"]
+    depends_on: [api]
+    healthcheck:
+      test: [CMD-SHELL, "wget -q -O /dev/null http://127.0.0.1:8080/api/v1/auth/csrf && wget -q -O /dev/null http://127.0.0.1:8080/"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  app-setup:
+    profiles: [setup]
+    image: sf-local-python-dev:env
+    pull_policy: never
+    working_dir: /work
+    read_only: true
+    tmpfs: [/tmp]
+    environment:
+      PGHOST: postgres
+      PGDATABASE: ${SF_WEB_APP_DB:-sf_app}
+      SF_SEED_PASSWORDS_FILE: /run/secrets/seed_accounts
+    secrets: [app_migrator_password, seed_accounts]
+    volumes:
+      - ../../apps/supportflow/db:/work/apps/supportflow/db:ro
+      - ../../apps/supportflow/domain:/work/apps/supportflow/domain:ro
+      - ../../evals/fixtures/supportflow/fx_base:/work/fixture:ro
+    command:
+      - sh
+      - -ec
+      - |
+        export PGPASSWORD="$$(cat /run/secrets/app_migrator_password)"
+        python -B -m apps.supportflow.db.manage migrate --target app
+        python -B -m apps.supportflow.db.checkpoints
+        python -B -m apps.supportflow.db.manage seed --target app --fixture /work/fixture/seed.json
+
+networks:
+  edge: {}
+secrets:
+  seed_accounts: {file: "${SF_WEB_ACCOUNTS:-./.secrets/seed-accounts.json}"}

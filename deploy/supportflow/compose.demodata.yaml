@@ -1,0 +1,12 @@
+# Optional ordinary demonstration fixtures. Add after the diagnosis profile.
+services:
+  demo-data-setup:
+    extends: {file: compose.diagnosis.yaml, service: sandbox-setup}
+    volumes:
+      - ./demo-data:/work/demo-fixture:ro
+    command:
+      - sh
+      - -ec
+      - |
+        export PGPASSWORD="$$(cat /run/secrets/sandbox_migrator_password)"
+        python -B -m apps.supportflow.db.manage seed-demo --target sandbox --fixture /work/demo-fixture/invitation-v1.json

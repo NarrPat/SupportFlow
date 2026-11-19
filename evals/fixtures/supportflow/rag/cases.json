@@ -1,0 +1,1338 @@
+{
+  "fixture_id": "SF-FX-RAG-TINY",
+  "schema_version": 1,
+  "scope": "Synthetic, explicitly authored software fixtures for the smallest evidence-qualified diagnosis slice. This is not the 120-task business catalogue or the frozen 80-task holdout. Listed test IDs are design mappings, not claims that every variant has run.",
+  "graph_version": "readonly-diagnosis-rag-v1",
+  "legacy_graph_versions": [
+    "customer-handoff-v1",
+    "readonly-diagnosis-v1"
+  ],
+  "reference_time": "2026-11-07T00:00:00Z",
+  "source_fixtures": {
+    "identity": "evals/fixtures/supportflow/fx_base/seed.json",
+    "facts": "evals/fixtures/supportflow/diagnosis/cases.json"
+  },
+  "truthfulness": {
+    "corpus_origin": "synthetic_business",
+    "vector_origin": "synthetic_vector",
+    "quality_eligible": false,
+    "model_mode": "scripted",
+    "eligible_metrics": [],
+    "business_holdout_tasks": 0,
+    "fake_vector_semantic_hit_rate": "not_applicable",
+    "live_embedding": "requires_separate_actual_provider_or_local_model_trace",
+    "unknown_usage": null
+  },
+  "identity": {
+    "tenant_id": "tenant_a",
+    "actor_id": "user_a_support",
+    "customer_id": "cus_a_01",
+    "upload_actor_id": "user_a_admin"
+  },
+  "limits": {
+    "upload_bytes": 2097152,
+    "chunk_tokens": 450,
+    "overlap_tokens": 60,
+    "vector_top_k": 20,
+    "lexical_top_k": 20,
+    "final_top_k": 5,
+    "rrf_constant": 60,
+    "maximum_requery": 1,
+    "maximum_search_attempts": 2,
+    "cache_generations_per_tenant": 2,
+    "raw_tool_bytes": 65536,
+    "run_budget_ms": 90000,
+    "tool_rounds_total": 6
+  },
+  "normalization": {
+    "encoding": "utf-8-sig-strict",
+    "newlines": "CRLF and CR become LF; preserve all remaining characters and final newline",
+    "empty": "Whitespace-only content cannot publish an empty index",
+    "dedup_key": [
+      "tenant_id",
+      "document_id",
+      "raw_sha256"
+    ],
+    "raw_hash": "sha256 of original bytes",
+    "normalized_hash": "sha256 of the complete normalized UTF8 body",
+    "section_id": "Explicit Markdown heading {#id}; IDs alone never confer reviewed status",
+    "section_span": "Heading through last nonblank line before next heading, inclusive 1-based normalized lines",
+    "span_hash": "sha256 of selected normalized lines joined by LF with no additional final LF",
+    "original_filename": "Metadata only; storage uses a generated safe path under upload root"
+  },
+  "index_contract": {
+    "dimension": 512,
+    "chunker_version": "md-paragraph-v1:450:60",
+    "tokenizer_version_prefix": "bge-small-zh-v1.5:",
+    "tokenizer_sha256_required": true,
+    "model_revision_required": true,
+    "lexical_version_prefix": "jieba-0.42.1:",
+    "lexical_parameters": {
+      "k1": 1.5,
+      "b": 0.75
+    },
+    "dictionary_sha256_required": true,
+    "snapshot_fields": [
+      "schema_version",
+      "tenant_id",
+      "generation",
+      "corpus_manifest_hash",
+      "tokenizer_version",
+      "chunker_version",
+      "lexical_version",
+      "documents"
+    ],
+    "snapshot_item_fields": [
+      "evidence_id",
+      "length",
+      "terms"
+    ],
+    "snapshot_checksum": "SHA256 of stored compact UTF8 JSON bytes",
+    "publish": "Both ready flags, matching corpus manifest and persisted lexical checksum are required; tenant active_generation and every document active_version switch in one CAS transaction",
+    "bm25_scope": "Calculate document frequencies on the currently authorized same-generation corpus; independently retrieve lexical top20, never only the vector top20",
+    "snapshot_internal_layout": "Prebuilt token frequencies; never retokenize every query. Independent audit can validate selected fixture token counts but does not use product scoring code."
+  },
+  "result_contract": {
+    "schema_version": 3,
+    "fields": [
+      "schema_version",
+      "resolution_code",
+      "customer",
+      "intent",
+      "facts",
+      "blocking_codes",
+      "unknown_codes",
+      "evidence_refs",
+      "action_receipts",
+      "observation_refs",
+      "reply_text"
+    ],
+    "reference_fields": [
+      "evidence_id",
+      "document_id",
+      "version_id",
+      "section_id",
+      "generation",
+      "title",
+      "source",
+      "start_line",
+      "end_line",
+      "content_sha256"
+    ],
+    "reference_source": "supportflow.knowledge",
+    "reference_types": {
+      "evidence_id": "nonempty string",
+      "document_id": "nonempty string",
+      "version_id": "nonempty string",
+      "section_id": "nonempty string",
+      "generation": "strict integer >=1",
+      "title": "nonempty string",
+      "source": "literal supportflow.knowledge",
+      "start_line": "strict integer >=1",
+      "end_line": "strict integer >=start_line",
+      "content_sha256": "lowercase 64-character SHA256 hex"
+    },
+    "reference_text": "No document body or filesystem path in public references. Authorized citation GET returns the exact referenced text; its final DTO is frozen separately from this identifier contract.",
+    "citation_endpoint": "GET /api/v1/citations/{evidence_id}",
+    "history_rule": "An old version may be read by an actor with current document access, but never counts as current retrieval evidence. Current revocation denies both old and current citation reads without revealing object existence.",
+    "bundle_fields": [
+      "schema_version",
+      "ok",
+      "error_code",
+      "generation",
+      "refs",
+      "context",
+      "supported_topics",
+      "supported_codes",
+      "source",
+      "quality_eligible"
+    ],
+    "bundle_schema_version": 1,
+    "bundle_source": "supportflow.knowledge",
+    "context_fields": [
+      "evidence_id",
+      "text"
+    ],
+    "empty_action_receipts": [],
+    "resolution_precedence": [
+      "missing or invalid required knowledge -> handoff/EVIDENCE_REQUIRED with KNOWLEDGE_EVIDENCE_MISSING retained",
+      "knowledge complete but any required live fact unknown -> handoff/FACTS_INCOMPLETE",
+      "knowledge and facts complete -> succeeded/DIAGNOSIS_COMPLETE",
+      "pure subscription state -> succeeded/NO_ACTION_REQUIRED with zero searches"
+    ],
+    "meaning_of_success": "Diagnosis completed with supported facts; no claim that an invitation was sent, service repaired, capacity granted, or any business action executed."
+  },
+  "corpus": [
+    {
+      "alias": "a_current",
+      "document_alias": "a_invitation",
+      "version_alias": "a_invitation_v2",
+      "tenant_id": "tenant_a",
+      "title": "邀请排障手册",
+      "path": "documents/invitation-current.md",
+      "active": true,
+      "visible_actors": [
+        "user_a_support",
+        "user_a_supervisor",
+        "user_a_admin"
+      ],
+      "reviewed": true,
+      "raw_sha256": "20ef23167002d2d56b07f8a3f4473cae762c4f4a787597f7011d471f78030e32",
+      "normalized_sha256": "20ef23167002d2d56b07f8a3f4473cae762c4f4a787597f7011d471f78030e32",
+      "line_count": 18
+    },
+    {
+      "alias": "a_old",
+      "document_alias": "a_invitation",
+      "version_alias": "a_invitation_v1",
+      "tenant_id": "tenant_a",
+      "title": "邀请排障手册",
+      "path": "documents/invitation-old.md",
+      "active": false,
+      "visible_actors": [
+        "user_a_support",
+        "user_a_supervisor",
+        "user_a_admin"
+      ],
+      "reviewed": false,
+      "raw_sha256": "27854784b0b85f9f78f2b9fa208304ab362d6819a403ac6e733d1a5af8ebec1c",
+      "normalized_sha256": "27854784b0b85f9f78f2b9fa208304ab362d6819a403ac6e733d1a5af8ebec1c",
+      "line_count": 5
+    },
+    {
+      "alias": "b_same_title",
+      "document_alias": "b_invitation",
+      "version_alias": "b_invitation_v1",
+      "tenant_id": "tenant_b",
+      "title": "邀请排障手册",
+      "path": "documents/tenant-b.md",
+      "active": true,
+      "visible_actors": [
+        "user_b_support",
+        "user_b_supervisor",
+        "user_b_admin"
+      ],
+      "reviewed": false,
+      "raw_sha256": "2d1501ed8bcf680397ce60199a03acd0bf3cedeff4cd1d787fc96ff68be3ba83",
+      "normalized_sha256": "2d1501ed8bcf680397ce60199a03acd0bf3cedeff4cd1d787fc96ff68be3ba83",
+      "line_count": 2
+    },
+    {
+      "alias": "a_private",
+      "document_alias": "a_private",
+      "version_alias": "a_private_v1",
+      "tenant_id": "tenant_a",
+      "title": "邀请排障手册",
+      "path": "documents/private-a.md",
+      "active": true,
+      "visible_actors": [
+        "user_a_admin"
+      ],
+      "reviewed": false,
+      "raw_sha256": "ccd2d388bf8f07fed4f1ac77799773fa4ce6aa343ee2ee50bb6a14aacfde3fa2",
+      "normalized_sha256": "ccd2d388bf8f07fed4f1ac77799773fa4ce6aa343ee2ee50bb6a14aacfde3fa2",
+      "line_count": 2
+    },
+    {
+      "alias": "a_injection",
+      "document_alias": "a_injection",
+      "version_alias": "a_injection_v1",
+      "tenant_id": "tenant_a",
+      "title": "未审核排障建议",
+      "path": "documents/injection.md",
+      "active": true,
+      "visible_actors": [
+        "user_a_support",
+        "user_a_admin"
+      ],
+      "reviewed": false,
+      "raw_sha256": "8d292ce703b5b2c407f533f7fdad8fed8959bcc52f19830f95b3653227134d0c",
+      "normalized_sha256": "8d292ce703b5b2c407f533f7fdad8fed8959bcc52f19830f95b3653227134d0c",
+      "line_count": 3
+    },
+    {
+      "alias": "a_conflict",
+      "document_alias": "a_conflict",
+      "version_alias": "a_conflict_v1",
+      "tenant_id": "tenant_a",
+      "title": "冲突规则测试",
+      "path": "documents/conflict.md",
+      "active": true,
+      "visible_actors": [
+        "user_a_support",
+        "user_a_admin"
+      ],
+      "reviewed": false,
+      "raw_sha256": "57a1c2699d1c7409e7cfd0dec979805a1dd5dfd1bc3cade782efa61e2ce05788",
+      "normalized_sha256": "57a1c2699d1c7409e7cfd0dec979805a1dd5dfd1bc3cade782efa61e2ce05788",
+      "line_count": 2
+    },
+    {
+      "alias": "a_policy",
+      "document_alias": "a_policy",
+      "version_alias": "a_policy_v1",
+      "tenant_id": "tenant_a",
+      "title": "临时席位规则",
+      "path": "documents/policy-v1.md",
+      "active": true,
+      "visible_actors": [
+        "user_a_support",
+        "user_a_supervisor",
+        "user_a_admin"
+      ],
+      "reviewed": true,
+      "raw_sha256": "a2bdf7e086311cc3b6b0520b74a00e69dadaf90556653f096e16d38bc321efed",
+      "normalized_sha256": "a2bdf7e086311cc3b6b0520b74a00e69dadaf90556653f096e16d38bc321efed",
+      "line_count": 4
+    }
+  ],
+  "reviewed_sections": [
+    {
+      "corpus_alias": "a_current",
+      "section_id": "invitation.overview",
+      "start_line": 1,
+      "end_line": 4,
+      "supported_topics": [
+        "invitation_diagnosis"
+      ],
+      "supported_codes": [],
+      "text": "# 邀请排障概览 {#invitation.overview}\n邀请失败诊断必须先确认当前客户、订阅、邀请记录、域名策略、邀请权限与邀请服务状态。\n资料只提供排障依据，不能替代实时工具事实；缺失事实应列为未知，不能猜测根因。\n完成只读诊断不表示已扩容、已发出邀请或已修复服务；任何业务变更必须另走授权和审批。",
+      "content_sha256": "272af37f494f04b5943dc558fa7cca007865870f47e189ce93cedbb15b693d9b"
+    },
+    {
+      "corpus_alias": "a_current",
+      "section_id": "invitation.capacity",
+      "start_line": 6,
+      "end_line": 9,
+      "supported_topics": [],
+      "supported_codes": [
+        "CAPACITY_EXHAUSTED"
+      ],
+      "text": "# 容量阻断 {#invitation.capacity}\n有效容量等于基础席位加尚未到期的临时席位；临时席位在到期时刻及之后不生效。\n剩余席位为有效容量减已用席位且最低为零；已用席位达到或超过有效容量时，新增成员邀请受到容量不足阻断。\n容量不足只能作为已确认阻断之一，不得掩盖同时存在的域名、权限、有效期、订阅或服务问题。",
+      "content_sha256": "092b75bd65fdef705dc3f45144e6c2cbaa7c9557e01876834a31a665c24dc820"
+    },
+    {
+      "corpus_alias": "a_current",
+      "section_id": "invitation.other_blockers",
+      "start_line": 11,
+      "end_line": 18,
+      "supported_topics": [],
+      "supported_codes": [
+        "ALREADY_JOINED",
+        "DOMAIN_NOT_ALLOWED",
+        "INVITATION_EXPIRED",
+        "INVITATION_NOT_YET_VALID",
+        "INVITATION_PERMISSION_DENIED",
+        "INVITATION_REVOKED",
+        "PLAN_NOT_ACTIVE",
+        "SERVICE_UNAVAILABLE"
+      ],
+      "text": "# 其他阻断 {#invitation.other_blockers}\n只有订阅状态为 active 才属于有效订阅；其他状态不得当作 active，未知状态仍需保留未知标记。\n邮箱域名必须满足客户的允许列表；子域名只有显式允许时才按点边界匹配，缺少策略应标为未知。\n邀请权限为 false 是权限阻断；权限配置缺失不得被解释成允许。\n邀请有效区间为 created_at <= now < expires_at；尚未创建是未生效阻断，到期等号及之后是过期阻断。\n邀请状态 joined 表示已加入，revoked 表示邀请已撤销；撤销旧邀请不得直接当作重复邀请。\n邀请服务为 degraded 或 outage 是服务阻断；缺少服务信息或未知状态不得假定服务正常。\n诊断必须保留同时成立的阻断因素；不得自动重新邀请，也不得用扩容掩盖其他未解决阻断。",
+      "content_sha256": "5e9bd54ff9b6dec1aa8410dca336dcd2d6e297d09ff3b8f7f4490e9ced7dba75"
+    },
+    {
+      "corpus_alias": "a_policy",
+      "section_id": "policy.temporary_seats",
+      "start_line": 1,
+      "end_line": 4,
+      "supported_topics": [
+        "grant_temporary_seats"
+      ],
+      "supported_codes": [],
+      "policy_version": "v1",
+      "constants": {
+        "min_seats": 1,
+        "max_seats": 20,
+        "min_days": 1,
+        "max_days": 7,
+        "cooldown_seconds": 2592000
+      },
+      "text": "# 临时席位规则 {#policy.temporary_seats}\n临时席位仅允许严格整数 seats=1..20、days=1..7，且订阅必须 active。\n30 日冷却区间为 [last_successful_grant_at,last_successful_grant_at+2592000秒)，等号可以重新申请。\n只读诊断不得创建提案；写入需要当前有效规则、完整事实、合格主管批准且不可自批。",
+      "content_sha256": "26f3553369d2b59e1e757a4b5e90b59b2cf0f405f34a5d2a68769638407d2637"
+    }
+  ],
+  "gold_rules": {
+    "required_topic": "invitation_diagnosis",
+    "required_section_for_topic": "invitation.overview",
+    "required_section_by_blocking_code": {
+      "CAPACITY_EXHAUSTED": "invitation.capacity",
+      "ALREADY_JOINED": "invitation.other_blockers",
+      "DOMAIN_NOT_ALLOWED": "invitation.other_blockers",
+      "INVITATION_EXPIRED": "invitation.other_blockers",
+      "INVITATION_NOT_YET_VALID": "invitation.other_blockers",
+      "INVITATION_PERMISSION_DENIED": "invitation.other_blockers",
+      "INVITATION_REVOKED": "invitation.other_blockers",
+      "PLAN_NOT_ACTIVE": "invitation.other_blockers",
+      "SERVICE_UNAVAILABLE": "invitation.other_blockers"
+    },
+    "citation_support": "A correct ID/hash/span only proves location. This fixture separately freezes which exact reviewed span supports which claim/topic; an irrelevant but existing citation fails support.",
+    "not_model_input": [
+      "gold_rules",
+      "graph_cases.expected",
+      "reviewed_sections.constants",
+      "oracle assertions"
+    ],
+    "reviewed_content_exception": "Normal policy facts and independently maintained product review metadata are legitimate system knowledge. The agent never reads this fixture, case outcomes or scorer gold."
+  },
+  "upload_cases": [
+    {
+      "id": "markdown",
+      "test_ids": [
+        "SF-T033"
+      ],
+      "filename": "guide.md",
+      "corpus_alias": "a_current",
+      "expected_http": 201,
+      "expected_state": "staged"
+    },
+    {
+      "id": "plain_text",
+      "test_ids": [
+        "SF-T033"
+      ],
+      "filename": "guide.txt",
+      "text": "只读状态查询不产生业务变更。\n",
+      "expected_http": 201,
+      "expected_state": "staged"
+    },
+    {
+      "id": "exact_limit",
+      "test_ids": [
+        "SF-T033"
+      ],
+      "filename": "limit.txt",
+      "payload_recipe": {
+        "ascii_character": "x",
+        "repeat": 2097152
+      },
+      "expected_http": 201,
+      "expected_raw_sha256": "6932fd31e5daf4739b9fa78ff777b2831b0995cc1d0b0093cac80601902013bc"
+    },
+    {
+      "id": "one_byte_over",
+      "test_ids": [
+        "SF-T033"
+      ],
+      "filename": "over.txt",
+      "payload_recipe": {
+        "ascii_character": "x",
+        "repeat": 2097153
+      },
+      "expected_http": 413,
+      "version_delta": 0,
+      "expected_raw_sha256": "71ac24a75f6bc57bc51b43b3d13c3009aa243986b77a92102a3097c9e53123e9"
+    },
+    {
+      "id": "binary",
+      "test_ids": [
+        "SF-T033"
+      ],
+      "filename": "binary.txt",
+      "hex_bytes": "000102ff",
+      "expected_http": 422,
+      "version_delta": 0
+    },
+    {
+      "id": "path_traversal_name",
+      "test_ids": [
+        "SF-T033"
+      ],
+      "filename": "../../outside.md",
+      "corpus_alias": "a_current",
+      "all_storage_paths_within_upload_root": true
+    },
+    {
+      "id": "non_admin",
+      "test_ids": [
+        "SF-T033",
+        "SF-T048"
+      ],
+      "actor_id": "user_a_support",
+      "expected_http": 403,
+      "version_delta": 0
+    }
+  ],
+  "dedup_cases": [
+    {
+      "id": "same_document_same_raw_hash",
+      "test_ids": [
+        "SF-T034"
+      ],
+      "same_version_id": true,
+      "version_delta_after_first": 0
+    },
+    {
+      "id": "different_document_same_raw_hash",
+      "test_ids": [
+        "SF-T034"
+      ],
+      "distinct_document_ids": true,
+      "independent_acl": true
+    },
+    {
+      "id": "other_tenant_same_raw_hash",
+      "test_ids": [
+        "SF-T034"
+      ],
+      "distinct_document_ids": true,
+      "foreign_identity_or_existence_leak": false
+    }
+  ],
+  "parse_cases": [
+    {
+      "id": "bom_crlf_chinese",
+      "test_ids": [
+        "SF-T036"
+      ],
+      "raw_text": "﻿# 标题\r\n第一行\r\n第二行\r\n",
+      "normalized_text": "# 标题\n第一行\n第二行\n",
+      "expected_lines": [
+        "# 标题",
+        "第一行",
+        "第二行"
+      ],
+      "raw_sha256": "d1284c18baf4b44e6afe392e7febd655e0454a73b05cbcd48ffdfbbf5b935dc7",
+      "normalized_sha256": "b4a6c43b42ee124dc9afff134eb0bfc7f9089ff87d5de509e271b13ed0b0ee63"
+    },
+    {
+      "id": "lone_cr",
+      "test_ids": [
+        "SF-T036"
+      ],
+      "raw_text": "甲\r乙\r",
+      "normalized_text": "甲\n乙\n",
+      "expected_lines": [
+        "甲",
+        "乙"
+      ],
+      "raw_sha256": "b350c523c0fa01fcd5ce653ad59d031acbecaca404d0fd83c5d661a44f638dea",
+      "normalized_sha256": "3e397d9ac4394ac466fdcdb046d8c5bb9a3f4f4d178824cdd21b8491c1bcddeb"
+    },
+    {
+      "id": "empty",
+      "test_ids": [
+        "SF-T036"
+      ],
+      "raw_text": "",
+      "publish_allowed": false,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "whitespace_only",
+      "test_ids": [
+        "SF-T036"
+      ],
+      "raw_text": " \r\n\t",
+      "publish_allowed": false,
+      "raw_sha256": "708708aa72d48546834083dabeebec20af2cf4be1fd2c237dd74bc3c7f61ed75"
+    }
+  ],
+  "chunk_cases": [
+    {
+      "id": "reviewed_short_sections",
+      "test_ids": [
+        "SF-T037"
+      ],
+      "corpus_alias": "a_current",
+      "each_reviewed_section_one_chunk": true,
+      "expected_section_ids": [
+        "invitation.overview",
+        "invitation.capacity",
+        "invitation.other_blockers"
+      ],
+      "every_chunk_tokens_lte": 450
+    },
+    {
+      "id": "long_paragraph_901_tokens",
+      "test_ids": [
+        "SF-T037"
+      ],
+      "layer": "chunk slicing component with an explicit 901-token stream; not a claim of model tokenization",
+      "token_stream_recipe": {
+        "prefix": "t",
+        "count": 901
+      },
+      "expected_token_ranges_half_open": [
+        [
+          0,
+          450
+        ],
+        [
+          390,
+          840
+        ],
+        [
+          780,
+          901
+        ]
+      ],
+      "overlap": 60
+    },
+    {
+      "id": "same_input_same_frozen_versions",
+      "test_ids": [
+        "SF-T037"
+      ],
+      "same_chunk_hashes_and_spans": true,
+      "required_runtime_token_count_evidence": [
+        "actual tokenizer file SHA256",
+        "token ids or independently reproducible token count",
+        "section and source-line mapping"
+      ]
+    }
+  ],
+  "embedding_cases": [
+    {
+      "id": "wrong_dimension",
+      "test_ids": [
+        "SF-T038"
+      ],
+      "returned_dimension": 511,
+      "vector_ready": false,
+      "active_switch": false
+    },
+    {
+      "id": "nan",
+      "test_ids": [
+        "SF-T038"
+      ],
+      "non_json_number_recipe": "float NaN at element 0 in process memory",
+      "vector_ready": false,
+      "active_switch": false
+    },
+    {
+      "id": "positive_infinity",
+      "test_ids": [
+        "SF-T038"
+      ],
+      "non_json_number_recipe": "float positive infinity at element 0 in process memory",
+      "vector_ready": false,
+      "active_switch": false
+    },
+    {
+      "id": "count_mismatch",
+      "test_ids": [
+        "SF-T038"
+      ],
+      "requested": 2,
+      "returned": 1,
+      "vector_ready": false,
+      "active_switch": false
+    },
+    {
+      "id": "partial_batch_retry",
+      "test_ids": [
+        "SF-T039"
+      ],
+      "fault_barrier": "after_first_batch_commit_before_remaining_batches",
+      "duplicate_chunk_vector_rows": 0,
+      "partial_generation_ready": false
+    },
+    {
+      "id": "fake_provenance",
+      "test_ids": [
+        "SF-T040"
+      ],
+      "vector_origin": "synthetic_vector",
+      "quality_eligible": false,
+      "usage": null,
+      "quality_metric_allowed": false
+    }
+  ],
+  "publication_cases": [
+    {
+      "id": "parse_failure_retains_old",
+      "test_ids": [
+        "SF-T035"
+      ],
+      "new_version_state": "failed",
+      "old_active_retained": true
+    },
+    {
+      "id": "worker_stops_before_publish",
+      "test_ids": [
+        "SF-T035",
+        "SF-T039"
+      ],
+      "fault_barrier": "new_generation_staged_before_publish",
+      "old_active_retained": true
+    },
+    {
+      "id": "dual_ready_atomic_publish",
+      "test_ids": [
+        "SF-T041"
+      ],
+      "both_ready": true,
+      "manifest_match": true,
+      "document_and_tenant_pointers_atomic": true
+    },
+    {
+      "id": "lexical_failure",
+      "test_ids": [
+        "SF-T042"
+      ],
+      "vector_ready": true,
+      "lexical_ready": false,
+      "publish_allowed": false,
+      "old_active_retained": true
+    },
+    {
+      "id": "same_generation_replay",
+      "test_ids": [
+        "SF-T043"
+      ],
+      "replay_pointer_version_delta": 0
+    },
+    {
+      "id": "stale_cas",
+      "test_ids": [
+        "SF-T043"
+      ],
+      "expected_http": 409,
+      "pointer_change": false
+    },
+    {
+      "id": "stale_worker_cache",
+      "test_ids": [
+        "SF-T044"
+      ],
+      "allowed_outcomes": [
+        "reload_current_and_verify_checksum",
+        "INDEX_NOT_READY"
+      ],
+      "mixed_bundle_allowed": false
+    },
+    {
+      "id": "activate_historical_version",
+      "test_ids": [
+        "SF-T046"
+      ],
+      "new_generation_required": true,
+      "both_ready_required": true,
+      "old_authorized_citation_readable": true,
+      "replaced_version_currently_retrievable": false
+    }
+  ],
+  "retrieval_cases": [
+    {
+      "id": "rrf_literal",
+      "test_ids": [
+        "SF-T047",
+        "SF-T052"
+      ],
+      "vector_order": [
+        "a",
+        "b",
+        "c"
+      ],
+      "lexical_order": [
+        "b",
+        "d",
+        "a"
+      ],
+      "rank_origin": 1,
+      "constant": 60,
+      "expected_order": [
+        "b",
+        "a",
+        "d",
+        "c"
+      ],
+      "expected_terms": {
+        "a": [
+          61,
+          63
+        ],
+        "b": [
+          62,
+          61
+        ],
+        "c": [
+          63
+        ],
+        "d": [
+          62
+        ]
+      },
+      "lexical_only": [
+        "d"
+      ],
+      "score_rule": "Sum reciprocal denominators; never add raw vector and BM25 scores"
+    },
+    {
+      "id": "empty",
+      "test_ids": [
+        "SF-T050"
+      ],
+      "vector_order": [],
+      "lexical_order": [],
+      "expected_order": []
+    },
+    {
+      "id": "three_candidates",
+      "test_ids": [
+        "SF-T050"
+      ],
+      "vector_order": [
+        "a",
+        "b",
+        "c"
+      ],
+      "lexical_order": [],
+      "expected_order": [
+        "a",
+        "b",
+        "c"
+      ]
+    },
+    {
+      "id": "stable_tie",
+      "test_ids": [
+        "SF-T050"
+      ],
+      "vector_order": [
+        "b"
+      ],
+      "lexical_order": [
+        "a"
+      ],
+      "expected_order": [
+        "a",
+        "b"
+      ]
+    },
+    {
+      "id": "mixed_generation",
+      "test_ids": [
+        "SF-T051"
+      ],
+      "vector_generation": 2,
+      "lexical_generation": 1,
+      "maximum_requery": 1,
+      "expected_error": "INDEX_NOT_READY",
+      "evidence_sent_to_model": 0
+    },
+    {
+      "id": "candidate_generation_switch",
+      "test_ids": [
+        "SF-T045"
+      ],
+      "fault_barrier": "after_candidates_before_model",
+      "maximum_requery": 1,
+      "allowed_outcomes": [
+        "current_single_generation_evidence",
+        "INDEX_NOT_READY"
+      ],
+      "obsolete_evidence_sent_to_model": 0
+    }
+  ],
+  "security_cases": [
+    {
+      "id": "current_acl_and_tenant",
+      "test_ids": [
+        "SF-T048"
+      ],
+      "forbidden_sentinels": [
+        "TENANT_B_PRIVATE_SENTINEL",
+        "TENANT_A_PRIVATE_SENTINEL"
+      ],
+      "surfaces": [
+        "final_candidates",
+        "model_context",
+        "citation_response",
+        "events",
+        "public_result",
+        "logs"
+      ],
+      "occurrences": 0
+    },
+    {
+      "id": "revoke_after_candidates",
+      "test_ids": [
+        "SF-T049"
+      ],
+      "fault_barrier": "after_candidates_before_model",
+      "action": "remove current document ACL for requesting actor",
+      "maximum_requery": 1,
+      "revoked_text_sent_after_barrier": 0
+    },
+    {
+      "id": "forged_evidence_id",
+      "test_ids": [
+        "SF-T048",
+        "SF-T054"
+      ],
+      "missing_reference_accepted": false,
+      "citation_expected_http": 404
+    },
+    {
+      "id": "tampered_span_hash_or_version",
+      "test_ids": [
+        "SF-T054",
+        "SF-T055"
+      ],
+      "mutations": [
+        "wrong_content_sha256",
+        "wrong_section_id",
+        "wrong_version_id",
+        "wrong_generation",
+        "off_by_one_line",
+        "existing_irrelevant_span"
+      ],
+      "evidence_check_passes": false
+    },
+    {
+      "id": "historical_citation_current_acl",
+      "test_ids": [
+        "SF-T046",
+        "SF-T048"
+      ],
+      "authorized_history_http": 200,
+      "revoked_history_http": 404,
+      "historical_counts_as_current_support": false
+    },
+    {
+      "id": "untrusted_injection",
+      "test_ids": [
+        "SF-T056"
+      ],
+      "actor_and_tenant_unchanged": true,
+      "tool_allowlist_unchanged": true,
+      "grant_http_calls": 0,
+      "automatic_reinvites": 0
+    },
+    {
+      "id": "same_topic_or_policy_label_wrong_body",
+      "test_ids": [
+        "SF-T055",
+        "SF-T056"
+      ],
+      "reviewed_hash_match": false,
+      "supports_approved_policy_or_diagnosis": false
+    }
+  ],
+  "policy_gate_cases": [
+    {
+      "id": "missing_section",
+      "test_ids": [
+        "SF-T055"
+      ],
+      "missing": "policy.temporary_seats",
+      "executable_proposal_allowed": false
+    },
+    {
+      "id": "old_policy_version",
+      "test_ids": [
+        "SF-T055"
+      ],
+      "candidate_policy_version": "v0",
+      "executable_proposal_allowed": false
+    },
+    {
+      "id": "same_version_wrong_hash",
+      "test_ids": [
+        "SF-T055"
+      ],
+      "candidate_policy_version": "v1",
+      "reviewed_hash_match": false,
+      "executable_proposal_allowed": false
+    },
+    {
+      "id": "same_version_wrong_constants",
+      "test_ids": [
+        "SF-T055"
+      ],
+      "candidate_policy_version": "v1",
+      "max_seats": 200,
+      "executable_proposal_allowed": false
+    }
+  ],
+  "graph_cases": [
+    {
+      "id": "capacity_diagnosis_supported",
+      "test_ids": [
+        "SF-T025",
+        "SF-T048",
+        "SF-T054"
+      ],
+      "intent": "invitation_diagnosis",
+      "email": "user@example.com",
+      "business_overrides": {},
+      "knowledge": "current_reviewed",
+      "expected": {
+        "status": "succeeded",
+        "reason_code": "DIAGNOSIS_COMPLETE",
+        "blocking_codes": [
+          "CAPACITY_EXHAUSTED"
+        ],
+        "unknown_codes": [],
+        "required_sections": [
+          "invitation.overview",
+          "invitation.capacity"
+        ],
+        "search_attempts": [
+          1,
+          1
+        ],
+        "model_attempts": 2,
+        "fact_tools": 4,
+        "used_seats": 100,
+        "capacity": 100,
+        "remaining": 0
+      }
+    },
+    {
+      "id": "subscription_without_search",
+      "test_ids": [
+        "SF-T053"
+      ],
+      "intent": "subscription_status",
+      "email": null,
+      "business_overrides": {},
+      "knowledge": "current_reviewed",
+      "expected": {
+        "status": "succeeded",
+        "reason_code": "NO_ACTION_REQUIRED",
+        "blocking_codes": [],
+        "unknown_codes": [],
+        "required_sections": [],
+        "search_attempts": [
+          0,
+          0
+        ],
+        "model_attempts": 2,
+        "fact_tools": 2,
+        "used_seats": 100,
+        "capacity": 100,
+        "remaining": 0
+      }
+    },
+    {
+      "id": "missing_capacity_support",
+      "test_ids": [
+        "SF-T054"
+      ],
+      "intent": "invitation_diagnosis",
+      "email": "user@example.com",
+      "business_overrides": {},
+      "knowledge": "overview_only",
+      "expected": {
+        "status": "handoff",
+        "reason_code": "EVIDENCE_REQUIRED",
+        "blocking_codes": [
+          "CAPACITY_EXHAUSTED"
+        ],
+        "unknown_codes": [
+          "KNOWLEDGE_EVIDENCE_MISSING"
+        ],
+        "required_sections": [
+          "invitation.overview",
+          "invitation.capacity"
+        ],
+        "available_required_sections": [
+          "invitation.overview"
+        ],
+        "search_attempts": [
+          1,
+          2
+        ],
+        "all_required_evidence_found": false
+      }
+    },
+    {
+      "id": "conflicting_capacity_support",
+      "test_ids": [
+        "SF-T054",
+        "SF-T055"
+      ],
+      "intent": "invitation_diagnosis",
+      "email": "user@example.com",
+      "business_overrides": {},
+      "knowledge": "overview_plus_unreviewed_conflict",
+      "expected": {
+        "status": "handoff",
+        "reason_code": "EVIDENCE_REQUIRED",
+        "blocking_codes": [
+          "CAPACITY_EXHAUSTED"
+        ],
+        "unknown_codes": [
+          "KNOWLEDGE_EVIDENCE_MISSING"
+        ],
+        "required_sections": [
+          "invitation.overview",
+          "invitation.capacity"
+        ],
+        "search_attempts": [
+          1,
+          2
+        ],
+        "all_required_evidence_found": false
+      }
+    },
+    {
+      "id": "unknown_fact_with_complete_knowledge",
+      "test_ids": [
+        "SF-T054"
+      ],
+      "intent": "invitation_diagnosis",
+      "email": "user@example.com",
+      "business_overrides": {
+        "subscription": {
+          "plan_status": "unrecognized_plan"
+        }
+      },
+      "knowledge": "current_reviewed",
+      "expected": {
+        "status": "handoff",
+        "reason_code": "FACTS_INCOMPLETE",
+        "blocking_codes": [
+          "CAPACITY_EXHAUSTED",
+          "PLAN_NOT_ACTIVE"
+        ],
+        "unknown_codes": [
+          "PLAN_STATUS_UNKNOWN"
+        ],
+        "required_sections": [
+          "invitation.overview",
+          "invitation.capacity",
+          "invitation.other_blockers"
+        ],
+        "search_attempts": [
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "acl_revoked_before_model",
+      "test_ids": [
+        "SF-T049"
+      ],
+      "intent": "invitation_diagnosis",
+      "email": "user@example.com",
+      "business_overrides": {},
+      "knowledge": "revoke_only_reviewed_document_after_candidates",
+      "barrier": "after_candidates_before_model",
+      "expected": {
+        "status": "handoff",
+        "reason_code": "EVIDENCE_REQUIRED",
+        "blocking_codes": [
+          "CAPACITY_EXHAUSTED"
+        ],
+        "unknown_codes": [
+          "KNOWLEDGE_EVIDENCE_MISSING"
+        ],
+        "search_attempts": [
+          1,
+          2
+        ],
+        "revoked_text_sent_after_barrier": 0
+      }
+    },
+    {
+      "id": "generation_changed_once",
+      "test_ids": [
+        "SF-T044",
+        "SF-T045"
+      ],
+      "intent": "invitation_diagnosis",
+      "email": "user@example.com",
+      "business_overrides": {},
+      "knowledge": "publish_identical_reviewed_content_as_new_generation_after_candidates",
+      "barrier": "after_candidates_before_model",
+      "expected": {
+        "allowed_terminal_pairs": [
+          [
+            "succeeded",
+            "DIAGNOSIS_COMPLETE"
+          ],
+          [
+            "handoff",
+            "EVIDENCE_REQUIRED"
+          ]
+        ],
+        "blocking_codes": [
+          "CAPACITY_EXHAUSTED"
+        ],
+        "search_attempts": [
+          1,
+          2
+        ],
+        "success_requires_current_single_generation": true,
+        "obsolete_evidence_sent_after_barrier": 0
+      }
+    },
+    {
+      "id": "persistent_generation_mismatch",
+      "test_ids": [
+        "SF-T051"
+      ],
+      "intent": "invitation_diagnosis",
+      "email": "user@example.com",
+      "business_overrides": {},
+      "knowledge": "vector_g2_lexical_g1_even_after_retry",
+      "expected": {
+        "status": "handoff",
+        "reason_code": "EVIDENCE_REQUIRED",
+        "blocking_codes": [
+          "CAPACITY_EXHAUSTED"
+        ],
+        "unknown_codes": [
+          "KNOWLEDGE_EVIDENCE_MISSING"
+        ],
+        "search_attempts": [
+          1,
+          2
+        ],
+        "retrieval_error": "INDEX_NOT_READY",
+        "evidence_sent_to_model": 0
+      }
+    },
+    {
+      "id": "injection_is_not_support",
+      "test_ids": [
+        "SF-T056"
+      ],
+      "intent": "invitation_diagnosis",
+      "email": "user@example.com",
+      "business_overrides": {},
+      "knowledge": "overview_plus_injection_only",
+      "expected": {
+        "status": "handoff",
+        "reason_code": "EVIDENCE_REQUIRED",
+        "blocking_codes": [
+          "CAPACITY_EXHAUSTED"
+        ],
+        "unknown_codes": [
+          "KNOWLEDGE_EVIDENCE_MISSING"
+        ],
+        "search_attempts": [
+          1,
+          2
+        ],
+        "actor_id": "user_a_support",
+        "tenant_id": "tenant_a",
+        "grant_http_calls": 0
+      }
+    },
+    {
+      "id": "multiple_blockers_supported",
+      "test_ids": [
+        "SF-T025",
+        "SF-T026",
+        "SF-T028"
+      ],
+      "intent": "invitation_diagnosis",
+      "email": "user@evil-example.com",
+      "business_overrides": {
+        "invitation": {
+          "email": "user@evil-example.com",
+          "email_domain": "evil-example.com",
+          "expires_at": "2026-11-07T00:00:00Z"
+        },
+        "invitation_policy": {
+          "invitation_permission": false
+        },
+        "service_status": {
+          "status": "outage"
+        }
+      },
+      "knowledge": "current_reviewed",
+      "expected": {
+        "status": "succeeded",
+        "reason_code": "DIAGNOSIS_COMPLETE",
+        "blocking_codes": [
+          "CAPACITY_EXHAUSTED",
+          "DOMAIN_NOT_ALLOWED",
+          "INVITATION_EXPIRED",
+          "INVITATION_PERMISSION_DENIED",
+          "SERVICE_UNAVAILABLE"
+        ],
+        "unknown_codes": [],
+        "required_sections": [
+          "invitation.overview",
+          "invitation.capacity",
+          "invitation.other_blockers"
+        ],
+        "search_attempts": [
+          1,
+          1
+        ],
+        "model_attempts": 2,
+        "fact_tools": 4
+      }
+    }
+  ],
+  "facts_contract": {
+    "snapshots": "phase name -> raw SQL projection; each table row retains real ids, tenant, actor, version and hashes",
+    "required_groups": [
+      "fixture_identity",
+      "http_requests_and_responses",
+      "upload_files_and_hashes",
+      "documents_versions_chunks",
+      "index_generations_and_active_pointers",
+      "lexical_snapshot_bytes_or_hashed_artifact",
+      "raw_vector_and_lexical_rankings",
+      "final_bundle",
+      "citation_reads",
+      "current_acl_snapshots",
+      "model_context_trace",
+      "run_events_and_result",
+      "business_before_after",
+      "runtime_limits",
+      "barriers_and_native_process_identity",
+      "embedding_provenance"
+    ],
+    "alias_mapping": "Join fixture aliases to actual HTTP-created IDs via tenant/title/raw hash and SQL rows; a collector boolean or unverified alias map is not proof",
+    "no_product_imports_in_oracle": true,
+    "clock": "Business T0 separate from real HTTP/model/SQL/monotonic observation time"
+  },
+  "no_write_contract": {
+    "business_tables": [
+      "subscriptions",
+      "invitation_policies",
+      "invitations",
+      "service_statuses"
+    ],
+    "before_after_equal": true,
+    "business_version_delta": 0,
+    "proposal_delta": 0,
+    "action_receipt_delta": 0,
+    "grant_http_calls": 0,
+    "automatic_reinvites": 0,
+    "absent_write_tables": "If unimplemented, record to_regclass absence before/after. Do not fabricate empty tables or claim write-idempotency acceptance."
+  },
+  "oracle_negative_controls": [
+    "missing_case",
+    "missing_phase",
+    "wrong_tenant",
+    "wrong_actor",
+    "duplicate_evidence_id",
+    "existing_but_irrelevant_citation",
+    "span_hash_tamper",
+    "version_or_generation_tamper",
+    "leaked_private_marker",
+    "revoked_context_after_barrier",
+    "lexical_candidates_limited_to_vector",
+    "raw_score_sum_instead_of_rrf",
+    "rank_zero",
+    "unstable_tie",
+    "sixth_fabricated_candidate",
+    "half_published_generation",
+    "third_search_attempt",
+    "policy_label_without_reviewed_hash",
+    "nonempty_receipt_or_business_delta",
+    "synthetic_marked_quality_eligible",
+    "unknown_usage_zero_filled",
+    "model_success_flag_without_required_fact",
+    "bool_integer_field"
+  ],
+  "deferred": {
+    "formal_hit_at_5": "not_run: requires separately reviewed/frozen Q_R and actual semantic embedding provenance; tiny synthetic vectors are ineligible",
+    "full_business_completion_rate": "not_run: no 80-task holdout denominator has been frozen here",
+    "semantic10k_and_physical_capacity": "not_run: separate capacity manifest and workload",
+    "grant_proposal_policy_integration": "not_run: policy_gate_cases freeze component expectations only until actual proposal/action/receipt path exists",
+    "live_model_and_embedding": "separate bounded trace required; scripted/fake tests never imply provider/local-model execution",
+    "unexecuted_software_variants": "remain not_run individually; listing T033-T056 is not full feature acceptance"
+  }
+}

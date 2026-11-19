@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "model_id": "BAAI/bge-small-zh-v1.5",
+  "repository": "Qdrant/bge-small-zh-v1.5",
+  "revision": "46fbe35fd4374a00fee7de77dfddaeb6dd6a2c59",
+  "dimension": 512,
+  "max_input_tokens": 512,
+  "license": "mit",
+  "license_source": "https://github.com/qdrant/fastembed/blob/main/fastembed/text/onnx_embedding.py",
+  "metadata_source": "https://huggingface.co/api/models/Qdrant/bge-small-zh-v1.5?blobs=true",
+  "files": [
+    {"path": "config.json", "size": 739, "git_blob_sha1": "60938626ad1097a0c1a14be4f8340e32c714a056"},
+    {"path": "model_optimized.onnx", "size": 94781076, "sha256": "1294ea4b6331115a353d81f96b85e8c8d7fdcc284453d5b2fab5b016230aad38"},
+    {"path": "ort_config.json", "size": 1234, "git_blob_sha1": "31d3edac186bcfc7fb617662b7e0f750c7fef47a"},
+    {"path": "special_tokens_map.json", "size": 125, "git_blob_sha1": "a8b3208c2884c4efb86e49300fdd3dc877220cdf"},
+    {"path": "tokenizer.json", "size": 439125, "git_blob_sha1": "cdb3043fc938fc918c06e66cf704c2ba58f88747"},
+    {"path": "tokenizer_config.json", "size": 367, "git_blob_sha1": "3a59388f0fd1bd22dec2ce7902c1be8e1fb84107"},
+    {"path": "vocab.txt", "size": 109540, "git_blob_sha1": "ca4f9781030019ab9b253c6dcb8c7878b6dc87a5"}
+  ]
+}

@@ -1,0 +1,50 @@
+# Add after web/worker/diagnosis. Knowledge and model assets stay project-local.
+x-knowledge-environment: &knowledge-environment
+  SF_EMBEDDING_MODEL_DIR: /models/bge-small-zh-v1.5
+  SF_KB_UPLOAD_DIR: /data/knowledge/uploads
+  SF_KB_SNAPSHOT_DIR: /data/knowledge/indexes
+services:
+  api:
+    environment:
+      <<: *knowledge-environment
+      SF_GRAPH_VERSION: readonly-diagnosis-rag-v1
+      SF_KNOWLEDGE_QUESTION_MODE: ${SF_KNOWLEDGE_QUESTION_MODE:-disabled}
+      SF_CAPACITY_DIAGNOSIS_MODE: ${SF_CAPACITY_DIAGNOSIS_MODE:-disabled}
+    volumes:
+      - knowledge:/data/knowledge
+      - ../../.cache/models/bge-small-zh-v1.5/46fbe35fd4374a00fee7de77dfddaeb6dd6a2c59:/models/bge-small-zh-v1.5:ro
+  worker:
+    environment:
+      <<: *knowledge-environment
+    volumes:
+      - knowledge:/data/knowledge:ro
+      - ../../.cache/models/bge-small-zh-v1.5/46fbe35fd4374a00fee7de77dfddaeb6dd6a2c59:/models/bge-small-zh-v1.5:ro
+  scanner:
+    environment:
+      <<: *knowledge-environment
+    volumes:
+      - knowledge:/data/knowledge:ro
+      - ../../.cache/models/bge-small-zh-v1.5/46fbe35fd4374a00fee7de77dfddaeb6dd6a2c59:/models/bge-small-zh-v1.5:ro
+  knowledge-setup:
+    profiles: [setup]
+    image: sf-local-python-dev:env
+    pull_policy: never
+    platform: linux/amd64
+    working_dir: /work
+    read_only: true
+    tmpfs: [/tmp]
+    environment:
+      <<: *knowledge-environment
+      PYTHONDONTWRITEBYTECODE: "1"
+      PGHOST: postgres
+      PGDATABASE: ${SF_WEB_APP_DB:-sf_app}
+      PGPASSWORD_FILE: /run/secrets/app_runtime_password
+    volumes:
+      - ../../apps/supportflow/retrieval:/work/apps/supportflow/retrieval:ro
+      - ../../apps/supportflow/knowledge:/work/apps/supportflow/knowledge:ro
+      - knowledge:/data/knowledge
+      - ../../.cache/models/bge-small-zh-v1.5/46fbe35fd4374a00fee7de77dfddaeb6dd6a2c59:/models/bge-small-zh-v1.5:ro
+    secrets: [app_runtime_password]
+    command: [sh, -ec, 'python -B -m apps.supportflow.knowledge.cli ensure --tenant tenant_a --actor user_a_admin --corpus-tenant primary; python -B -m apps.supportflow.knowledge.cli ensure --tenant tenant_b --actor user_b_admin --corpus-tenant secondary']
+volumes:
+  knowledge: {}

@@ -1,0 +1,263 @@
+{
+  "schema_version": 1,
+  "corpus_origin": "synthetic_business",
+  "provenance": "Manually authored local demonstration corpus; no production customer or policy experience is claimed.",
+  "documents": [
+    {
+      "slug": "temporary-seat-policy-v1",
+      "file": "temporary-seat-policy-v1.md",
+      "title": "临时席位申请规则 v1",
+      "tenant": "primary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "other-temporary-seat-policy-v1",
+      "file": "temporary-seat-policy-v1.md",
+      "title": "临时席位申请规则 v1",
+      "tenant": "secondary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "invitation-current",
+      "file": "invitation-current.md",
+      "title": "邀请排障手册",
+      "tenant": "primary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "subscription-status",
+      "file": "subscription-status.md",
+      "title": "订阅状态读取",
+      "tenant": "primary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "temporary-expiry",
+      "file": "temporary-expiry.md",
+      "title": "临时席位有效期",
+      "tenant": "primary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "domain-boundary",
+      "file": "domain-boundary.md",
+      "title": "邮箱域名边界",
+      "tenant": "primary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "invitation-status",
+      "file": "invitation-status.md",
+      "title": "邀请状态释义",
+      "tenant": "primary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "service-observation",
+      "file": "service-observation.md",
+      "title": "服务状态观察",
+      "tenant": "primary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "unknown-fields",
+      "file": "unknown-fields.md",
+      "title": "未知事实处理",
+      "tenant": "primary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "customer-binding",
+      "file": "customer-binding.md",
+      "title": "客户绑定核对",
+      "tenant": "primary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "diagnosis-meaning",
+      "file": "diagnosis-meaning.md",
+      "title": "诊断完成语义",
+      "tenant": "primary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "access-revocation",
+      "file": "access-revocation.md",
+      "title": "资料撤权",
+      "tenant": "primary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "approval-boundary",
+      "file": "approval-boundary.md",
+      "title": "审批边界说明",
+      "tenant": "primary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "reference-history",
+      "file": "reference-history.md",
+      "title": "历史引用定位",
+      "tenant": "primary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "upload-format",
+      "file": "upload-format.md",
+      "title": "知识上传格式",
+      "tenant": "primary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "knowledge-publish",
+      "file": "knowledge-publish.md",
+      "title": "知识版本发布",
+      "tenant": "primary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "run-timeout",
+      "file": "run-timeout.md",
+      "title": "运行预算说明",
+      "tenant": "primary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "manual-handoff",
+      "file": "manual-handoff.md",
+      "title": "人工交接信息",
+      "tenant": "primary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "noise-billing",
+      "file": "noise-billing.md",
+      "title": "账单日期演示",
+      "tenant": "primary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "noise-export",
+      "file": "noise-export.md",
+      "title": "报表导出演示",
+      "tenant": "primary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "noise-theme",
+      "file": "noise-theme.md",
+      "title": "界面主题演示",
+      "tenant": "primary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "noise-timezone",
+      "file": "noise-timezone.md",
+      "title": "时区展示演示",
+      "tenant": "primary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "noise-contact",
+      "file": "noise-contact.md",
+      "title": "联系信息演示",
+      "tenant": "primary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "private-operations",
+      "file": "private-operations.md",
+      "title": "内部演示资料",
+      "tenant": "primary",
+      "visibility": "private",
+      "active": true
+    },
+    {
+      "slug": "private-audit",
+      "file": "private-audit.md",
+      "title": "内部审计说明",
+      "tenant": "primary",
+      "visibility": "private",
+      "active": true
+    },
+    {
+      "slug": "injection-text",
+      "file": "injection-text.md",
+      "title": "不可信注入样例",
+      "tenant": "primary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "old-invitation",
+      "file": "old-invitation.md",
+      "title": "历史邀请说明",
+      "tenant": "primary",
+      "visibility": "tenant",
+      "active": false
+    },
+    {
+      "slug": "other-invitation",
+      "file": "other-invitation.md",
+      "title": "其他租户邀请手册",
+      "tenant": "secondary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "other-private",
+      "file": "other-private.md",
+      "title": "其他租户私有资料",
+      "tenant": "secondary",
+      "visibility": "private",
+      "active": true
+    },
+    {
+      "slug": "other-billing",
+      "file": "other-billing.md",
+      "title": "其他租户账单说明",
+      "tenant": "secondary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "other-service",
+      "file": "other-service.md",
+      "title": "其他租户服务说明",
+      "tenant": "secondary",
+      "visibility": "tenant",
+      "active": true
+    },
+    {
+      "slug": "other-noise",
+      "file": "other-noise.md",
+      "title": "其他租户界面说明",
+      "tenant": "secondary",
+      "visibility": "tenant",
+      "active": true
+    }
+  ]
+}

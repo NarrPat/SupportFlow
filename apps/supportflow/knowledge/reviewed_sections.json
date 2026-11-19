@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "review_scope": "Reviewed synthetic diagnosis and policy text. The legacy policy.temporary_seats section remains background only. The complete policy.temporary_seats.v1 section can supply policy evidence only after current authorization and exact full-chunk hash matching; the separate server grant gate must still verify its fixed constants, confirmation and all live facts. Topic support never grants approval or business-write authority. AI-assisted code-side review is not human-reviewed holdout gold.",
+  "sections": [
+    {
+      "section_id": "policy.temporary_seats.v1",
+      "content_sha256": "89310ab4bedb6b246ab9367e75082acb0d594c5b13ed374273a1209c057695e6",
+      "supported_topics": [
+        "temporary_seats_policy",
+        "domain_policy",
+        "invitation_lifecycle",
+        "service_health_rules"
+      ],
+      "supported_codes": []
+    },
+    {
+      "section_id": "invitation.overview",
+      "content_sha256": "272af37f494f04b5943dc558fa7cca007865870f47e189ce93cedbb15b693d9b",
+      "supported_topics": [
+        "invitation_diagnosis",
+        "service_health_rules"
+      ],
+      "supported_codes": []
+    },
+    {
+      "section_id": "invitation.capacity",
+      "content_sha256": "092b75bd65fdef705dc3f45144e6c2cbaa7c9557e01876834a31a665c24dc820",
+      "supported_topics": [],
+      "supported_codes": [
+        "CAPACITY_EXHAUSTED"
+      ]
+    },
+    {
+      "section_id": "invitation.other_blockers",
+      "content_sha256": "5e9bd54ff9b6dec1aa8410dca336dcd2d6e297d09ff3b8f7f4490e9ced7dba75",
+      "supported_topics": [
+        "service_health",
+        "domain_policy",
+        "invitation_lifecycle",
+        "service_health_rules"
+      ],
+      "supported_codes": [
+        "PLAN_NOT_ACTIVE",
+        "DOMAIN_NOT_ALLOWED",
+        "INVITATION_PERMISSION_DENIED",
+        "INVITATION_NOT_YET_VALID",
+        "INVITATION_EXPIRED",
+        "ALREADY_JOINED",
+        "INVITATION_REVOKED",
+        "SERVICE_UNAVAILABLE"
+      ],
+      "supported_unknown_codes": [
+        "SERVICE_STATUS_UNKNOWN",
+        "DOMAIN_POLICY_UNKNOWN",
+        "INVITATION_UNAVAILABLE"
+      ]
+    },
+    {
+      "section_id": "policy.temporary_seats",
+      "content_sha256": "26f3553369d2b59e1e757a4b5e90b59b2cf0f405f34a5d2a68769638407d2637",
+      "supported_topics": [
+        "grant_temporary_seats"
+      ],
+      "supported_codes": []
+    },
+    {
+      "section_id": "invitation.capacity",
+      "content_sha256": "f9cf74e1a285156e727b3e1b0a98b43940854d6bb759487a8b79b91026bc6170",
+      "supported_topics": [
+        "seat_capacity",
+        "invitation_lifecycle"
+      ],
+      "supported_codes": [
+        "CAPACITY_EXHAUSTED"
+      ]
+    },
+    {
+      "section_id": "invitation.roles",
+      "content_sha256": "27d46667e0b0800031f694c93ec25301e7271a70c702abd140fb472ebcefe290",
+      "supported_topics": [
+        "invitation_roles"
+      ],
+      "supported_codes": []
+    },
+    {
+      "section_id": "domain-boundary",
+      "content_sha256": "eb5fcd62f8d5f8bd7d25daaabfcb1dd16bcdbf08ce5ead7a67dfb5077f140235",
+      "supported_topics": [
+        "domain_policy"
+      ],
+      "supported_codes": []
+    },
+    {
+      "section_id": "unknown-fields",
+      "content_sha256": "363f176ffdbe44f1ec2b431e209f162d3de4cffea0dbd599193a9293b39f1a6d",
+      "supported_topics": [
+        "domain_policy",
+        "invitation_lifecycle",
+        "service_unknown"
+      ],
+      "supported_codes": []
+    },
+    {
+      "section_id": "invitation-status",
+      "content_sha256": "708349858e4b1217ee611cec0729ebead65a2f95cb58227fd8b82c0a50f6e215",
+      "supported_topics": [
+        "invitation_lifecycle"
+      ],
+      "supported_codes": []
+    },
+    {
+      "section_id": "service-observation",
+      "content_sha256": "cd05a95d7375157be1d80e4dabe636499088d81b99a730a73e7743912bb675f5",
+      "supported_topics": [
+        "service_health_rules",
+        "service_unknown"
+      ],
+      "supported_codes": []
+    },
+    {
+      "section_id": "manual-handoff",
+      "content_sha256": "a90978150b3e88b226dab17ba801b6a4ed22eb6538cd2c1ed27cd18f80992a71",
+      "supported_topics": [
+        "service_unknown"
+      ],
+      "supported_codes": []
+    },
+    {
+      "section_id": "reference-history",
+      "content_sha256": "b6fa4875e3a28164f8175e92cdf8f61cfda386897784479817cefdfb24551b7e",
+      "supported_topics": [
+        "knowledge_governance"
+      ],
+      "supported_codes": []
+    },
+    {
+      "section_id": "knowledge-publish",
+      "content_sha256": "30937c2bee48f3d888563051b732bab18bac6e005c5cef866f45c05459b57bf8",
+      "supported_topics": [
+        "knowledge_governance"
+      ],
+      "supported_codes": []
+    },
+    {
+      "section_id": "access-revocation",
+      "content_sha256": "134b809750879230be2d1e11ce2fb8de39fddb6c58597ba1b05e5f2aeb20aabb",
+      "supported_topics": [
+        "knowledge_governance"
+      ],
+      "supported_codes": []
+    }
+  ]
+}
