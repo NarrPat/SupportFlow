@@ -1,0 +1,668 @@
+diff --git a/artifacts/iterations/SF-I001/development-notes/run-v9-continuation-repair.py b/artifacts/iterations/SF-I001/development-notes/run-v9-continuation-repair.py
+new file mode 100644
+index 00000000..6628dcd4
+--- /dev/null
++++ b/artifacts/iterations/SF-I001/development-notes/run-v9-continuation-repair.py
+@@ -0,0 +1,67 @@
++"""Recheck exactly the nonpassing units of the v9 continuation, under a new registration."""
++import argparse
++import json
++from pathlib import Path
++import runpy
++import subprocess
++import sys
++
++ROOT = Path.cwd()
++NOTES = Path(__file__).resolve().parent
++sys.path.insert(0, str(ROOT / 'tools'))
++from formal_results import create_manifest, read_reference, reference, require, write_exclusive
++from formal_scheduler import scheduler_owner
++from formal_unit_material import V9_CONTINUATION_REPAIR
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('output', type=Path)
++    parser.add_argument('--first-batch', type=int, required=True)
++    parser.add_argument('--previous-batch', required=True)
++    parser.add_argument('--unit', action='append')
++    args = parser.parse_args()
++    target = args.output.resolve()
++    require(target.is_relative_to(NOTES) and not target.exists(), 'New evidence directory required')
++    require(not subprocess.check_output(['git', 'diff', 'HEAD', '--name-only'], text=True).strip(),
++            'Tracked source differs from registered commit')
++    source = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
++    spec = read_reference(ROOT, reference(ROOT, V9_CONTINUATION_REPAIR))
++    history = read_reference(ROOT, spec['origin_report'])
++    original = read_reference(ROOT, spec['origin_manifest'])
++    require(history['manifest'] == spec['origin_manifest'], 'History points to another manifest')
++    rows = [u for u in history['units'][222:348] if u['status'] in ('failed', 'error')]
++    require(len(rows) == 35 and sum(u['status'] == 'failed' for u in rows) == 28,
++            'Historical continuation scope differs')
++    require(spec['unit_ids'] == [u['unit_id'] for u in rows] and spec['units'] == [
++        {'unit_id': u['unit_id'], 'arm': u['arm'], 'repetition': u['repetition'],
++         'original_status': u['status'], 'stage': u['failure']['stage'], 'result': u['result']}
++        for u in rows], 'Repair scope does not match the frozen records')
++    selected = set(args.unit or spec['unit_ids'])
++    require(selected and selected <= set(spec['unit_ids']), 'Unknown unit in repair scope')
++    manifest = create_manifest(ROOT, spec['experiment_prefix'] + target.name, source)
++    require(manifest['material'] == original['material'] and manifest['common'] == original['common'],
++            'Business material or common parameters changed')
++    units = {unit['unit_id']: unit for unit in manifest['units']}
++    run_unit = runpy.run_path(str(NOTES / 'run-v9-remaining-sample.py'))['run_unit']
++    outcomes = []
++    previous = args.previous_batch
++    with scheduler_owner(target):
++        write_exclusive(target / 'manifest.json', manifest)
++        for index, row in enumerate(u for u in rows if u['unit_id'] in selected):
++            uid = row['unit_id']
++            batch = f'SF-B{args.first_batch + index}-v9-continuation-recheck'
++            outcome = run_unit(target, manifest, units[uid], batch, previous)
++            outcome['original'] = row['result']
++            write_exclusive(target / uid.lower() / 'outcome.json', outcome)
++            print(json.dumps(outcome, ensure_ascii=False), flush=True)
++            outcomes.append(outcome)
++            if (NOTES.parent / batch / 'seal.json').is_file():
++                previous = batch
++        write_exclusive(target / 'outcomes.json', {'source_revision': source, 'formal_eligible': False,
++                                                   'units': outcomes})
++    return int(any(row['status'] != 'passed' for row in outcomes))
++
++
++if __name__ == '__main__':
++    sys.exit(main())
+diff --git a/evals/fixtures/supportflow/quality/v9-continuation-repair-v1.json b/evals/fixtures/supportflow/quality/v9-continuation-repair-v1.json
+new file mode 100644
+index 00000000..5056a663
+--- /dev/null
++++ b/evals/fixtures/supportflow/quality/v9-continuation-repair-v1.json
+@@ -0,0 +1,436 @@
++{
++  "schema_version": 1,
++  "experiment_prefix": "sf-calibration-v9-continuation-repair-",
++  "origin_report": {
++    "path": "artifacts/iterations/SF-I001/development-notes/SF-v9-resume-1795169960910/checkpoint-0348.json",
++    "sha256": "0ef78de9ffd965d1cb36c960f3ad2c5976682299841fb048f7df040ebe31415f"
++  },
++  "origin_manifest": {
++    "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9/manifest.json",
++    "sha256": "66c1556c5ecc51b4a8ffd41d6690ce99b9611d624417dd72828b1e9bd68583d8"
++  },
++  "unit_ids": [
++    "SF-029-r1-H0",
++    "SF-076-r2-H1-S0",
++    "SF-076-r2-H0",
++    "SF-100-r1-H0",
++    "SF-050-r2-H1-S0",
++    "SF-050-r2-H0",
++    "SF-089-r3-H1-S0",
++    "SF-089-r3-H0",
++    "SF-022-r3-H0",
++    "SF-022-r3-H1-S0",
++    "SF-090-r2-H1-S1",
++    "SF-090-r2-H0",
++    "SF-114-r3-H0",
++    "SF-080-r1-H1-S0",
++    "SF-080-r1-H0",
++    "SF-044-r1-H0",
++    "SF-044-r1-H1-S0",
++    "SF-047-r3-H1-S1",
++    "SF-047-r3-H1-S0",
++    "SF-059-r2-H1-S0",
++    "SF-080-r3-H0",
++    "SF-080-r3-H1-S0",
++    "SF-049-r1-H1-S0",
++    "SF-049-r1-H1-S1",
++    "SF-117-r2-H1-S0",
++    "SF-079-r2-H0",
++    "SF-079-r2-H1-S0",
++    "SF-082-r3-H1-S0",
++    "SF-082-r2-H0",
++    "SF-105-r2-H1-S0",
++    "SF-105-r2-H0",
++    "SF-054-r2-H1-S0",
++    "SF-054-r2-H1-S1",
++    "SF-079-r3-H0",
++    "SF-079-r3-H1-S0"
++  ],
++  "units": [
++    {
++      "unit_id": "SF-029-r1-H0",
++      "arm": "H0",
++      "repetition": 1,
++      "original_status": "failed",
++      "stage": "independent_score",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0225.json",
++        "sha256": "a349d8b836b6ab38495fcdc47ab9d009c46ebcd7283f1ff280c6ee547aeebc3b"
++      }
++    },
++    {
++      "unit_id": "SF-076-r2-H1-S0",
++      "arm": "H1-S0",
++      "repetition": 2,
++      "original_status": "failed",
++      "stage": "semantic_review",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0228.json",
++        "sha256": "9529f1df8920fb386f26a5835e11e60807d118496208fc134e757e8297c33eb5"
++      }
++    },
++    {
++      "unit_id": "SF-076-r2-H0",
++      "arm": "H0",
++      "repetition": 2,
++      "original_status": "failed",
++      "stage": "semantic_review",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0229.json",
++        "sha256": "32c331a972efb05c2353119122bbd313d152376c2b7975c54aec6a78519e4754"
++      }
++    },
++    {
++      "unit_id": "SF-100-r1-H0",
++      "arm": "H0",
++      "repetition": 1,
++      "original_status": "error",
++      "stage": "incomplete_observation",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0236.json",
++        "sha256": "5b36c907c0f7ef6f44d92d1b98c122b17ca4ec1614732b3ef330016383205fbc"
++      }
++    },
++    {
++      "unit_id": "SF-050-r2-H1-S0",
++      "arm": "H1-S0",
++      "repetition": 2,
++      "original_status": "failed",
++      "stage": "independent_score",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0239.json",
++        "sha256": "defaa291a62c1d0ea6d440ea38baca1f0c3faf19e65b08bf9ef34ab0bb86dede"
++      }
++    },
++    {
++      "unit_id": "SF-050-r2-H0",
++      "arm": "H0",
++      "repetition": 2,
++      "original_status": "failed",
++      "stage": "independent_score",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0240.json",
++        "sha256": "df1a0b571b6aaa72ff46a2fba85e6fbc0256559e09a3d3cd817bb2c3e0f2f3a3"
++      }
++    },
++    {
++      "unit_id": "SF-089-r3-H1-S0",
++      "arm": "H1-S0",
++      "repetition": 3,
++      "original_status": "failed",
++      "stage": "independent_score",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0251.json",
++        "sha256": "07d139e57eee70d49dc225fb29e849a90834e5a9a3dcef96a6b05b8e07664f90"
++      }
++    },
++    {
++      "unit_id": "SF-089-r3-H0",
++      "arm": "H0",
++      "repetition": 3,
++      "original_status": "failed",
++      "stage": "independent_score",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0252.json",
++        "sha256": "3c68b32a9e812bfc1fa4f8d03703dfede7d9735882b539dc3aaac8dbce5c827a"
++      }
++    },
++    {
++      "unit_id": "SF-022-r3-H0",
++      "arm": "H0",
++      "repetition": 3,
++      "original_status": "failed",
++      "stage": "semantic_review",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0253.json",
++        "sha256": "f47927e62ed1c2b8320b425b9baae84017a3a733ce5fca05b680858309544dfb"
++      }
++    },
++    {
++      "unit_id": "SF-022-r3-H1-S0",
++      "arm": "H1-S0",
++      "repetition": 3,
++      "original_status": "failed",
++      "stage": "semantic_review",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0254.json",
++        "sha256": "9f9e58b00c9cafb6ef9e59f8aacbbb6fbe539a454cc9d01a2b407e5f92f9c4f2"
++      }
++    },
++    {
++      "unit_id": "SF-090-r2-H1-S1",
++      "arm": "H1-S1",
++      "repetition": 2,
++      "original_status": "failed",
++      "stage": "semantic_review",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0270.json",
++        "sha256": "44d254772c612fec8c558e925f9fdc1c63a3e9568167fe37134609b4f653e3f5"
++      }
++    },
++    {
++      "unit_id": "SF-090-r2-H0",
++      "arm": "H0",
++      "repetition": 2,
++      "original_status": "failed",
++      "stage": "semantic_review",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0271.json",
++        "sha256": "cd815d8ce2aadae39288983f036f1ec589afdf3e5a9e7d9c9b4de404b6f012fa"
++      }
++    },
++    {
++      "unit_id": "SF-114-r3-H0",
++      "arm": "H0",
++      "repetition": 3,
++      "original_status": "failed",
++      "stage": "semantic_review",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0276.json",
++        "sha256": "38f463f2f7d1c6c20b676c326152867ecffa15d27988ace7a4dff4b9efd1aa90"
++      }
++    },
++    {
++      "unit_id": "SF-080-r1-H1-S0",
++      "arm": "H1-S0",
++      "repetition": 1,
++      "original_status": "error",
++      "stage": "incomplete_observation",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0278.json",
++        "sha256": "1d9a8583146452a1535c5ab0549ba7f0c2682c1343eb4bc6351284d8ef5af616"
++      }
++    },
++    {
++      "unit_id": "SF-080-r1-H0",
++      "arm": "H0",
++      "repetition": 1,
++      "original_status": "error",
++      "stage": "incomplete_observation",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0279.json",
++        "sha256": "16d093dfd1d4bd9cad3ec179f03ac4687ba2458a6d73bec2e77550e9040b2582"
++      }
++    },
++    {
++      "unit_id": "SF-044-r1-H0",
++      "arm": "H0",
++      "repetition": 1,
++      "original_status": "failed",
++      "stage": "independent_score",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0280.json",
++        "sha256": "b8b42b6bd589019d348a61a063bbc16372a2744d3a113e221af3549e6669e028"
++      }
++    },
++    {
++      "unit_id": "SF-044-r1-H1-S0",
++      "arm": "H1-S0",
++      "repetition": 1,
++      "original_status": "failed",
++      "stage": "independent_score",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0281.json",
++        "sha256": "24e7f1e88d9fc6b4586a0bab39650d791abef012b09fe96761cb97f7e3d1ae34"
++      }
++    },
++    {
++      "unit_id": "SF-047-r3-H1-S1",
++      "arm": "H1-S1",
++      "repetition": 3,
++      "original_status": "failed",
++      "stage": "independent_score",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0286.json",
++        "sha256": "fe021bdc518b45e08583b5e8523afd18247533a2f185c7aa1ac94b835238787a"
++      }
++    },
++    {
++      "unit_id": "SF-047-r3-H1-S0",
++      "arm": "H1-S0",
++      "repetition": 3,
++      "original_status": "failed",
++      "stage": "independent_score",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0288.json",
++        "sha256": "e344141c53ce0159744aadf134ab7e3f7e877c42f947616526f8138c641c7232"
++      }
++    },
++    {
++      "unit_id": "SF-059-r2-H1-S0",
++      "arm": "H1-S0",
++      "repetition": 2,
++      "original_status": "failed",
++      "stage": "semantic_review",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0290.json",
++        "sha256": "d3527bc0c7afd9c51da030a35d1a63e485c4304f5a9ec0f86536d23b0ac57aef"
++      }
++    },
++    {
++      "unit_id": "SF-080-r3-H0",
++      "arm": "H0",
++      "repetition": 3,
++      "original_status": "error",
++      "stage": "incomplete_observation",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0294.json",
++        "sha256": "0368702b41844317278df4055ccfbd59c3d06ab1d4900872049fe807db524de8"
++      }
++    },
++    {
++      "unit_id": "SF-080-r3-H1-S0",
++      "arm": "H1-S0",
++      "repetition": 3,
++      "original_status": "error",
++      "stage": "incomplete_observation",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0295.json",
++        "sha256": "845b8c5f6222d927a65ec11b32d92304828ac426ab16d66db414fe5bc2a28ce7"
++      }
++    },
++    {
++      "unit_id": "SF-049-r1-H1-S0",
++      "arm": "H1-S0",
++      "repetition": 1,
++      "original_status": "failed",
++      "stage": "independent_score",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0309.json",
++        "sha256": "7fc7beb771f1b8832902eca0126b3110467bc75091a237646cce52caf63e0ada"
++      }
++    },
++    {
++      "unit_id": "SF-049-r1-H1-S1",
++      "arm": "H1-S1",
++      "repetition": 1,
++      "original_status": "failed",
++      "stage": "independent_score",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0310.json",
++        "sha256": "604297539db25077911ec2950b700837b271da9a958b3580b46791647d982f2c"
++      }
++    },
++    {
++      "unit_id": "SF-117-r2-H1-S0",
++      "arm": "H1-S0",
++      "repetition": 2,
++      "original_status": "failed",
++      "stage": "semantic_review",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0311.json",
++        "sha256": "30556dedfa59dc2fac32a3f464a1d8c95dde2ff279e2ae75f13e90e2efae128a"
++      }
++    },
++    {
++      "unit_id": "SF-079-r2-H0",
++      "arm": "H0",
++      "repetition": 2,
++      "original_status": "failed",
++      "stage": "semantic_review",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0313.json",
++        "sha256": "8b820557974c42578f88e79faa9b195191534650a3e38198f49a8696bf6685da"
++      }
++    },
++    {
++      "unit_id": "SF-079-r2-H1-S0",
++      "arm": "H1-S0",
++      "repetition": 2,
++      "original_status": "failed",
++      "stage": "semantic_review",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0314.json",
++        "sha256": "d4359c535d52ccdade9ff1261319dc20689c62cf8a1db6361e0898821e0125de"
++      }
++    },
++    {
++      "unit_id": "SF-082-r3-H1-S0",
++      "arm": "H1-S0",
++      "repetition": 3,
++      "original_status": "failed",
++      "stage": "semantic_review",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0321.json",
++        "sha256": "dbd3fde32af3b85b57ab9eb7202f8662c898371ee3c38ac7d1f73e7b74fdd7bd"
++      }
++    },
++    {
++      "unit_id": "SF-082-r2-H0",
++      "arm": "H0",
++      "repetition": 2,
++      "original_status": "failed",
++      "stage": "semantic_review",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0323.json",
++        "sha256": "54864dee5bd78f630982b0d3b1148f0819c83507fb85e9916c9e88e459e4e225"
++      }
++    },
++    {
++      "unit_id": "SF-105-r2-H1-S0",
++      "arm": "H1-S0",
++      "repetition": 2,
++      "original_status": "error",
++      "stage": "no_run_admitted",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0326.json",
++        "sha256": "2e48fc552635ccd834e5354f37fb1e800d3679fd66e6508b6b00078f193f653f"
++      }
++    },
++    {
++      "unit_id": "SF-105-r2-H0",
++      "arm": "H0",
++      "repetition": 2,
++      "original_status": "error",
++      "stage": "no_run_admitted",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0327.json",
++        "sha256": "edd3dbc50908d6df0e49ff625eb630e4cfd0e23734b6d2626d8ca9cb9e71787a"
++      }
++    },
++    {
++      "unit_id": "SF-054-r2-H1-S0",
++      "arm": "H1-S0",
++      "repetition": 2,
++      "original_status": "failed",
++      "stage": "independent_score",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0332.json",
++        "sha256": "5dc90112541cb26a92290bdb1277c6777a154b2d09664a86e1702ed134561ecc"
++      }
++    },
++    {
++      "unit_id": "SF-054-r2-H1-S1",
++      "arm": "H1-S1",
++      "repetition": 2,
++      "original_status": "failed",
++      "stage": "independent_score",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0334.json",
++        "sha256": "100ea4ce6fb394806e9cecdb6f6f0abff820a0098321cb5f07892b59aca79e08"
++      }
++    },
++    {
++      "unit_id": "SF-079-r3-H0",
++      "arm": "H0",
++      "repetition": 3,
++      "original_status": "failed",
++      "stage": "semantic_review",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0342.json",
++        "sha256": "0229ab580959541ba0a182473f1e14761ff86e288afdb556cff8270d2606d40e"
++      }
++    },
++    {
++      "unit_id": "SF-079-r3-H1-S0",
++      "arm": "H1-S0",
++      "repetition": 3,
++      "original_status": "failed",
++      "stage": "semantic_review",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-ledger/0343.json",
++        "sha256": "59779d63162a82e83b18ca4b1045976513699b6d3b10cf6c20a90375557e9d3e"
++      }
++    }
++  ]
++}
+diff --git a/tools/formal_ai_review.py b/tools/formal_ai_review.py
+index ba393c0d..c5748c81 100644
+--- a/tools/formal_ai_review.py
++++ b/tools/formal_ai_review.py
+@@ -361,6 +361,51 @@ def competing_run_measurements(item, final):
+                            'dispatch_count': sum(r['run_id'] == target_id for r in target_app['action_dispatches'])}}
+ 
+ 
++def guarded_write_measurements(item, assertions):
++    """Project the specific observed control without exposing SQL rows or identifiers."""
++    groups = {group: {a['assertion_id'].removeprefix(f"{item['case_id']}.{group}."): a
++                      for a in assertions if a['assertion_id'].startswith(f"{item['case_id']}.{group}.")}
++              for group in ('integrity', 'duplicate_write', 'authority')}
++    integrity = item.get('integrity_control') or {}
++    if integrity.get('run_id') == item.get('target_run_id') and groups['integrity']:
++        facts = groups['integrity']
++        original = facts['original_parameters']['actual']
++        changed = facts['changed_command']['actual']
++        return 'immutable_proposal', {
++            'approved_parameters': dict(zip(('seats', 'days'), original, strict=True)),
++            'observed_replacement': {field: changed[field] for field in ('seats', 'days')},
++            'replacement_retains_approved_hash': facts['retained_hash']['actual'] == facts['original_hash']['actual'],
++            'replacement_hash_conflicts': facts['independent_hash_conflict']['actual'],
++            'terminal_reason': facts['terminal']['actual'][1],
++            'no_downstream_grant_http': facts['no_grant_http']['passed'],
++            'business_state_unchanged': facts['zero_agent_write']['passed'],
++        }
++    replay = item.get('duplicate_write_control') or {}
++    if (replay.get('operation') == 'repeat_same_decision'
++            and replay.get('run_id') == item.get('target_run_id') and groups['duplicate_write']):
++        facts = groups['duplicate_write']
++        return 'repeated_approval', {
++            'observed_decision_requests': facts['decision_http_count']['actual'],
++            'same_request_and_response': facts['same_request']['passed'] and facts['same_response']['passed'],
++            'persisted_decision_count': int(bool(facts['one_decision']['actual'])) if facts['one_decision']['passed'] else None,
++            'resume_outbox_count': facts['resume_once']['actual'],
++            'outbox_unchanged_on_replay': facts['replay_unchanged.outbox']['passed'],
++            'new_receipt_count': facts['one_new_effect']['actual'],
++        }
++    if (item.get('authority_control') or {}).get('operation') == 'revoke_scope' and groups['authority']:
++        facts = groups['authority']
++        return 'customer_scope_revocation', {
++            'scope_deleted': facts['deleted']['passed'],
++            'existing_stream_closed': facts['stream_closed']['actual'],
++            'new_sse_status': facts['new_sse_denied']['actual'],
++            'follow_up_access_statuses': facts['access_denials']['actual'],
++            'no_hidden_payload': facts['no_hidden_payload']['actual'],
++            'dispatch_count': len(facts['no_target_action_dispatches']['actual']),
++            'business_state_unchanged': facts['no_target_effect']['passed'],
++        }
++    return None
++
++
+ def packet(root,pending_path,*,include_issue_evidence=True):
+     pending=read_reference(root,reference(root,pending_path))
+     raw=read_reference(root,pending['observation']);score=read_reference(root,pending['independent_score'])
+@@ -392,11 +437,11 @@ def packet(root,pending_path,*,include_issue_evidence=True):
+             if filter_evidence is not None:
+                 actual['recorded_issue_filter'] = filter_evidence
+         version = pending.get('review_packet_version')
+-        if version in (2, 3, 4, 5, 6):
++        if version in (2, 3, 4, 5, 6, 7):
+             approval_evidence = approval_review_evidence(item, final, version=version)
+             if approval_evidence is not None:
+                 actual['approval_authority'] = approval_evidence
+-        if version in (3, 4, 5, 6):
++        if version in (3, 4, 5, 6, 7):
+             protected_approval = protected_approval_evidence(item)
+             if protected_approval is not None:
+                 actual['protected_approval'] = protected_approval
+@@ -413,14 +458,14 @@ def packet(root,pending_path,*,include_issue_evidence=True):
+         'failed_assertions':[c for c in checks if c['passed'] is not True]}
+     if pending.get('review_packet_version') in (2, 3, 4):
+         value['question_scope'] = pending['question_scope']
+-    if pending.get('review_packet_version') in (5, 6):
++    if pending.get('review_packet_version') in (5, 6, 7):
+         bundle = read_reference(root, pending['review_input'])
+         require(bundle['formal_unit']['binding'] == pending['binding'] and
+                 bundle['formal_unit']['dispatch_intent'] == pending['dispatch_intent'], 'Unbound review input')
+         case = bundle['case']
+         procedure = case['category'] == 'knowledge' and any(word in case['request'] for word in ('如何', '怎么', '为什么'))
+         value['question_scope'] = 'knowledge_procedure' if procedure else 'case'
+-    if pending.get('review_packet_version') in (5, 6) and actual:
++    if pending.get('review_packet_version') in (5, 6, 7) and actual:
+         if 'protected_approval' in actual:
+             value.update(review_scope='protected_approval_decision',
+                          actual={'protected_approval': actual['protected_approval']})
+@@ -436,10 +481,15 @@ def packet(root,pending_path,*,include_issue_evidence=True):
+         parallel_claim = parallel_claim_measurements(item, checks)
+         if parallel_claim is not None:
+             value.update(review_scope='parallel_claim', actual={'parallel_claim': parallel_claim})
+-        if pending['review_packet_version'] == 6:
++        if pending['review_packet_version'] in (6, 7):
+             competing = competing_run_measurements(item, final)
+             if competing is not None:
+                 value.update(review_scope='competing_run', actual={'competing_run': competing})
++        if pending['review_packet_version'] == 7 and value['independent_passed']:
++            control = guarded_write_measurements(item, checks)
++            if control is not None:
++                scope, measurement = control
++                value.update(review_scope=scope, actual={scope: measurement})
+     require(len(json.dumps(value,ensure_ascii=False).encode())<=PROFILE['max_packet_bytes'],
+             'Review packet exceeds bound: explicit evidence adapter required, no truncation')
+     return value,pending
+@@ -469,7 +519,7 @@ def review(root,pending_path,output,model):
+     system = SYSTEM
+     schema = SCHEMA
+     version = pending.get('review_packet_version')
+-    if version in (2, 3, 4, 5, 6):
++    if version in (2, 3, 4, 5, 6, 7):
+         count = len(value['requirements'])
+         system += REVIEW_V2_GUIDANCE
+         if version >= 3:
+diff --git a/tools/formal_unit_material.py b/tools/formal_unit_material.py
+index 7e8b8e28..0ec42a4c 100644
+--- a/tools/formal_unit_material.py
++++ b/tools/formal_unit_material.py
+@@ -13,11 +13,12 @@ STAGE2_ACCEPTANCE = 'evals/fixtures/supportflow/quality/simplified-stage2-accept
+ V9_FAILURE_RECHECK = 'evals/fixtures/supportflow/quality/v9-failure-recheck-v1.json'
+ V9_REMAINING_SAMPLE = 'evals/fixtures/supportflow/quality/v9-remaining-100-v1.json'
+ V9_EARLIER_FOUR = 'evals/fixtures/supportflow/quality/v9-earlier-four-v1.json'
++V9_CONTINUATION_REPAIR = 'evals/fixtures/supportflow/quality/v9-continuation-repair-v1.json'
+ 
+ 
+ def recheck_spec(root, experiment_id, unit_id):
+     for path in (RECHECK, STAGE1_RECHECK, STAGE2_ACCEPTANCE, V9_FAILURE_RECHECK,
+-                 V9_REMAINING_SAMPLE, V9_EARLIER_FOUR):
++                 V9_REMAINING_SAMPLE, V9_EARLIER_FOUR, V9_CONTINUATION_REPAIR):
+         spec = json.loads((root / path).read_bytes())
+         unit_ids = spec['unit_ids'] if 'unit_ids' in spec else [spec['unit_id']]
+         if experiment_id.startswith(spec['experiment_prefix']) and unit_id in unit_ids:
+diff --git a/tools/formal_unit_result.py b/tools/formal_unit_result.py
+index 4162d964..0e2a3e33 100644
+--- a/tools/formal_unit_result.py
++++ b/tools/formal_unit_result.py
+@@ -25,6 +25,7 @@ def bounded_checks(assess, name):
+ def collect(root,input_path,batch,directory,*,calibration=False):
+     from evidence_archive import verify_batch
+     from formal_case_scoring import assess_unit_directory
++    from formal_unit_material import V9_CONTINUATION_REPAIR, recheck_spec
+     bundle=load_bundle(root,input_path)
+     expected_mode = 'dev_formal_path_calibration' if calibration else 'formal_native'
+     require(bundle['mode']==expected_mode,'Collection mode does not match input')
+@@ -73,7 +74,8 @@ def collect(root,input_path,batch,directory,*,calibration=False):
+     pending={'state':'awaiting_ai_review','binding':binding,'run_id':state['run_id'],
+         'dispatch_intent':bundle['formal_unit']['dispatch_intent'],'observation':score['observation'],
+         'independent_score':reference(root,directory/'score.json'),'redispatch_allowed':False}
+-    pending.update(review_packet_version=6, review_input=reference(root,input_path))
++    repair_packet = calibration and recheck_spec(root, binding['experiment_id'], binding['unit_id']) == V9_CONTINUATION_REPAIR
++    pending.update(review_packet_version=7 if repair_packet else 6, review_input=reference(root,input_path))
+     write_exclusive(directory/'pending-review.json',pending)
+     return pending
+ 

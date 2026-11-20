@@ -49,3 +49,5 @@ pwsh -NoProfile -File tools/build-spring-sandbox.ps1
 [Java 实现](apps/supportflow/spring-sandbox) · [Java Compose](deploy/supportflow/compose.spring-java.yaml) · [回执对账](apps/supportflow/jobs/grant_reconciliation.py)
 
 本快照对应开发仓提交 `5d55ea35c873bf99d34211024cc20e8a052347f8`，含应用、依赖锁、启动夹具和可独立运行的 Java 与前端测试。[验收范围、版本与证据批次](docs/verification.md)
+
+[v9 失败修复与逐项复验摘要](docs/verification.md#v9-失败与错误复验)

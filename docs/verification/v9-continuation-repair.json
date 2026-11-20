@@ -1,0 +1,334 @@
+{
+  "tested_source": "5e0d25b08fb78be53303e9c81c5d8d92f2ef81ed",
+  "formal_eligible": false,
+  "original_matrix": {
+    "planned": 534,
+    "recorded": 348,
+    "pending": 1,
+    "not_run": 185
+  },
+  "python_regression": {
+    "batch": "SF-B14735-v9-continuation-repair-offline",
+    "passed": 1745,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "units": [
+    {
+      "unit_id": "SF-029-r1-H0",
+      "arm": "H0",
+      "repetition": 1,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14700-v9-continuation-recheck",
+      "assertions_passed": 106
+    },
+    {
+      "unit_id": "SF-076-r2-H1-S0",
+      "arm": "H1-S0",
+      "repetition": 2,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14701-v9-continuation-recheck",
+      "assertions_passed": 76
+    },
+    {
+      "unit_id": "SF-076-r2-H0",
+      "arm": "H0",
+      "repetition": 2,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14702-v9-continuation-recheck",
+      "assertions_passed": 112
+    },
+    {
+      "unit_id": "SF-100-r1-H0",
+      "arm": "H0",
+      "repetition": 1,
+      "original_status": "error",
+      "recheck_status": "passed",
+      "batch": "SF-B14703-v9-continuation-recheck",
+      "assertions_passed": 101
+    },
+    {
+      "unit_id": "SF-050-r2-H1-S0",
+      "arm": "H1-S0",
+      "repetition": 2,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14704-v9-continuation-recheck",
+      "assertions_passed": 112
+    },
+    {
+      "unit_id": "SF-050-r2-H0",
+      "arm": "H0",
+      "repetition": 2,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14705-v9-continuation-recheck",
+      "assertions_passed": 136
+    },
+    {
+      "unit_id": "SF-089-r3-H1-S0",
+      "arm": "H1-S0",
+      "repetition": 3,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14706-v9-continuation-recheck",
+      "assertions_passed": 120
+    },
+    {
+      "unit_id": "SF-089-r3-H0",
+      "arm": "H0",
+      "repetition": 3,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14707-v9-continuation-recheck",
+      "assertions_passed": 120
+    },
+    {
+      "unit_id": "SF-022-r3-H0",
+      "arm": "H0",
+      "repetition": 3,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14708-v9-continuation-recheck",
+      "assertions_passed": 106
+    },
+    {
+      "unit_id": "SF-022-r3-H1-S0",
+      "arm": "H1-S0",
+      "repetition": 3,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14709-v9-continuation-recheck",
+      "assertions_passed": 94
+    },
+    {
+      "unit_id": "SF-090-r2-H1-S1",
+      "arm": "H1-S1",
+      "repetition": 2,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14710-v9-continuation-recheck",
+      "assertions_passed": 133
+    },
+    {
+      "unit_id": "SF-090-r2-H0",
+      "arm": "H0",
+      "repetition": 2,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14711-v9-continuation-recheck",
+      "assertions_passed": 169
+    },
+    {
+      "unit_id": "SF-114-r3-H0",
+      "arm": "H0",
+      "repetition": 3,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14712-v9-continuation-recheck",
+      "assertions_passed": 172
+    },
+    {
+      "unit_id": "SF-080-r1-H1-S0",
+      "arm": "H1-S0",
+      "repetition": 1,
+      "original_status": "error",
+      "recheck_status": "passed",
+      "batch": "SF-B14713-v9-continuation-recheck",
+      "assertions_passed": 97
+    },
+    {
+      "unit_id": "SF-080-r1-H0",
+      "arm": "H0",
+      "repetition": 1,
+      "original_status": "error",
+      "recheck_status": "passed",
+      "batch": "SF-B14714-v9-continuation-recheck",
+      "assertions_passed": 133
+    },
+    {
+      "unit_id": "SF-044-r1-H0",
+      "arm": "H0",
+      "repetition": 1,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14715-v9-continuation-recheck",
+      "assertions_passed": 138
+    },
+    {
+      "unit_id": "SF-044-r1-H1-S0",
+      "arm": "H1-S0",
+      "repetition": 1,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14716-v9-continuation-recheck",
+      "assertions_passed": 114
+    },
+    {
+      "unit_id": "SF-047-r3-H1-S1",
+      "arm": "H1-S1",
+      "repetition": 3,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14717-v9-continuation-recheck",
+      "assertions_passed": 135
+    },
+    {
+      "unit_id": "SF-047-r3-H1-S0",
+      "arm": "H1-S0",
+      "repetition": 3,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14718-v9-continuation-recheck",
+      "assertions_passed": 135
+    },
+    {
+      "unit_id": "SF-059-r2-H1-S0",
+      "arm": "H1-S0",
+      "repetition": 2,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14719-v9-continuation-recheck",
+      "assertions_passed": 136
+    },
+    {
+      "unit_id": "SF-080-r3-H0",
+      "arm": "H0",
+      "repetition": 3,
+      "original_status": "error",
+      "recheck_status": "passed",
+      "batch": "SF-B14720-v9-continuation-recheck",
+      "assertions_passed": 133
+    },
+    {
+      "unit_id": "SF-080-r3-H1-S0",
+      "arm": "H1-S0",
+      "repetition": 3,
+      "original_status": "error",
+      "recheck_status": "passed",
+      "batch": "SF-B14721-v9-continuation-recheck",
+      "assertions_passed": 97
+    },
+    {
+      "unit_id": "SF-049-r1-H1-S0",
+      "arm": "H1-S0",
+      "repetition": 1,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14722-v9-continuation-recheck",
+      "assertions_passed": 124
+    },
+    {
+      "unit_id": "SF-049-r1-H1-S1",
+      "arm": "H1-S1",
+      "repetition": 1,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14723-v9-continuation-recheck",
+      "assertions_passed": 124
+    },
+    {
+      "unit_id": "SF-117-r2-H1-S0",
+      "arm": "H1-S0",
+      "repetition": 2,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14724-v9-continuation-recheck",
+      "assertions_passed": 141
+    },
+    {
+      "unit_id": "SF-079-r2-H0",
+      "arm": "H0",
+      "repetition": 2,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14725-v9-continuation-recheck",
+      "assertions_passed": 112
+    },
+    {
+      "unit_id": "SF-079-r2-H1-S0",
+      "arm": "H1-S0",
+      "repetition": 2,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14726-v9-continuation-recheck",
+      "assertions_passed": 76
+    },
+    {
+      "unit_id": "SF-082-r3-H1-S0",
+      "arm": "H1-S0",
+      "repetition": 3,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14727-v9-continuation-recheck",
+      "assertions_passed": 75
+    },
+    {
+      "unit_id": "SF-082-r2-H0",
+      "arm": "H0",
+      "repetition": 2,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14728-v9-continuation-recheck",
+      "assertions_passed": 111
+    },
+    {
+      "unit_id": "SF-105-r2-H1-S0",
+      "arm": "H1-S0",
+      "repetition": 2,
+      "original_status": "error",
+      "recheck_status": "passed",
+      "batch": "SF-B14729-v9-continuation-recheck",
+      "assertions_passed": 116
+    },
+    {
+      "unit_id": "SF-105-r2-H0",
+      "arm": "H0",
+      "repetition": 2,
+      "original_status": "error",
+      "recheck_status": "passed",
+      "batch": "SF-B14730-v9-continuation-recheck",
+      "assertions_passed": 128
+    },
+    {
+      "unit_id": "SF-054-r2-H1-S0",
+      "arm": "H1-S0",
+      "repetition": 2,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14731-v9-continuation-recheck",
+      "assertions_passed": 124
+    },
+    {
+      "unit_id": "SF-054-r2-H1-S1",
+      "arm": "H1-S1",
+      "repetition": 2,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14732-v9-continuation-recheck",
+      "assertions_passed": 124
+    },
+    {
+      "unit_id": "SF-079-r3-H0",
+      "arm": "H0",
+      "repetition": 3,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14733-v9-continuation-recheck",
+      "assertions_passed": 112
+    },
+    {
+      "unit_id": "SF-079-r3-H1-S0",
+      "arm": "H1-S0",
+      "repetition": 3,
+      "original_status": "failed",
+      "recheck_status": "passed",
+      "batch": "SF-B14734-v9-continuation-recheck",
+      "assertions_passed": 76
+    }
+  ]
+}
