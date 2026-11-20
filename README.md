@@ -2,7 +2,7 @@
 
 SupportFlow 是面向模拟双租户 SaaS 的客服工作台。客服从工单查邀请、订阅与服务事实，查看带版本和行号的知识引用。临时席位授予需主管批准具体提案；执行前重新核对权限和业务版本，提交后按回执对账。
 
-Python · FastAPI · LangGraph · PostgreSQL / pgvector · Celery / Redis · React / TypeScript
+Python · FastAPI · LangGraph · PostgreSQL / pgvector · Celery / Redis · React / TypeScript · Spring Boot（可选业务服务）
 
 ## 快速启动
 
@@ -37,4 +37,15 @@ $ui = @(Get-ChildItem tests/supportflow -Filter 'ui_*.test.mjs' | Sort-Object Na
 node --test @ui
 ```
 
-这是应用源码 `f05989c55ae91437ebf9ec14e5c69238ecf9ae12` 的独立运行快照。随仓库保留合成启动数据与前端测试，不包含开发仓的历史验收原档、数据库、日志或本机凭据。[验收范围与版本](docs/verification.md)
+## Spring Boot 业务服务
+
+在完整演示命令末尾加 `-WithJavaSandbox`，并准备支持 Java 21 字节码构建的 JDK（本次使用 JDK 25）。脚本用锁定的 Maven 构建 Java 模块。Java 使用独立 PostgreSQL 业务卷；Python 沿固定内部地址读取事实、批准后派发，并在收到回执后核对订阅。演示切换需等前一个运行窗口退出，两种模式都使用端口 18080。
+
+```powershell
+pwsh -NoProfile -File tools/build-spring-sandbox.ps1
+.venv/Scripts/python.exe -I -B -X utf8 tools/verify-spring-workbench-deploy.py
+```
+
+[Java 实现](apps/supportflow/spring-sandbox) · [Java Compose](deploy/supportflow/compose.spring-java.yaml) · [回执对账](apps/supportflow/jobs/grant_reconciliation.py)
+
+本快照对应开发仓提交 `5d55ea35c873bf99d34211024cc20e8a052347f8`，含应用、依赖锁、启动夹具和可独立运行的 Java 与前端测试。[验收范围、版本与证据批次](docs/verification.md)

@@ -1,0 +1,601 @@
+{
+  "schema_version": 1,
+  "source_revision": "f05989c55ae91437ebf9ec14e5c69238ecf9ae12",
+  "origin": "Python DTOs and canonical serialization; synthetic examples, not runtime observations",
+  "command_vectors": [
+    {
+      "case": "standard",
+      "request": {
+        "action_id": "action-standard",
+        "command_schema_version": 1,
+        "proposal_id": "proposal-standard",
+        "tenant_id": "tenant_a",
+        "customer_id": "cus_a_01",
+        "subscription_id": "sub_a_01",
+        "seats": 10,
+        "days": 3,
+        "expected_business_version": 7,
+        "policy_version": "v1",
+        "proposal_expires_at": "2026-11-07T00:15:00Z",
+        "canonical_args_hash": "fcf4f2b0ae478a2028702d135a01130c79cd35586796ddd64b141b0a121bfbd3",
+        "authorization_id": "auth-standard",
+        "authorized_at": "2026-11-07T00:02:00Z"
+      },
+      "canonical_json": "{\"action_type\":\"grant_temporary_seats\",\"business_version\":7,\"command_schema_version\":1,\"created_at\":\"2026-11-07T00:00:00Z\",\"customer_id\":\"cus_a_01\",\"days\":3,\"expires_at\":\"2026-11-07T00:15:00Z\",\"policy_version\":\"v1\",\"schema_version\":1,\"seats\":10,\"subscription_id\":\"sub_a_01\",\"tenant_id\":\"tenant_a\"}",
+      "sha256": "fcf4f2b0ae478a2028702d135a01130c79cd35586796ddd64b141b0a121bfbd3"
+    },
+    {
+      "case": "offset",
+      "request": {
+        "action_id": "action-offset",
+        "command_schema_version": 1,
+        "proposal_id": "proposal-offset",
+        "tenant_id": "tenant_a",
+        "customer_id": "cus_a_01",
+        "subscription_id": "sub_a_01",
+        "seats": 10,
+        "days": 3,
+        "expected_business_version": 9007199254740993,
+        "policy_version": "策略-😀-\"quote\"-\\",
+        "proposal_expires_at": "2026-11-07T05:45:00.012300+05:30",
+        "canonical_args_hash": "18b94baa27875775ad9c149b3eaa61370452b9e76d986a195ce9db2f3807731a",
+        "authorization_id": "auth-offset",
+        "authorized_at": "2026-11-07T00:02:00Z"
+      },
+      "canonical_json": "{\"action_type\":\"grant_temporary_seats\",\"business_version\":9007199254740993,\"command_schema_version\":1,\"created_at\":\"2026-11-07T00:00:00.012300Z\",\"customer_id\":\"cus_a_01\",\"days\":3,\"expires_at\":\"2026-11-07T00:15:00.012300Z\",\"policy_version\":\"策略-😀-\\\"quote\\\"-\\\\\",\"schema_version\":1,\"seats\":10,\"subscription_id\":\"sub_a_01\",\"tenant_id\":\"tenant_a\"}",
+      "sha256": "18b94baa27875775ad9c149b3eaa61370452b9e76d986a195ce9db2f3807731a"
+    },
+    {
+      "case": "same-instant-utc",
+      "request": {
+        "action_id": "action-offset",
+        "command_schema_version": 1,
+        "proposal_id": "proposal-offset",
+        "tenant_id": "tenant_a",
+        "customer_id": "cus_a_01",
+        "subscription_id": "sub_a_01",
+        "seats": 10,
+        "days": 3,
+        "expected_business_version": 9007199254740993,
+        "policy_version": "策略-😀-\"quote\"-\\",
+        "proposal_expires_at": "2026-11-07T00:15:00.012300Z",
+        "canonical_args_hash": "18b94baa27875775ad9c149b3eaa61370452b9e76d986a195ce9db2f3807731a",
+        "authorization_id": "auth-offset",
+        "authorized_at": "2026-11-07T00:02:00Z"
+      },
+      "canonical_json": "{\"action_type\":\"grant_temporary_seats\",\"business_version\":9007199254740993,\"command_schema_version\":1,\"created_at\":\"2026-11-07T00:00:00.012300Z\",\"customer_id\":\"cus_a_01\",\"days\":3,\"expires_at\":\"2026-11-07T00:15:00.012300Z\",\"policy_version\":\"策略-😀-\\\"quote\\\"-\\\\\",\"schema_version\":1,\"seats\":10,\"subscription_id\":\"sub_a_01\",\"tenant_id\":\"tenant_a\"}",
+      "sha256": "18b94baa27875775ad9c149b3eaa61370452b9e76d986a195ce9db2f3807731a"
+    },
+    {
+      "case": "long-max",
+      "request": {
+        "action_id": "action-long-max",
+        "command_schema_version": 1,
+        "proposal_id": "proposal-long-max",
+        "tenant_id": "tenant_a",
+        "customer_id": "cus_a_01",
+        "subscription_id": "sub_a_01",
+        "seats": 10,
+        "days": 3,
+        "expected_business_version": 9223372036854775807,
+        "policy_version": "v1",
+        "proposal_expires_at": "2026-11-07T00:15:00Z",
+        "canonical_args_hash": "ff5f4bbc3afba078061d2abc9893d977195e2c6ae1ceb61efffa7366cd6a3fc0",
+        "authorization_id": "auth-long-max",
+        "authorized_at": "2026-11-07T00:02:00Z"
+      },
+      "canonical_json": "{\"action_type\":\"grant_temporary_seats\",\"business_version\":9223372036854775807,\"command_schema_version\":1,\"created_at\":\"2026-11-07T00:00:00Z\",\"customer_id\":\"cus_a_01\",\"days\":3,\"expires_at\":\"2026-11-07T00:15:00Z\",\"policy_version\":\"v1\",\"schema_version\":1,\"seats\":10,\"subscription_id\":\"sub_a_01\",\"tenant_id\":\"tenant_a\"}",
+      "sha256": "ff5f4bbc3afba078061d2abc9893d977195e2c6ae1ceb61efffa7366cd6a3fc0"
+    }
+  ],
+  "rejected_commands": [
+    {
+      "case": "bool-seats",
+      "request": {
+        "action_id": "action-standard",
+        "command_schema_version": 1,
+        "proposal_id": "proposal-standard",
+        "tenant_id": "tenant_a",
+        "customer_id": "cus_a_01",
+        "subscription_id": "sub_a_01",
+        "seats": true,
+        "days": 3,
+        "expected_business_version": 7,
+        "policy_version": "v1",
+        "proposal_expires_at": "2026-11-07T00:15:00Z",
+        "canonical_args_hash": "fcf4f2b0ae478a2028702d135a01130c79cd35586796ddd64b141b0a121bfbd3",
+        "authorization_id": "auth-standard",
+        "authorized_at": "2026-11-07T00:02:00Z"
+      },
+      "status": 422
+    },
+    {
+      "case": "fractional-seats",
+      "request": {
+        "action_id": "action-standard",
+        "command_schema_version": 1,
+        "proposal_id": "proposal-standard",
+        "tenant_id": "tenant_a",
+        "customer_id": "cus_a_01",
+        "subscription_id": "sub_a_01",
+        "seats": 10.0,
+        "days": 3,
+        "expected_business_version": 7,
+        "policy_version": "v1",
+        "proposal_expires_at": "2026-11-07T00:15:00Z",
+        "canonical_args_hash": "fcf4f2b0ae478a2028702d135a01130c79cd35586796ddd64b141b0a121bfbd3",
+        "authorization_id": "auth-standard",
+        "authorized_at": "2026-11-07T00:02:00Z"
+      },
+      "status": 422
+    },
+    {
+      "case": "text-days",
+      "request": {
+        "action_id": "action-standard",
+        "command_schema_version": 1,
+        "proposal_id": "proposal-standard",
+        "tenant_id": "tenant_a",
+        "customer_id": "cus_a_01",
+        "subscription_id": "sub_a_01",
+        "seats": 10,
+        "days": "3",
+        "expected_business_version": 7,
+        "policy_version": "v1",
+        "proposal_expires_at": "2026-11-07T00:15:00Z",
+        "canonical_args_hash": "fcf4f2b0ae478a2028702d135a01130c79cd35586796ddd64b141b0a121bfbd3",
+        "authorization_id": "auth-standard",
+        "authorized_at": "2026-11-07T00:02:00Z"
+      },
+      "status": 422
+    },
+    {
+      "case": "bool-schema",
+      "request": {
+        "action_id": "action-standard",
+        "command_schema_version": true,
+        "proposal_id": "proposal-standard",
+        "tenant_id": "tenant_a",
+        "customer_id": "cus_a_01",
+        "subscription_id": "sub_a_01",
+        "seats": 10,
+        "days": 3,
+        "expected_business_version": 7,
+        "policy_version": "v1",
+        "proposal_expires_at": "2026-11-07T00:15:00Z",
+        "canonical_args_hash": "fcf4f2b0ae478a2028702d135a01130c79cd35586796ddd64b141b0a121bfbd3",
+        "authorization_id": "auth-standard",
+        "authorized_at": "2026-11-07T00:02:00Z"
+      },
+      "status": 422
+    },
+    {
+      "case": "past-long-max",
+      "request": {
+        "action_id": "action-standard",
+        "command_schema_version": 1,
+        "proposal_id": "proposal-standard",
+        "tenant_id": "tenant_a",
+        "customer_id": "cus_a_01",
+        "subscription_id": "sub_a_01",
+        "seats": 10,
+        "days": 3,
+        "expected_business_version": 9223372036854775808,
+        "policy_version": "v1",
+        "proposal_expires_at": "2026-11-07T00:15:00Z",
+        "canonical_args_hash": "fcf4f2b0ae478a2028702d135a01130c79cd35586796ddd64b141b0a121bfbd3",
+        "authorization_id": "auth-standard",
+        "authorized_at": "2026-11-07T00:02:00Z"
+      },
+      "status": 422
+    },
+    {
+      "case": "zero-version",
+      "request": {
+        "action_id": "action-standard",
+        "command_schema_version": 1,
+        "proposal_id": "proposal-standard",
+        "tenant_id": "tenant_a",
+        "customer_id": "cus_a_01",
+        "subscription_id": "sub_a_01",
+        "seats": 10,
+        "days": 3,
+        "expected_business_version": 0,
+        "policy_version": "v1",
+        "proposal_expires_at": "2026-11-07T00:15:00Z",
+        "canonical_args_hash": "fcf4f2b0ae478a2028702d135a01130c79cd35586796ddd64b141b0a121bfbd3",
+        "authorization_id": "auth-standard",
+        "authorized_at": "2026-11-07T00:02:00Z"
+      },
+      "status": 422
+    },
+    {
+      "case": "naive-time",
+      "request": {
+        "action_id": "action-standard",
+        "command_schema_version": 1,
+        "proposal_id": "proposal-standard",
+        "tenant_id": "tenant_a",
+        "customer_id": "cus_a_01",
+        "subscription_id": "sub_a_01",
+        "seats": 10,
+        "days": 3,
+        "expected_business_version": 7,
+        "policy_version": "v1",
+        "proposal_expires_at": "2026-11-07T00:15:00",
+        "canonical_args_hash": "fcf4f2b0ae478a2028702d135a01130c79cd35586796ddd64b141b0a121bfbd3",
+        "authorization_id": "auth-standard",
+        "authorized_at": "2026-11-07T00:02:00Z"
+      },
+      "status": 422
+    },
+    {
+      "case": "extra-field",
+      "request": {
+        "action_id": "action-standard",
+        "command_schema_version": 1,
+        "proposal_id": "proposal-standard",
+        "tenant_id": "tenant_a",
+        "customer_id": "cus_a_01",
+        "subscription_id": "sub_a_01",
+        "seats": 10,
+        "days": 3,
+        "expected_business_version": 7,
+        "policy_version": "v1",
+        "proposal_expires_at": "2026-11-07T00:15:00Z",
+        "canonical_args_hash": "fcf4f2b0ae478a2028702d135a01130c79cd35586796ddd64b141b0a121bfbd3",
+        "authorization_id": "auth-standard",
+        "authorized_at": "2026-11-07T00:02:00Z",
+        "unexpected": 1
+      },
+      "status": 422
+    },
+    {
+      "case": "changed-seats",
+      "request": {
+        "action_id": "action-standard",
+        "command_schema_version": 1,
+        "proposal_id": "proposal-standard",
+        "tenant_id": "tenant_a",
+        "customer_id": "cus_a_01",
+        "subscription_id": "sub_a_01",
+        "seats": 11,
+        "days": 3,
+        "expected_business_version": 7,
+        "policy_version": "v1",
+        "proposal_expires_at": "2026-11-07T00:15:00Z",
+        "canonical_args_hash": "fcf4f2b0ae478a2028702d135a01130c79cd35586796ddd64b141b0a121bfbd3",
+        "authorization_id": "auth-standard",
+        "authorized_at": "2026-11-07T00:02:00Z"
+      },
+      "status": 409
+    },
+    {
+      "case": "changed-expiry",
+      "request": {
+        "action_id": "action-standard",
+        "command_schema_version": 1,
+        "proposal_id": "proposal-standard",
+        "tenant_id": "tenant_a",
+        "customer_id": "cus_a_01",
+        "subscription_id": "sub_a_01",
+        "seats": 10,
+        "days": 3,
+        "expected_business_version": 7,
+        "policy_version": "v1",
+        "proposal_expires_at": "2026-11-07T00:15:01Z",
+        "canonical_args_hash": "fcf4f2b0ae478a2028702d135a01130c79cd35586796ddd64b141b0a121bfbd3",
+        "authorization_id": "auth-standard",
+        "authorized_at": "2026-11-07T00:02:00Z"
+      },
+      "status": 409
+    }
+  ],
+  "responses": {
+    "subscription": {
+      "ok": true,
+      "data": {
+        "subscription_id": "sub_a_01",
+        "base_seats": 100,
+        "used_seats": 100,
+        "temporary_seats": 0,
+        "temporary_expires_at": null,
+        "plan_status": "active",
+        "business_version": 7
+      },
+      "error_code": null,
+      "retryable": false,
+      "source": "sandbox.subscriptions",
+      "observed_at": "2026-11-07T00:02:00Z",
+      "schema_version": 1
+    },
+    "subscription_after": {
+      "ok": true,
+      "data": {
+        "subscription_id": "sub_a_01",
+        "base_seats": 100,
+        "used_seats": 100,
+        "temporary_seats": 10,
+        "temporary_expires_at": "2026-11-10T00:02:00Z",
+        "plan_status": "active",
+        "business_version": 8
+      },
+      "error_code": null,
+      "retryable": false,
+      "source": "sandbox.subscriptions",
+      "observed_at": "2026-11-07T00:02:00Z",
+      "schema_version": 1
+    },
+    "subscription-grant": {
+      "ok": true,
+      "data": {
+        "subscription_id": "sub_a_01",
+        "base_seats": 100,
+        "used_seats": 100,
+        "temporary_seats": 0,
+        "temporary_expires_at": null,
+        "plan_status": "active",
+        "business_version": 7,
+        "grant_history": {
+          "complete": true,
+          "receipts": []
+        },
+        "policy": {
+          "policy_version": "v1",
+          "section_id": "policy.temporary_seats.v1",
+          "content_sha256": "89310ab4bedb6b246ab9367e75082acb0d594c5b13ed374273a1209c057695e6",
+          "constants": {
+            "action_type": "grant_temporary_seats",
+            "command_schema_version": 1,
+            "seats_min": 1,
+            "seats_max": 20,
+            "days_min": 1,
+            "days_max": 7,
+            "required_plan_status": "active",
+            "cooldown_seconds": 2592000,
+            "proposal_ttl_seconds": 900,
+            "day_seconds": 86400,
+            "minimum_remaining_seats": 1,
+            "temporary_grant_mode": "replace_expired",
+            "approval_role": "supervisor",
+            "self_approval_allowed": false
+          }
+        }
+      },
+      "error_code": null,
+      "retryable": false,
+      "source": "sandbox.subscription_grant",
+      "observed_at": "2026-11-07T00:02:00Z",
+      "schema_version": 1
+    },
+    "subscription-grant_after": {
+      "ok": true,
+      "data": {
+        "subscription_id": "sub_a_01",
+        "base_seats": 100,
+        "used_seats": 100,
+        "temporary_seats": 10,
+        "temporary_expires_at": "2026-11-10T00:02:00Z",
+        "plan_status": "active",
+        "business_version": 8,
+        "grant_history": {
+          "complete": true,
+          "receipts": [
+            {
+              "action_id": "action-standard",
+              "tenant_id": "tenant_a",
+              "customer_id": "cus_a_01",
+              "subscription_id": "sub_a_01",
+              "canonical_args_hash": "fcf4f2b0ae478a2028702d135a01130c79cd35586796ddd64b141b0a121bfbd3",
+              "before_version": 7,
+              "after_version": 8,
+              "committed_business_at": "2026-11-07T00:02:00Z",
+              "seats": 10,
+              "days": 3,
+              "temporary_expires_at": "2026-11-10T00:02:00Z",
+              "policy_version": "v1"
+            }
+          ]
+        },
+        "policy": {
+          "policy_version": "v1",
+          "section_id": "policy.temporary_seats.v1",
+          "content_sha256": "89310ab4bedb6b246ab9367e75082acb0d594c5b13ed374273a1209c057695e6",
+          "constants": {
+            "action_type": "grant_temporary_seats",
+            "command_schema_version": 1,
+            "seats_min": 1,
+            "seats_max": 20,
+            "days_min": 1,
+            "days_max": 7,
+            "required_plan_status": "active",
+            "cooldown_seconds": 2592000,
+            "proposal_ttl_seconds": 900,
+            "day_seconds": 86400,
+            "minimum_remaining_seats": 1,
+            "temporary_grant_mode": "replace_expired",
+            "approval_role": "supervisor",
+            "self_approval_allowed": false
+          }
+        }
+      },
+      "error_code": null,
+      "retryable": false,
+      "source": "sandbox.subscription_grant",
+      "observed_at": "2026-11-07T00:02:00Z",
+      "schema_version": 1
+    },
+    "subscription-grant_unavailable": {
+      "ok": false,
+      "data": null,
+      "error_code": "UPSTREAM_UNAVAILABLE",
+      "retryable": false,
+      "source": "sandbox",
+      "observed_at": "2026-11-07T00:02:00Z",
+      "schema_version": 1
+    },
+    "invitation": {
+      "ok": true,
+      "data": {
+        "invitation": {
+          "invitation_id": "invite-current",
+          "email": "member@example.com",
+          "email_domain": "example.com",
+          "created_at": "2026-11-06T23:00:00Z",
+          "expires_at": "2026-11-08T00:00:00Z",
+          "status": "pending",
+          "reason_code": null
+        },
+        "policy": {
+          "allowed_domains": [
+            "example.com"
+          ],
+          "allow_subdomains": false,
+          "invitation_permission": true
+        },
+        "history": [
+          {
+            "invitation_id": "invite-old",
+            "email": "member@example.com",
+            "email_domain": "example.com",
+            "created_at": "2026-11-01T00:00:00Z",
+            "expires_at": "2026-11-02T00:00:00Z",
+            "status": "revoked",
+            "reason_code": null
+          }
+        ]
+      },
+      "error_code": null,
+      "retryable": false,
+      "source": "sandbox.invitations",
+      "observed_at": "2026-11-07T00:02:00Z",
+      "schema_version": 1
+    },
+    "service-status": {
+      "ok": true,
+      "data": {
+        "component": "invitations",
+        "status": "healthy",
+        "updated_at": "2026-11-07T00:02:00Z"
+      },
+      "error_code": null,
+      "retryable": false,
+      "source": "sandbox.service_statuses",
+      "observed_at": "2026-11-07T00:02:00Z",
+      "schema_version": 1
+    },
+    "grant": {
+      "ok": true,
+      "data": {
+        "action_id": "action-standard",
+        "tenant_id": "tenant_a",
+        "customer_id": "cus_a_01",
+        "subscription_id": "sub_a_01",
+        "canonical_args_hash": "fcf4f2b0ae478a2028702d135a01130c79cd35586796ddd64b141b0a121bfbd3",
+        "before_version": 7,
+        "after_version": 8,
+        "committed_business_at": "2026-11-07T00:02:00Z",
+        "seats": 10,
+        "days": 3,
+        "temporary_expires_at": "2026-11-10T00:02:00Z",
+        "policy_version": "v1",
+        "proposal_id": "proposal-standard",
+        "authorization_id": "auth-standard",
+        "authorized_at": "2026-11-07T00:02:00Z"
+      },
+      "error_code": null,
+      "retryable": false,
+      "source": "sandbox.temporary_grants",
+      "observed_at": "2026-11-07T00:02:00Z",
+      "schema_version": 1
+    },
+    "receipt": {
+      "ok": true,
+      "data": {
+        "action_id": "action-standard",
+        "tenant_id": "tenant_a",
+        "customer_id": "cus_a_01",
+        "subscription_id": "sub_a_01",
+        "canonical_args_hash": "fcf4f2b0ae478a2028702d135a01130c79cd35586796ddd64b141b0a121bfbd3",
+        "before_version": 7,
+        "after_version": 8,
+        "committed_business_at": "2026-11-07T00:02:00Z",
+        "seats": 10,
+        "days": 3,
+        "temporary_expires_at": "2026-11-10T00:02:00Z",
+        "policy_version": "v1",
+        "proposal_id": "proposal-standard",
+        "authorization_id": "auth-standard",
+        "authorized_at": "2026-11-07T00:02:00Z"
+      },
+      "error_code": null,
+      "retryable": false,
+      "source": "sandbox.action_receipts",
+      "observed_at": "2026-11-07T00:02:00Z",
+      "schema_version": 1
+    },
+    "receipt_missing": {
+      "ok": false,
+      "data": null,
+      "error_code": "NOT_FOUND",
+      "retryable": false,
+      "source": "sandbox.action_receipts",
+      "observed_at": "2026-11-07T00:02:00Z",
+      "schema_version": 1
+    },
+    "stale": {
+      "ok": false,
+      "data": null,
+      "error_code": "BUSINESS_VERSION_CHANGED",
+      "retryable": false,
+      "source": "sandbox.temporary_grants",
+      "observed_at": "2026-11-07T00:02:00Z",
+      "schema_version": 1
+    },
+    "grant_unauthenticated": {
+      "ok": false,
+      "data": null,
+      "error_code": "UNAUTHORIZED",
+      "retryable": false,
+      "source": "sandbox.temporary_grants",
+      "observed_at": "2026-11-07T00:02:00Z",
+      "schema_version": 1
+    },
+    "grant_scope_mismatch": {
+      "ok": false,
+      "data": null,
+      "error_code": "NOT_FOUND",
+      "retryable": false,
+      "source": "sandbox.temporary_grants",
+      "observed_at": "2026-11-07T00:02:00Z",
+      "schema_version": 1
+    },
+    "grant_invalid": {
+      "ok": false,
+      "data": null,
+      "error_code": "VALIDATION_ERROR",
+      "retryable": false,
+      "source": "sandbox.temporary_grants",
+      "observed_at": "2026-11-07T00:02:00Z",
+      "schema_version": 1
+    },
+    "grant_conflict": {
+      "ok": false,
+      "data": null,
+      "error_code": "IDEMPOTENCY_CONFLICT",
+      "retryable": false,
+      "source": "sandbox.temporary_grants",
+      "observed_at": "2026-11-07T00:02:00Z",
+      "schema_version": 1
+    },
+    "rollback": {
+      "ok": false,
+      "data": null,
+      "error_code": "DEPENDENCY_UNAVAILABLE",
+      "retryable": false,
+      "source": "sandbox.temporary_grants",
+      "observed_at": "2026-11-07T00:02:00Z",
+      "schema_version": 1
+    }
+  }
+}

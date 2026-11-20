@@ -13,6 +13,8 @@ evals/fixtures/supportflow/rag/cases.json -text
 evals/fixtures/supportflow/rag/browser-run-view-v2.json -text
 evals/fixtures/supportflow/approval/*.json -text
 evals/fixtures/supportflow/grant_execution/*.json -text
+evals/fixtures/supportflow/spring_sandbox/contract-v1.json -text
+apps/supportflow/spring-sandbox/dependency-tree.lock -text whitespace=cr-at-eol
 evals/fixtures/supportflow/six_views/*.json -text
 evals/fixtures/supportflow/public_reply/*.json -text
 evals/fixtures/supportflow/eval_accounting/*.json -text
@@ -28,6 +30,3 @@ tests/supportflow/h0_graph.py -text
 tests/supportflow/h1_strategy.py -text
 tests/supportflow/evaluation_binding.py -text
 apps/supportflow/agent/assets/deepseek-v41-tokenizer.json -text
-
-# Keep the original CRLF fixture bytes and allow CR at line endings in diffs.
-evals/fixtures/supportflow/rag/cases.json whitespace=cr-at-eol

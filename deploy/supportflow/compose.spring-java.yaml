@@ -1,0 +1,77 @@
+# Explicit replacement after all ordinary execution overlays. No test controls or host Java/DB ports.
+services:
+  sandbox: !override
+    image: sf-java-sandbox:workspace
+    build: {context: ../../apps/supportflow/spring-sandbox}
+    platform: linux/amd64
+    read_only: true
+    tmpfs: [/tmp]
+    environment:
+      SF_JAVA_JDBC_URL: jdbc:postgresql://java-postgres:5432/sf_java_workspace?currentSchema=public
+    secrets: [java_runtime_password, sandbox_service_token]
+    networks: [default, java-business]
+    depends_on:
+      java-postgres: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, bash, -ec, 'exec 3<>/dev/tcp/127.0.0.1/8001; printf "GET /health HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n" >&3; read -r line <&3; [[ "$$line" == "HTTP/1.1 200 "* ]]']
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  java-postgres:
+    image: pgvector/pgvector:pg16@sha256:c0cd736fe8b8b5d408db56b780570bac404fe518e66e39de624aa46f9aabc60a
+    platform: linux/amd64
+    environment:
+      POSTGRES_DB: sf_java_workspace
+      POSTGRES_USER: sf_java_bootstrap
+      POSTGRES_PASSWORD_FILE: /run/secrets/java_bootstrap_password
+      POSTGRES_INITDB_ARGS: --auth-local=scram-sha-256 --auth-host=scram-sha-256
+    secrets: [java_bootstrap_password, java_migrator_password, java_runtime_password, java_oracle_password]
+    networks: [java-business]
+    volumes:
+      - java_pgdata:/var/lib/postgresql/data
+      - ./spring-smoke/init-roles.sh:/docker-entrypoint-initdb.d/10-roles.sh:ro
+    healthcheck:
+      test: [CMD, pg_isready, -h, 127.0.0.1, -U, sf_java_bootstrap, -d, sf_java_workspace]
+      interval: 2s
+      timeout: 2s
+      retries: 25
+  java-migrate:
+    profiles: [setup]
+    image: sf-java-sandbox:workspace
+    platform: linux/amd64
+    read_only: true
+    tmpfs: [/tmp]
+    environment:
+      SF_JAVA_JDBC_URL: jdbc:postgresql://java-postgres:5432/sf_java_workspace?currentSchema=public
+    networks: [java-business]
+    secrets: [java_migrator_password]
+    command: [--spring.profiles.active=migrate]
+  java-seed:
+    profiles: [setup]
+    image: sf-local-python-dev:env
+    pull_policy: never
+    platform: linux/amd64
+    working_dir: /work
+    read_only: true
+    tmpfs: [/tmp]
+    networks: [java-business]
+    secrets: [java_migrator_password]
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+    volumes:
+      - ./spring-seed.py:/work/spring-seed.py:ro
+      - ../../apps/supportflow/db:/work/apps/supportflow/db:ro
+      - ../../apps/supportflow/domain:/work/apps/supportflow/domain:ro
+      - ../../apps/supportflow/knowledge:/work/apps/supportflow/knowledge:ro
+      - ../../evals/fixtures/supportflow/fx_base/seed.json:/fixture/base.json:ro
+      - ./demo-data/invitation-v1.json:/fixture/demo.json:ro
+    command: [python, -B, /work/spring-seed.py]
+networks:
+  java-business: {internal: true}
+volumes:
+  java_pgdata: {}
+secrets:
+  java_bootstrap_password: {file: '${SF_JAVA_SECRETS_DIR:?set Java secret directory}/java_bootstrap_password'}
+  java_migrator_password: {file: '${SF_JAVA_SECRETS_DIR:?set Java secret directory}/java_migrator_password'}
+  java_runtime_password: {file: '${SF_JAVA_SECRETS_DIR:?set Java secret directory}/java_runtime_password'}
+  java_oracle_password: {file: '${SF_JAVA_SECRETS_DIR:?set Java secret directory}/java_oracle_password'}

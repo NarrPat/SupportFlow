@@ -4,7 +4,7 @@ param(
     [ValidateRange(1,180)][int]$Minutes = 15,
     [switch]$WithWorker, [switch]$RequireIdle, [switch]$WithKnowledge, [switch]$WithClarification,
     [switch]$WithProposal, [switch]$WithApproval, [switch]$WithExecution, [switch]$WithDemoData,
-    [switch]$ObserveExistingUpgrade, [switch]$WithGitHubIssues
+    [switch]$ObserveExistingUpgrade, [switch]$WithGitHubIssues, [switch]$WithJavaSandbox
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -19,16 +19,21 @@ if ($WithExecution -and !$WithApproval) { throw 'WithExecution requires WithAppr
 if ($WithApproval -and !$WithProposal) { throw 'WithApproval requires WithProposal, WithKnowledge and WithWorker.' }
 if ($WithDemoData -and !$WithWorker) { throw 'WithDemoData requires WithWorker.' }
 if ($WithGitHubIssues -and !$WithKnowledge) { throw 'WithGitHubIssues requires WithKnowledge and WithWorker.' }
+if ($WithJavaSandbox -and (!$WithExecution -or $ObserveExistingUpgrade -or $RequireIdle)) {
+    throw 'WithJavaSandbox requires WithExecution and does not use the Python migration observation flags.'
+}
 $root = (Get-Item (Join-Path $PSScriptRoot '..')).FullName
 $deploy = Join-Path $root 'deploy/supportflow'
-$compose = @('compose','-p','sf-local','--project-directory',$deploy,'-f',"$deploy/compose.yaml",'-f',"$deploy/compose.web.yaml")
+$project = if ($WithJavaSandbox) {'sf-java-workspace'} else {'sf-local'}
+$compose = @('compose','-p',$project,'--project-directory',$deploy,'-f',"$deploy/compose.yaml",'-f',"$deploy/compose.web.yaml")
 if ($WithWorker) { $compose += @('-f',"$deploy/compose.worker.yaml",'-f',"$deploy/compose.diagnosis.yaml") }
 if ($WithKnowledge) { $compose += @('-f',"$deploy/compose.rag.yaml") }
 if ($WithClarification) { $compose += @('-f',"$deploy/compose.clarification.yaml") }
 if ($WithProposal) { $compose += @('-f',"$deploy/compose.proposal.yaml") }
 if ($WithApproval) { $compose += @('-f',"$deploy/compose.approval.yaml") }
 if ($WithExecution) { $compose += @('-f',"$deploy/compose.execution.yaml") }
-if ($WithDemoData) { $compose += @('-f',"$deploy/compose.demodata.yaml") }
+if ($WithDemoData -and !$WithJavaSandbox) { $compose += @('-f',"$deploy/compose.demodata.yaml") }
+if ($WithJavaSandbox) { $compose += @('-f',"$deploy/compose.spring-java.yaml") }
 if ($WithGitHubIssues) {
     if ([string]::IsNullOrWhiteSpace($env:SF_GITHUB_ALLOWED_REPOSITORIES)) {
         throw 'WithGitHubIssues requires SF_GITHUB_ALLOWED_REPOSITORIES.'
@@ -38,7 +43,8 @@ if ($WithGitHubIssues) {
     }
     $compose += @('-f',"$deploy/compose.github.yaml")
 }
-$filter = 'label=com.docker.compose.project=sf-local'
+$filter = "label=com.docker.compose.project=$project"
+$oldJavaSecrets = $env:SF_JAVA_SECRETS_DIR
 $result = @{failure = $null}
 
 function Invoke-Compose([string[]]$Arguments) {
@@ -60,14 +66,22 @@ function Observe-ProposalPhase([string]$Phase) {
 function Show-Workspace {
     # Only down after preflight has established exclusive ownership of the stack.
     try {
-        & "$deploy/verify-runtime.ps1" -PreflightOnly
+        & "$deploy/verify-runtime.ps1" -PreflightOnly -Project $project
         $networks = @(docker network ls -q --filter $filter)
-        if ($LASTEXITCODE -or $networks.Count) { throw 'The demo requires a clean sf-local network boundary.' }
+        if ($LASTEXITCODE -or $networks.Count) { throw "The demo requires a clean $project network boundary." }
         if ($WithWorker -and !(Test-Path -LiteralPath "$deploy/.secrets/deepseek_api_key" -PathType Leaf)) {
             throw 'Worker profile requires the local deepseek_api_key credential file.'
         }
         & "$root/.venv/Scripts/python.exe" -B "$deploy/init_accounts.py"
         if ($LASTEXITCODE) { throw 'Demo credential setup failed.' }
+        if ($WithJavaSandbox) {
+            & "$root/.venv/Scripts/python.exe" -B "$PSScriptRoot/init-spring-secrets.py"
+            if ($LASTEXITCODE) { throw 'Java credential setup failed.' }
+            $env:SF_JAVA_SECRETS_DIR = "$root/.local/spring-workspace-secrets".Replace('\','/')
+            & "$PSScriptRoot/build-spring-sandbox.ps1"
+            if ($LASTEXITCODE) { throw 'Java sandbox build failed.' }
+            Invoke-Compose @('build','sandbox')
+        }
         Push-Location "$root/apps/supportflow/web"
         try {
             & npm.cmd run build:product
@@ -79,8 +93,16 @@ function Show-Workspace {
         if ($ObserveExistingUpgrade) { Observe-ProposalPhase 'before_migration' }
         Invoke-Compose @('run','--rm','--no-deps','-T','app-setup')
         if ($RequireIdle) { Invoke-Compose @('run','--rm','--no-deps','-T','app-setup','python','-B','-m','apps.supportflow.db.demo_state','--require-idle') }
-        if ($WithWorker) { Invoke-Compose @('run','--rm','--no-deps','-T','sandbox-setup') }
-        if ($WithDemoData) { Invoke-Compose @('run','--rm','--no-deps','-T','demo-data-setup') }
+        if ($WithJavaSandbox) {
+            Invoke-Compose @('up','--no-deps','-d','--wait','--wait-timeout','120','java-postgres')
+            Invoke-Compose @('run','--rm','--no-deps','-T','java-migrate')
+            $seedArgs = @('run','--rm','--no-deps','-T','java-seed')
+            if ($WithDemoData) { $seedArgs += @('python','-B','/work/spring-seed.py','--demo') }
+            Invoke-Compose $seedArgs
+        } else {
+            if ($WithWorker) { Invoke-Compose @('run','--rm','--no-deps','-T','sandbox-setup') }
+            if ($WithDemoData) { Invoke-Compose @('run','--rm','--no-deps','-T','demo-data-setup') }
+        }
         Observe-ProposalPhase 'after_migration'
         if ($WithKnowledge) { Invoke-Compose @('run','--rm','--no-deps','-T','knowledge-setup') }
         Observe-ProposalPhase 'after_ensure'
@@ -99,6 +121,7 @@ function Show-Workspace {
         elseif ($WithApproval) { Write-Host 'Approval mode: decisions and dispatch authorization only; no business grant transport. Authorized runs explicitly hand off.' }
         elseif ($WithProposal) { Write-Host 'Proposal mode: prepares immutable pending review only; this legacy graph does not accept decisions or business grants.' }
         if ($WithDemoData) { Write-Host 'Demo invitation data: tenant_a customer C-001 and member@example.com. Existing grants and original invitation dates are retained.' }
+        if ($WithJavaSandbox) { Write-Host 'Java mode: sandbox:8001 uses the independent Java PostgreSQL data volume.' }
         Start-Sleep -Seconds ($Minutes * 60)
         Observe-ProposalPhase 'final'
         if ($RequireIdle) { Invoke-Compose @('run','--rm','--no-deps','-T','app-setup','python','-B','-m','apps.supportflow.db.demo_state','--require-idle') }
@@ -124,9 +147,9 @@ function Show-Workspace {
         Write-Host 'Demo drained: containers and networks removed; data volumes retained.'
     }
 }
-if (Test-Path -LiteralPath 'F:\work_agent_proj') {
+try { if (Test-Path -LiteralPath 'F:\work_agent_proj') {
     & "$PSScriptRoot/with-runtime-window.ps1" -CoordinationDirectory 'F:\work_agent_proj\coordination' `
-        -Purpose 'Time-limited SupportFlow ticket workspace' -Resources @('sf-local/18080 web, API, PostgreSQL; npm build', "Worker profile=$WithWorker; when enabled, Redis/Celery/DeepSeek with per-run 90s/8 calls/512 output cap", "Knowledge profile=$WithKnowledge; pinned local CPU embeddings and persistent knowledge volume", "Proposal profile=$WithProposal; pending review only, no approval or business grant") `
-        -MaxMinutes ($Minutes+15) -Work { Show-Workspace }
-} else { Show-Workspace }
+        -Purpose 'Time-limited SupportFlow ticket workspace' -Resources @("$project/18080 web, API, PostgreSQL; npm build", "Worker profile=$WithWorker; when enabled, Redis/Celery/DeepSeek with per-run 90s/8 calls/512 output cap", "Knowledge profile=$WithKnowledge; pinned local CPU embeddings and persistent knowledge volume", "Java profile=$WithJavaSandbox; when enabled, project-owned business PostgreSQL and Java build") `
+        -MaxMinutes ($Minutes+15) -ComposeProject $project -Work { Show-Workspace }
+} else { Show-Workspace } } finally { $env:SF_JAVA_SECRETS_DIR = $oldJavaSecrets }
 if ($result.failure) { throw $result.failure }

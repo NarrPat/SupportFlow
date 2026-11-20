@@ -11,8 +11,3 @@ __pycache__/
 .pytest_cache/
 *.pyc
 *.tsbuildinfo
-
-# Credentials generated for local deployment or added by the developer.
-.secrets/
-*.pem
-*.key

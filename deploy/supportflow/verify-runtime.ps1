@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param([switch]$PreflightOnly)
+param([switch]$PreflightOnly, [ValidateSet('sf-local','sf-java-workspace')][string]$Project='sf-local')
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -11,7 +11,6 @@ function Invoke-Docker([string[]]$Arguments) {
     }
 }
 
-$project = 'sf-local'
 $composeFile = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot 'compose.yaml')).Path
 $compose = @('compose', '-p', $project, '--project-directory', $PSScriptRoot, '-f', $composeFile)
 $projectFilter = "label=com.docker.compose.project=$project"
@@ -38,9 +37,9 @@ foreach ($name in $services) {
 
 # Refuse stopped containers too: a later 'down' must only remove what this run created.
 $existing = @(Invoke-Docker @('container', 'ls', '-aq', '--filter', $projectFilter))
-if ($existing.Count) { throw 'sf-local containers already exist; leaving them untouched.' }
-$networks = @(Invoke-Docker @('network', 'ls', '--filter', 'name=sf-local_default', '--format', '{{.Name}}') | Where-Object { $_ -ceq 'sf-local_default' })
-if ($networks.Count) { throw 'sf-local_default already exists; inspect its owner before a verification run.' }
+if ($existing.Count) { throw "$project containers already exist; leaving them untouched." }
+$networks = @(Invoke-Docker @('network', 'ls', '-q', '--filter', $projectFilter))
+if ($networks.Count) { throw "$project networks already exist; inspect their owner before a verification run." }
 foreach ($volume in @('pgdata', 'redisdata')) {
     $name = "${project}_$volume"
     $exists = @(Invoke-Docker @('volume', 'ls', '--filter', "name=$name", '--format', '{{.Name}}') | Where-Object { $_ -ceq $name })
@@ -51,7 +50,7 @@ foreach ($volume in @('pgdata', 'redisdata')) {
         }
     }
 }
-Write-Output 'Preflight OK: local engine, isolated sf-local configuration and no existing containers/network.'
+Write-Output "Preflight OK: local engine, isolated $project configuration and no existing containers/network."
 if ($PreflightOnly) { return }
 
 # The caller owns the exclusive resource window throughout startup and drain.
@@ -81,11 +80,11 @@ try {
         if ($remaining.Count -or $networks.Count) { throw 'sf-local containers or networks remain after down.' }
         if ($started) {
             $volumes = @(Invoke-Docker @('volume', 'ls', '--filter', $projectFilter, '--format', '{{.Name}}'))
-            foreach ($expected in @('sf-local_pgdata', 'sf-local_redisdata')) {
+            foreach ($expected in @("${project}_pgdata", "${project}_redisdata")) {
                 if ($expected -notin $volumes) { throw "Missing persistent volume after down: $expected" }
             }
         }
-        Write-Output 'Drain OK: zero sf-local containers and networks.'
+        Write-Output "Drain OK: zero $project containers and networks."
     } catch {
         $failures.Add("Drain verification: $($_.Exception.Message)")
     }

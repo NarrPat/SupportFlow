@@ -6,7 +6,8 @@ param(
     [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string]$Purpose,
     [Parameter(Mandatory)][scriptblock]$Work,
     [string[]]$Resources = @('supportflow project-local development environment'),
-    [ValidateRange(1, 240)][int]$MaxMinutes = 45
+    [ValidateRange(1, 240)][int]$MaxMinutes = 45,
+    [ValidatePattern('^sf-[a-z0-9-]{1,42}$')][string]$ComposeProject = 'sf-local'
 )
 $ErrorActionPreference = 'Stop'
 $coord = (Get-Item -LiteralPath $CoordinationDirectory).FullName
@@ -18,7 +19,7 @@ $window = [ordered]@{
     owner = 'supportflow'; nonce = $nonce; purpose = $Purpose
     started_at = $start.ToString('o'); max_deadline = $start.AddMinutes($MaxMinutes).ToString('o')
     project_root = (Get-Item -LiteralPath (Join-Path $PSScriptRoot '..')).FullName
-    compose_project = 'sf-local'; resources = $Resources
+    compose_project = $ComposeProject; resources = $Resources
     stop_and_drain = 'Finish synchronous work; verify registered children/services have drained before returning.'
 }
 
