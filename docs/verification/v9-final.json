@@ -1,0 +1,5543 @@
+{
+  "schema_version": 1,
+  "formal": {
+    "source_revision": "d4e82ee548d16c9562692b4da604e87436822019",
+    "planned": 534,
+    "recorded": 534,
+    "pending": 0,
+    "not_run": 0,
+    "counts": {
+      "passed": 404,
+      "failed": 102,
+      "error": 28
+    },
+    "last_86_counts": {
+      "passed": 67,
+      "failed": 19
+    },
+    "statuses_by_arm": {
+      "H0": {
+        "passed": 181,
+        "error": 16,
+        "failed": 43
+      },
+      "H1-S0": {
+        "failed": 44,
+        "passed": 184,
+        "error": 12
+      },
+      "H1-S1": {
+        "failed": 15,
+        "passed": 39
+      }
+    },
+    "H0_vs_H1-S0_block_counts": {
+      "baseline_only": 15,
+      "both_passed": 166,
+      "both_nonpassing": 41,
+      "variant_only": 18
+    },
+    "S0_vs_S1_QP_block_counts": {
+      "both_nonpassing": 14,
+      "both_passed": 36,
+      "variant_only": 3,
+      "baseline_only": 1
+    },
+    "failure_stage_counts": {
+      "independent_score": 47,
+      "no_run_admitted": 18,
+      "incomplete_observation": 10,
+      "semantic_review": 55
+    },
+    "units": [
+      {
+        "ordinal": 1,
+        "unit_id": "SF-054-r1-H0",
+        "case_id": "SF-054",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-054-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 2,
+        "unit_id": "SF-054-r1-H1-S0",
+        "case_id": "SF-054",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-054-r1",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 3,
+        "unit_id": "SF-054-r1-H1-S1",
+        "case_id": "SF-054",
+        "arm": "H1-S1",
+        "repetition": 1,
+        "block_id": "SF-054-r1",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 4,
+        "unit_id": "SF-051-r1-H0",
+        "case_id": "SF-051",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-051-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 5,
+        "unit_id": "SF-051-r1-H1-S1",
+        "case_id": "SF-051",
+        "arm": "H1-S1",
+        "repetition": 1,
+        "block_id": "SF-051-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 6,
+        "unit_id": "SF-051-r1-H1-S0",
+        "case_id": "SF-051",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-051-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 7,
+        "unit_id": "SF-087-r1-H0",
+        "case_id": "SF-087",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-087-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 8,
+        "unit_id": "SF-087-r1-H1-S0",
+        "case_id": "SF-087",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-087-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 9,
+        "unit_id": "SF-054-r3-H1-S0",
+        "case_id": "SF-054",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-054-r3",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 10,
+        "unit_id": "SF-054-r3-H0",
+        "case_id": "SF-054",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-054-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 11,
+        "unit_id": "SF-054-r3-H1-S1",
+        "case_id": "SF-054",
+        "arm": "H1-S1",
+        "repetition": 3,
+        "block_id": "SF-054-r3",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 12,
+        "unit_id": "SF-075-r1-H1-S0",
+        "case_id": "SF-075",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-075-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 13,
+        "unit_id": "SF-075-r1-H0",
+        "case_id": "SF-075",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-075-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 14,
+        "unit_id": "SF-083-r3-H0",
+        "case_id": "SF-083",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-083-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 15,
+        "unit_id": "SF-083-r3-H1-S0",
+        "case_id": "SF-083",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-083-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 16,
+        "unit_id": "SF-019-r2-H1-S0",
+        "case_id": "SF-019",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-019-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 17,
+        "unit_id": "SF-019-r2-H0",
+        "case_id": "SF-019",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-019-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 18,
+        "unit_id": "SF-101-r1-H0",
+        "case_id": "SF-101",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-101-r1",
+        "status": "error",
+        "failure_stage": "no_run_admitted"
+      },
+      {
+        "ordinal": 19,
+        "unit_id": "SF-101-r1-H1-S0",
+        "case_id": "SF-101",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-101-r1",
+        "status": "error",
+        "failure_stage": "no_run_admitted"
+      },
+      {
+        "ordinal": 20,
+        "unit_id": "SF-018-r2-H1-S0",
+        "case_id": "SF-018",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-018-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 21,
+        "unit_id": "SF-018-r2-H0",
+        "case_id": "SF-018",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-018-r2",
+        "status": "error",
+        "failure_stage": "incomplete_observation"
+      },
+      {
+        "ordinal": 22,
+        "unit_id": "SF-072-r3-H0",
+        "case_id": "SF-072",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-072-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 23,
+        "unit_id": "SF-072-r3-H1-S0",
+        "case_id": "SF-072",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-072-r3",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 24,
+        "unit_id": "SF-055-r1-H1-S0",
+        "case_id": "SF-055",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-055-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 25,
+        "unit_id": "SF-055-r1-H1-S1",
+        "case_id": "SF-055",
+        "arm": "H1-S1",
+        "repetition": 1,
+        "block_id": "SF-055-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 26,
+        "unit_id": "SF-055-r1-H0",
+        "case_id": "SF-055",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-055-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 27,
+        "unit_id": "SF-075-r2-H1-S0",
+        "case_id": "SF-075",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-075-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 28,
+        "unit_id": "SF-075-r2-H0",
+        "case_id": "SF-075",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-075-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 29,
+        "unit_id": "SF-027-r1-H0",
+        "case_id": "SF-027",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-027-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 30,
+        "unit_id": "SF-027-r1-H1-S0",
+        "case_id": "SF-027",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-027-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 31,
+        "unit_id": "SF-102-r1-H1-S0",
+        "case_id": "SF-102",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-102-r1",
+        "status": "error",
+        "failure_stage": "no_run_admitted"
+      },
+      {
+        "ordinal": 32,
+        "unit_id": "SF-102-r1-H0",
+        "case_id": "SF-102",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-102-r1",
+        "status": "error",
+        "failure_stage": "no_run_admitted"
+      },
+      {
+        "ordinal": 33,
+        "unit_id": "SF-116-r3-H0",
+        "case_id": "SF-116",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-116-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 34,
+        "unit_id": "SF-116-r3-H1-S0",
+        "case_id": "SF-116",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-116-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 35,
+        "unit_id": "SF-047-r2-H1-S1",
+        "case_id": "SF-047",
+        "arm": "H1-S1",
+        "repetition": 2,
+        "block_id": "SF-047-r2",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 36,
+        "unit_id": "SF-047-r2-H0",
+        "case_id": "SF-047",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-047-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 37,
+        "unit_id": "SF-047-r2-H1-S0",
+        "case_id": "SF-047",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-047-r2",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 38,
+        "unit_id": "SF-047-r1-H1-S1",
+        "case_id": "SF-047",
+        "arm": "H1-S1",
+        "repetition": 1,
+        "block_id": "SF-047-r1",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 39,
+        "unit_id": "SF-047-r1-H1-S0",
+        "case_id": "SF-047",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-047-r1",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 40,
+        "unit_id": "SF-047-r1-H0",
+        "case_id": "SF-047",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-047-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 41,
+        "unit_id": "SF-044-r2-H1-S0",
+        "case_id": "SF-044",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-044-r2",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 42,
+        "unit_id": "SF-044-r2-H0",
+        "case_id": "SF-044",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-044-r2",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 43,
+        "unit_id": "SF-086-r2-H0",
+        "case_id": "SF-086",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-086-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 44,
+        "unit_id": "SF-086-r2-H1-S0",
+        "case_id": "SF-086",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-086-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 45,
+        "unit_id": "SF-046-r3-H0",
+        "case_id": "SF-046",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-046-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 46,
+        "unit_id": "SF-046-r3-H1-S0",
+        "case_id": "SF-046",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-046-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 47,
+        "unit_id": "SF-046-r3-H1-S1",
+        "case_id": "SF-046",
+        "arm": "H1-S1",
+        "repetition": 3,
+        "block_id": "SF-046-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 48,
+        "unit_id": "SF-083-r1-H1-S0",
+        "case_id": "SF-083",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-083-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 49,
+        "unit_id": "SF-083-r1-H0",
+        "case_id": "SF-083",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-083-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 50,
+        "unit_id": "SF-097-r3-H0",
+        "case_id": "SF-097",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-097-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 51,
+        "unit_id": "SF-097-r3-H1-S0",
+        "case_id": "SF-097",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-097-r3",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 52,
+        "unit_id": "SF-102-r3-H1-S0",
+        "case_id": "SF-102",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-102-r3",
+        "status": "error",
+        "failure_stage": "no_run_admitted"
+      },
+      {
+        "ordinal": 53,
+        "unit_id": "SF-102-r3-H0",
+        "case_id": "SF-102",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-102-r3",
+        "status": "error",
+        "failure_stage": "no_run_admitted"
+      },
+      {
+        "ordinal": 54,
+        "unit_id": "SF-084-r1-H0",
+        "case_id": "SF-084",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-084-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 55,
+        "unit_id": "SF-084-r1-H1-S0",
+        "case_id": "SF-084",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-084-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 56,
+        "unit_id": "SF-118-r1-H1-S0",
+        "case_id": "SF-118",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-118-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 57,
+        "unit_id": "SF-118-r1-H0",
+        "case_id": "SF-118",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-118-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 58,
+        "unit_id": "SF-045-r3-H0",
+        "case_id": "SF-045",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-045-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 59,
+        "unit_id": "SF-045-r3-H1-S1",
+        "case_id": "SF-045",
+        "arm": "H1-S1",
+        "repetition": 3,
+        "block_id": "SF-045-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 60,
+        "unit_id": "SF-045-r3-H1-S0",
+        "case_id": "SF-045",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-045-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 61,
+        "unit_id": "SF-017-r2-H0",
+        "case_id": "SF-017",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-017-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 62,
+        "unit_id": "SF-017-r2-H1-S0",
+        "case_id": "SF-017",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-017-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 63,
+        "unit_id": "SF-080-r2-H1-S0",
+        "case_id": "SF-080",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-080-r2",
+        "status": "error",
+        "failure_stage": "incomplete_observation"
+      },
+      {
+        "ordinal": 64,
+        "unit_id": "SF-080-r2-H0",
+        "case_id": "SF-080",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-080-r2",
+        "status": "error",
+        "failure_stage": "incomplete_observation"
+      },
+      {
+        "ordinal": 65,
+        "unit_id": "SF-115-r3-H0",
+        "case_id": "SF-115",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-115-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 66,
+        "unit_id": "SF-115-r3-H1-S0",
+        "case_id": "SF-115",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-115-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 67,
+        "unit_id": "SF-057-r1-H1-S0",
+        "case_id": "SF-057",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-057-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 68,
+        "unit_id": "SF-057-r1-H0",
+        "case_id": "SF-057",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-057-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 69,
+        "unit_id": "SF-057-r1-H1-S1",
+        "case_id": "SF-057",
+        "arm": "H1-S1",
+        "repetition": 1,
+        "block_id": "SF-057-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 70,
+        "unit_id": "SF-088-r2-H1-S0",
+        "case_id": "SF-088",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-088-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 71,
+        "unit_id": "SF-088-r2-H0",
+        "case_id": "SF-088",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-088-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 72,
+        "unit_id": "SF-022-r2-H0",
+        "case_id": "SF-022",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-022-r2",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 73,
+        "unit_id": "SF-022-r2-H1-S0",
+        "case_id": "SF-022",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-022-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 74,
+        "unit_id": "SF-073-r2-H1-S0",
+        "case_id": "SF-073",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-073-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 75,
+        "unit_id": "SF-073-r2-H0",
+        "case_id": "SF-073",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-073-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 76,
+        "unit_id": "SF-102-r2-H0",
+        "case_id": "SF-102",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-102-r2",
+        "status": "error",
+        "failure_stage": "no_run_admitted"
+      },
+      {
+        "ordinal": 77,
+        "unit_id": "SF-102-r2-H1-S0",
+        "case_id": "SF-102",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-102-r2",
+        "status": "error",
+        "failure_stage": "no_run_admitted"
+      },
+      {
+        "ordinal": 78,
+        "unit_id": "SF-112-r2-H1-S0",
+        "case_id": "SF-112",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-112-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 79,
+        "unit_id": "SF-112-r2-H0",
+        "case_id": "SF-112",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-112-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 80,
+        "unit_id": "SF-020-r3-H0",
+        "case_id": "SF-020",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-020-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 81,
+        "unit_id": "SF-020-r3-H1-S0",
+        "case_id": "SF-020",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-020-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 82,
+        "unit_id": "SF-021-r2-H1-S0",
+        "case_id": "SF-021",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-021-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 83,
+        "unit_id": "SF-021-r2-H0",
+        "case_id": "SF-021",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-021-r2",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 84,
+        "unit_id": "SF-059-r1-H1-S0",
+        "case_id": "SF-059",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-059-r1",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 85,
+        "unit_id": "SF-059-r1-H1-S1",
+        "case_id": "SF-059",
+        "arm": "H1-S1",
+        "repetition": 1,
+        "block_id": "SF-059-r1",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 86,
+        "unit_id": "SF-059-r1-H0",
+        "case_id": "SF-059",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-059-r1",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 87,
+        "unit_id": "SF-100-r3-H0",
+        "case_id": "SF-100",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-100-r3",
+        "status": "error",
+        "failure_stage": "incomplete_observation"
+      },
+      {
+        "ordinal": 88,
+        "unit_id": "SF-100-r3-H1-S0",
+        "case_id": "SF-100",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-100-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 89,
+        "unit_id": "SF-097-r2-H1-S0",
+        "case_id": "SF-097",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-097-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 90,
+        "unit_id": "SF-097-r2-H0",
+        "case_id": "SF-097",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-097-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 91,
+        "unit_id": "SF-087-r3-H0",
+        "case_id": "SF-087",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-087-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 92,
+        "unit_id": "SF-087-r3-H1-S0",
+        "case_id": "SF-087",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-087-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 93,
+        "unit_id": "SF-112-r1-H1-S0",
+        "case_id": "SF-112",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-112-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 94,
+        "unit_id": "SF-112-r1-H0",
+        "case_id": "SF-112",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-112-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 95,
+        "unit_id": "SF-113-r1-H0",
+        "case_id": "SF-113",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-113-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 96,
+        "unit_id": "SF-113-r1-H1-S0",
+        "case_id": "SF-113",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-113-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 97,
+        "unit_id": "SF-085-r1-H1-S0",
+        "case_id": "SF-085",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-085-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 98,
+        "unit_id": "SF-085-r1-H0",
+        "case_id": "SF-085",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-085-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 99,
+        "unit_id": "SF-057-r3-H1-S1",
+        "case_id": "SF-057",
+        "arm": "H1-S1",
+        "repetition": 3,
+        "block_id": "SF-057-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 100,
+        "unit_id": "SF-057-r3-H0",
+        "case_id": "SF-057",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-057-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 101,
+        "unit_id": "SF-057-r3-H1-S0",
+        "case_id": "SF-057",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-057-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 102,
+        "unit_id": "SF-020-r1-H0",
+        "case_id": "SF-020",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-020-r1",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 103,
+        "unit_id": "SF-020-r1-H1-S0",
+        "case_id": "SF-020",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-020-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 104,
+        "unit_id": "SF-104-r3-H1-S0",
+        "case_id": "SF-104",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-104-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 105,
+        "unit_id": "SF-104-r3-H0",
+        "case_id": "SF-104",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-104-r3",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 106,
+        "unit_id": "SF-116-r2-H0",
+        "case_id": "SF-116",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-116-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 107,
+        "unit_id": "SF-116-r2-H1-S0",
+        "case_id": "SF-116",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-116-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 108,
+        "unit_id": "SF-099-r3-H1-S0",
+        "case_id": "SF-099",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-099-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 109,
+        "unit_id": "SF-099-r3-H0",
+        "case_id": "SF-099",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-099-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 110,
+        "unit_id": "SF-112-r3-H0",
+        "case_id": "SF-112",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-112-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 111,
+        "unit_id": "SF-112-r3-H1-S0",
+        "case_id": "SF-112",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-112-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 112,
+        "unit_id": "SF-041-r1-H1-S1",
+        "case_id": "SF-041",
+        "arm": "H1-S1",
+        "repetition": 1,
+        "block_id": "SF-041-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 113,
+        "unit_id": "SF-041-r1-H1-S0",
+        "case_id": "SF-041",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-041-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 114,
+        "unit_id": "SF-041-r1-H0",
+        "case_id": "SF-041",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-041-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 115,
+        "unit_id": "SF-081-r3-H1-S0",
+        "case_id": "SF-081",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-081-r3",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 116,
+        "unit_id": "SF-081-r3-H0",
+        "case_id": "SF-081",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-081-r3",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 117,
+        "unit_id": "SF-090-r3-H0",
+        "case_id": "SF-090",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-090-r3",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 118,
+        "unit_id": "SF-090-r3-H1-S0",
+        "case_id": "SF-090",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-090-r3",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 119,
+        "unit_id": "SF-090-r3-H1-S1",
+        "case_id": "SF-090",
+        "arm": "H1-S1",
+        "repetition": 3,
+        "block_id": "SF-090-r3",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 120,
+        "unit_id": "SF-030-r2-H0",
+        "case_id": "SF-030",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-030-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 121,
+        "unit_id": "SF-030-r2-H1-S0",
+        "case_id": "SF-030",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-030-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 122,
+        "unit_id": "SF-086-r1-H1-S0",
+        "case_id": "SF-086",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-086-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 123,
+        "unit_id": "SF-086-r1-H0",
+        "case_id": "SF-086",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-086-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 124,
+        "unit_id": "SF-015-r3-H0",
+        "case_id": "SF-015",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-015-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 125,
+        "unit_id": "SF-015-r3-H1-S0",
+        "case_id": "SF-015",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-015-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 126,
+        "unit_id": "SF-083-r2-H1-S0",
+        "case_id": "SF-083",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-083-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 127,
+        "unit_id": "SF-083-r2-H0",
+        "case_id": "SF-083",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-083-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 128,
+        "unit_id": "SF-101-r3-H0",
+        "case_id": "SF-101",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-101-r3",
+        "status": "error",
+        "failure_stage": "no_run_admitted"
+      },
+      {
+        "ordinal": 129,
+        "unit_id": "SF-101-r3-H1-S0",
+        "case_id": "SF-101",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-101-r3",
+        "status": "error",
+        "failure_stage": "no_run_admitted"
+      },
+      {
+        "ordinal": 130,
+        "unit_id": "SF-048-r1-H0",
+        "case_id": "SF-048",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-048-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 131,
+        "unit_id": "SF-048-r1-H1-S1",
+        "case_id": "SF-048",
+        "arm": "H1-S1",
+        "repetition": 1,
+        "block_id": "SF-048-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 132,
+        "unit_id": "SF-048-r1-H1-S0",
+        "case_id": "SF-048",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-048-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 133,
+        "unit_id": "SF-050-r3-H1-S0",
+        "case_id": "SF-050",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-050-r3",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 134,
+        "unit_id": "SF-050-r3-H0",
+        "case_id": "SF-050",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-050-r3",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 135,
+        "unit_id": "SF-013-r1-H0",
+        "case_id": "SF-013",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-013-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 136,
+        "unit_id": "SF-013-r1-H1-S0",
+        "case_id": "SF-013",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-013-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 137,
+        "unit_id": "SF-113-r2-H1-S0",
+        "case_id": "SF-113",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-113-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 138,
+        "unit_id": "SF-113-r2-H0",
+        "case_id": "SF-113",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-113-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 139,
+        "unit_id": "SF-022-r1-H0",
+        "case_id": "SF-022",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-022-r1",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 140,
+        "unit_id": "SF-022-r1-H1-S0",
+        "case_id": "SF-022",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-022-r1",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 141,
+        "unit_id": "SF-055-r2-H1-S0",
+        "case_id": "SF-055",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-055-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 142,
+        "unit_id": "SF-055-r2-H0",
+        "case_id": "SF-055",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-055-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 143,
+        "unit_id": "SF-055-r2-H1-S1",
+        "case_id": "SF-055",
+        "arm": "H1-S1",
+        "repetition": 2,
+        "block_id": "SF-055-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 144,
+        "unit_id": "SF-044-r3-H1-S0",
+        "case_id": "SF-044",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-044-r3",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 145,
+        "unit_id": "SF-044-r3-H0",
+        "case_id": "SF-044",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-044-r3",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 146,
+        "unit_id": "SF-028-r3-H0",
+        "case_id": "SF-028",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-028-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 147,
+        "unit_id": "SF-028-r3-H1-S0",
+        "case_id": "SF-028",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-028-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 148,
+        "unit_id": "SF-081-r2-H1-S0",
+        "case_id": "SF-081",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-081-r2",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 149,
+        "unit_id": "SF-081-r2-H0",
+        "case_id": "SF-081",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-081-r2",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 150,
+        "unit_id": "SF-026-r1-H0",
+        "case_id": "SF-026",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-026-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 151,
+        "unit_id": "SF-026-r1-H1-S0",
+        "case_id": "SF-026",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-026-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 152,
+        "unit_id": "SF-074-r3-H1-S0",
+        "case_id": "SF-074",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-074-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 153,
+        "unit_id": "SF-074-r3-H0",
+        "case_id": "SF-074",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-074-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 154,
+        "unit_id": "SF-018-r3-H0",
+        "case_id": "SF-018",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-018-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 155,
+        "unit_id": "SF-018-r3-H1-S0",
+        "case_id": "SF-018",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-018-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 156,
+        "unit_id": "SF-014-r1-H1-S0",
+        "case_id": "SF-014",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-014-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 157,
+        "unit_id": "SF-014-r1-H0",
+        "case_id": "SF-014",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-014-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 158,
+        "unit_id": "SF-041-r3-H1-S0",
+        "case_id": "SF-041",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-041-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 159,
+        "unit_id": "SF-041-r3-H1-S1",
+        "case_id": "SF-041",
+        "arm": "H1-S1",
+        "repetition": 3,
+        "block_id": "SF-041-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 160,
+        "unit_id": "SF-041-r3-H0",
+        "case_id": "SF-041",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-041-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 161,
+        "unit_id": "SF-119-r3-H0",
+        "case_id": "SF-119",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-119-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 162,
+        "unit_id": "SF-119-r3-H1-S0",
+        "case_id": "SF-119",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-119-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 163,
+        "unit_id": "SF-103-r3-H1-S0",
+        "case_id": "SF-103",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-103-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 164,
+        "unit_id": "SF-103-r3-H0",
+        "case_id": "SF-103",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-103-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 165,
+        "unit_id": "SF-050-r1-H0",
+        "case_id": "SF-050",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-050-r1",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 166,
+        "unit_id": "SF-050-r1-H1-S0",
+        "case_id": "SF-050",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-050-r1",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 167,
+        "unit_id": "SF-042-r1-H1-S1",
+        "case_id": "SF-042",
+        "arm": "H1-S1",
+        "repetition": 1,
+        "block_id": "SF-042-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 168,
+        "unit_id": "SF-042-r1-H0",
+        "case_id": "SF-042",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-042-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 169,
+        "unit_id": "SF-042-r1-H1-S0",
+        "case_id": "SF-042",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-042-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 170,
+        "unit_id": "SF-025-r2-H1-S0",
+        "case_id": "SF-025",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-025-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 171,
+        "unit_id": "SF-025-r2-H0",
+        "case_id": "SF-025",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-025-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 172,
+        "unit_id": "SF-105-r3-H0",
+        "case_id": "SF-105",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-105-r3",
+        "status": "error",
+        "failure_stage": "no_run_admitted"
+      },
+      {
+        "ordinal": 173,
+        "unit_id": "SF-105-r3-H1-S0",
+        "case_id": "SF-105",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-105-r3",
+        "status": "error",
+        "failure_stage": "no_run_admitted"
+      },
+      {
+        "ordinal": 174,
+        "unit_id": "SF-078-r1-H1-S0",
+        "case_id": "SF-078",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-078-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 175,
+        "unit_id": "SF-078-r1-H0",
+        "case_id": "SF-078",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-078-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 176,
+        "unit_id": "SF-052-r2-H1-S1",
+        "case_id": "SF-052",
+        "arm": "H1-S1",
+        "repetition": 2,
+        "block_id": "SF-052-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 177,
+        "unit_id": "SF-052-r2-H1-S0",
+        "case_id": "SF-052",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-052-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 178,
+        "unit_id": "SF-052-r2-H0",
+        "case_id": "SF-052",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-052-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 179,
+        "unit_id": "SF-018-r1-H0",
+        "case_id": "SF-018",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-018-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 180,
+        "unit_id": "SF-018-r1-H1-S0",
+        "case_id": "SF-018",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-018-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 181,
+        "unit_id": "SF-084-r2-H1-S0",
+        "case_id": "SF-084",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-084-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 182,
+        "unit_id": "SF-084-r2-H0",
+        "case_id": "SF-084",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-084-r2",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 183,
+        "unit_id": "SF-087-r2-H0",
+        "case_id": "SF-087",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-087-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 184,
+        "unit_id": "SF-087-r2-H1-S0",
+        "case_id": "SF-087",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-087-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 185,
+        "unit_id": "SF-059-r3-H0",
+        "case_id": "SF-059",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-059-r3",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 186,
+        "unit_id": "SF-059-r3-H1-S0",
+        "case_id": "SF-059",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-059-r3",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 187,
+        "unit_id": "SF-059-r3-H1-S1",
+        "case_id": "SF-059",
+        "arm": "H1-S1",
+        "repetition": 3,
+        "block_id": "SF-059-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 188,
+        "unit_id": "SF-103-r1-H1-S0",
+        "case_id": "SF-103",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-103-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 189,
+        "unit_id": "SF-103-r1-H0",
+        "case_id": "SF-103",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-103-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 190,
+        "unit_id": "SF-055-r3-H0",
+        "case_id": "SF-055",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-055-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 191,
+        "unit_id": "SF-055-r3-H1-S1",
+        "case_id": "SF-055",
+        "arm": "H1-S1",
+        "repetition": 3,
+        "block_id": "SF-055-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 192,
+        "unit_id": "SF-055-r3-H1-S0",
+        "case_id": "SF-055",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-055-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 193,
+        "unit_id": "SF-060-r2-H1-S0",
+        "case_id": "SF-060",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-060-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 194,
+        "unit_id": "SF-060-r2-H0",
+        "case_id": "SF-060",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-060-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 195,
+        "unit_id": "SF-060-r2-H1-S1",
+        "case_id": "SF-060",
+        "arm": "H1-S1",
+        "repetition": 2,
+        "block_id": "SF-060-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 196,
+        "unit_id": "SF-049-r3-H1-S0",
+        "case_id": "SF-049",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-049-r3",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 197,
+        "unit_id": "SF-049-r3-H1-S1",
+        "case_id": "SF-049",
+        "arm": "H1-S1",
+        "repetition": 3,
+        "block_id": "SF-049-r3",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 198,
+        "unit_id": "SF-049-r3-H0",
+        "case_id": "SF-049",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-049-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 199,
+        "unit_id": "SF-048-r2-H1-S1",
+        "case_id": "SF-048",
+        "arm": "H1-S1",
+        "repetition": 2,
+        "block_id": "SF-048-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 200,
+        "unit_id": "SF-048-r2-H0",
+        "case_id": "SF-048",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-048-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 201,
+        "unit_id": "SF-048-r2-H1-S0",
+        "case_id": "SF-048",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-048-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 202,
+        "unit_id": "SF-024-r1-H0",
+        "case_id": "SF-024",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-024-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 203,
+        "unit_id": "SF-024-r1-H1-S0",
+        "case_id": "SF-024",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-024-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 204,
+        "unit_id": "SF-042-r2-H1-S1",
+        "case_id": "SF-042",
+        "arm": "H1-S1",
+        "repetition": 2,
+        "block_id": "SF-042-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 205,
+        "unit_id": "SF-042-r2-H1-S0",
+        "case_id": "SF-042",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-042-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 206,
+        "unit_id": "SF-042-r2-H0",
+        "case_id": "SF-042",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-042-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 207,
+        "unit_id": "SF-060-r1-H0",
+        "case_id": "SF-060",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-060-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 208,
+        "unit_id": "SF-060-r1-H1-S0",
+        "case_id": "SF-060",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-060-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 209,
+        "unit_id": "SF-060-r1-H1-S1",
+        "case_id": "SF-060",
+        "arm": "H1-S1",
+        "repetition": 1,
+        "block_id": "SF-060-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 210,
+        "unit_id": "SF-114-r1-H1-S0",
+        "case_id": "SF-114",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-114-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 211,
+        "unit_id": "SF-114-r1-H0",
+        "case_id": "SF-114",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-114-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 212,
+        "unit_id": "SF-096-r1-H0",
+        "case_id": "SF-096",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-096-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 213,
+        "unit_id": "SF-096-r1-H1-S0",
+        "case_id": "SF-096",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-096-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 214,
+        "unit_id": "SF-030-r1-H1-S0",
+        "case_id": "SF-030",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-030-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 215,
+        "unit_id": "SF-030-r1-H0",
+        "case_id": "SF-030",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-030-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 216,
+        "unit_id": "SF-084-r3-H0",
+        "case_id": "SF-084",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-084-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 217,
+        "unit_id": "SF-084-r3-H1-S0",
+        "case_id": "SF-084",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-084-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 218,
+        "unit_id": "SF-057-r2-H0",
+        "case_id": "SF-057",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-057-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 219,
+        "unit_id": "SF-057-r2-H1-S1",
+        "case_id": "SF-057",
+        "arm": "H1-S1",
+        "repetition": 2,
+        "block_id": "SF-057-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 220,
+        "unit_id": "SF-057-r2-H1-S0",
+        "case_id": "SF-057",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-057-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 221,
+        "unit_id": "SF-114-r2-H1-S0",
+        "case_id": "SF-114",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-114-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 222,
+        "unit_id": "SF-114-r2-H0",
+        "case_id": "SF-114",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-114-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 223,
+        "unit_id": "SF-019-r3-H0",
+        "case_id": "SF-019",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-019-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 224,
+        "unit_id": "SF-019-r3-H1-S0",
+        "case_id": "SF-019",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-019-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 225,
+        "unit_id": "SF-029-r1-H1-S0",
+        "case_id": "SF-029",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-029-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 226,
+        "unit_id": "SF-029-r1-H0",
+        "case_id": "SF-029",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-029-r1",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 227,
+        "unit_id": "SF-012-r2-H0",
+        "case_id": "SF-012",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-012-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 228,
+        "unit_id": "SF-012-r2-H1-S0",
+        "case_id": "SF-012",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-012-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 229,
+        "unit_id": "SF-076-r2-H1-S0",
+        "case_id": "SF-076",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-076-r2",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 230,
+        "unit_id": "SF-076-r2-H0",
+        "case_id": "SF-076",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-076-r2",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 231,
+        "unit_id": "SF-028-r2-H0",
+        "case_id": "SF-028",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-028-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 232,
+        "unit_id": "SF-028-r2-H1-S0",
+        "case_id": "SF-028",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-028-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 233,
+        "unit_id": "SF-046-r2-H1-S0",
+        "case_id": "SF-046",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-046-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 234,
+        "unit_id": "SF-046-r2-H0",
+        "case_id": "SF-046",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-046-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 235,
+        "unit_id": "SF-046-r2-H1-S1",
+        "case_id": "SF-046",
+        "arm": "H1-S1",
+        "repetition": 2,
+        "block_id": "SF-046-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 236,
+        "unit_id": "SF-100-r1-H1-S0",
+        "case_id": "SF-100",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-100-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 237,
+        "unit_id": "SF-100-r1-H0",
+        "case_id": "SF-100",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-100-r1",
+        "status": "error",
+        "failure_stage": "incomplete_observation"
+      },
+      {
+        "ordinal": 238,
+        "unit_id": "SF-071-r3-H0",
+        "case_id": "SF-071",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-071-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 239,
+        "unit_id": "SF-071-r3-H1-S0",
+        "case_id": "SF-071",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-071-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 240,
+        "unit_id": "SF-050-r2-H1-S0",
+        "case_id": "SF-050",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-050-r2",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 241,
+        "unit_id": "SF-050-r2-H0",
+        "case_id": "SF-050",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-050-r2",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 242,
+        "unit_id": "SF-099-r2-H0",
+        "case_id": "SF-099",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-099-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 243,
+        "unit_id": "SF-099-r2-H1-S0",
+        "case_id": "SF-099",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-099-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 244,
+        "unit_id": "SF-073-r1-H1-S0",
+        "case_id": "SF-073",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-073-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 245,
+        "unit_id": "SF-073-r1-H0",
+        "case_id": "SF-073",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-073-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 246,
+        "unit_id": "SF-113-r3-H0",
+        "case_id": "SF-113",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-113-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 247,
+        "unit_id": "SF-113-r3-H1-S0",
+        "case_id": "SF-113",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-113-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 248,
+        "unit_id": "SF-013-r3-H1-S0",
+        "case_id": "SF-013",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-013-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 249,
+        "unit_id": "SF-013-r3-H0",
+        "case_id": "SF-013",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-013-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 250,
+        "unit_id": "SF-072-r1-H0",
+        "case_id": "SF-072",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-072-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 251,
+        "unit_id": "SF-072-r1-H1-S0",
+        "case_id": "SF-072",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-072-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 252,
+        "unit_id": "SF-089-r3-H1-S0",
+        "case_id": "SF-089",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-089-r3",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 253,
+        "unit_id": "SF-089-r3-H0",
+        "case_id": "SF-089",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-089-r3",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 254,
+        "unit_id": "SF-022-r3-H0",
+        "case_id": "SF-022",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-022-r3",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 255,
+        "unit_id": "SF-022-r3-H1-S0",
+        "case_id": "SF-022",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-022-r3",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 256,
+        "unit_id": "SF-023-r2-H1-S0",
+        "case_id": "SF-023",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-023-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 257,
+        "unit_id": "SF-023-r2-H0",
+        "case_id": "SF-023",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-023-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 258,
+        "unit_id": "SF-104-r2-H0",
+        "case_id": "SF-104",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-104-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 259,
+        "unit_id": "SF-104-r2-H1-S0",
+        "case_id": "SF-104",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-104-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 260,
+        "unit_id": "SF-111-r2-H1-S0",
+        "case_id": "SF-111",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-111-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 261,
+        "unit_id": "SF-111-r2-H0",
+        "case_id": "SF-111",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-111-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 262,
+        "unit_id": "SF-025-r3-H0",
+        "case_id": "SF-025",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-025-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 263,
+        "unit_id": "SF-025-r3-H1-S0",
+        "case_id": "SF-025",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-025-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 264,
+        "unit_id": "SF-073-r3-H1-S0",
+        "case_id": "SF-073",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-073-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 265,
+        "unit_id": "SF-073-r3-H0",
+        "case_id": "SF-073",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-073-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 266,
+        "unit_id": "SF-111-r1-H0",
+        "case_id": "SF-111",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-111-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 267,
+        "unit_id": "SF-111-r1-H1-S0",
+        "case_id": "SF-111",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-111-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 268,
+        "unit_id": "SF-026-r3-H1-S0",
+        "case_id": "SF-026",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-026-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 269,
+        "unit_id": "SF-026-r3-H0",
+        "case_id": "SF-026",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-026-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 270,
+        "unit_id": "SF-090-r2-H1-S0",
+        "case_id": "SF-090",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-090-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 271,
+        "unit_id": "SF-090-r2-H1-S1",
+        "case_id": "SF-090",
+        "arm": "H1-S1",
+        "repetition": 2,
+        "block_id": "SF-090-r2",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 272,
+        "unit_id": "SF-090-r2-H0",
+        "case_id": "SF-090",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-090-r2",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 273,
+        "unit_id": "SF-027-r2-H0",
+        "case_id": "SF-027",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-027-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 274,
+        "unit_id": "SF-027-r2-H1-S0",
+        "case_id": "SF-027",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-027-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 275,
+        "unit_id": "SF-013-r2-H1-S0",
+        "case_id": "SF-013",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-013-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 276,
+        "unit_id": "SF-013-r2-H0",
+        "case_id": "SF-013",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-013-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 277,
+        "unit_id": "SF-114-r3-H0",
+        "case_id": "SF-114",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-114-r3",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 278,
+        "unit_id": "SF-114-r3-H1-S0",
+        "case_id": "SF-114",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-114-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 279,
+        "unit_id": "SF-080-r1-H1-S0",
+        "case_id": "SF-080",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-080-r1",
+        "status": "error",
+        "failure_stage": "incomplete_observation"
+      },
+      {
+        "ordinal": 280,
+        "unit_id": "SF-080-r1-H0",
+        "case_id": "SF-080",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-080-r1",
+        "status": "error",
+        "failure_stage": "incomplete_observation"
+      },
+      {
+        "ordinal": 281,
+        "unit_id": "SF-044-r1-H0",
+        "case_id": "SF-044",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-044-r1",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 282,
+        "unit_id": "SF-044-r1-H1-S0",
+        "case_id": "SF-044",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-044-r1",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 283,
+        "unit_id": "SF-096-r2-H1-S0",
+        "case_id": "SF-096",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-096-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 284,
+        "unit_id": "SF-096-r2-H0",
+        "case_id": "SF-096",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-096-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 285,
+        "unit_id": "SF-029-r2-H0",
+        "case_id": "SF-029",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-029-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 286,
+        "unit_id": "SF-029-r2-H1-S0",
+        "case_id": "SF-029",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-029-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 287,
+        "unit_id": "SF-047-r3-H1-S1",
+        "case_id": "SF-047",
+        "arm": "H1-S1",
+        "repetition": 3,
+        "block_id": "SF-047-r3",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 288,
+        "unit_id": "SF-047-r3-H0",
+        "case_id": "SF-047",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-047-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 289,
+        "unit_id": "SF-047-r3-H1-S0",
+        "case_id": "SF-047",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-047-r3",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 290,
+        "unit_id": "SF-059-r2-H1-S1",
+        "case_id": "SF-059",
+        "arm": "H1-S1",
+        "repetition": 2,
+        "block_id": "SF-059-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 291,
+        "unit_id": "SF-059-r2-H1-S0",
+        "case_id": "SF-059",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-059-r2",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 292,
+        "unit_id": "SF-059-r2-H0",
+        "case_id": "SF-059",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-059-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 293,
+        "unit_id": "SF-023-r3-H1-S0",
+        "case_id": "SF-023",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-023-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 294,
+        "unit_id": "SF-023-r3-H0",
+        "case_id": "SF-023",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-023-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 295,
+        "unit_id": "SF-080-r3-H0",
+        "case_id": "SF-080",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-080-r3",
+        "status": "error",
+        "failure_stage": "incomplete_observation"
+      },
+      {
+        "ordinal": 296,
+        "unit_id": "SF-080-r3-H1-S0",
+        "case_id": "SF-080",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-080-r3",
+        "status": "error",
+        "failure_stage": "incomplete_observation"
+      },
+      {
+        "ordinal": 297,
+        "unit_id": "SF-074-r1-H1-S0",
+        "case_id": "SF-074",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-074-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 298,
+        "unit_id": "SF-074-r1-H0",
+        "case_id": "SF-074",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-074-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 299,
+        "unit_id": "SF-085-r3-H0",
+        "case_id": "SF-085",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-085-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 300,
+        "unit_id": "SF-085-r3-H1-S0",
+        "case_id": "SF-085",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-085-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 301,
+        "unit_id": "SF-086-r3-H1-S0",
+        "case_id": "SF-086",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-086-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 302,
+        "unit_id": "SF-086-r3-H0",
+        "case_id": "SF-086",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-086-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 303,
+        "unit_id": "SF-021-r1-H0",
+        "case_id": "SF-021",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-021-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 304,
+        "unit_id": "SF-021-r1-H1-S0",
+        "case_id": "SF-021",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-021-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 305,
+        "unit_id": "SF-118-r2-H1-S0",
+        "case_id": "SF-118",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-118-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 306,
+        "unit_id": "SF-118-r2-H0",
+        "case_id": "SF-118",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-118-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 307,
+        "unit_id": "SF-023-r1-H0",
+        "case_id": "SF-023",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-023-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 308,
+        "unit_id": "SF-023-r1-H1-S0",
+        "case_id": "SF-023",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-023-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 309,
+        "unit_id": "SF-049-r1-H0",
+        "case_id": "SF-049",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-049-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 310,
+        "unit_id": "SF-049-r1-H1-S0",
+        "case_id": "SF-049",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-049-r1",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 311,
+        "unit_id": "SF-049-r1-H1-S1",
+        "case_id": "SF-049",
+        "arm": "H1-S1",
+        "repetition": 1,
+        "block_id": "SF-049-r1",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 312,
+        "unit_id": "SF-117-r2-H1-S0",
+        "case_id": "SF-117",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-117-r2",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 313,
+        "unit_id": "SF-117-r2-H0",
+        "case_id": "SF-117",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-117-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 314,
+        "unit_id": "SF-079-r2-H0",
+        "case_id": "SF-079",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-079-r2",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 315,
+        "unit_id": "SF-079-r2-H1-S0",
+        "case_id": "SF-079",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-079-r2",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 316,
+        "unit_id": "SF-045-r1-H0",
+        "case_id": "SF-045",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-045-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 317,
+        "unit_id": "SF-045-r1-H1-S1",
+        "case_id": "SF-045",
+        "arm": "H1-S1",
+        "repetition": 1,
+        "block_id": "SF-045-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 318,
+        "unit_id": "SF-045-r1-H1-S0",
+        "case_id": "SF-045",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-045-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 319,
+        "unit_id": "SF-077-r1-H1-S0",
+        "case_id": "SF-077",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-077-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 320,
+        "unit_id": "SF-077-r1-H0",
+        "case_id": "SF-077",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-077-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 321,
+        "unit_id": "SF-082-r3-H0",
+        "case_id": "SF-082",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-082-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 322,
+        "unit_id": "SF-082-r3-H1-S0",
+        "case_id": "SF-082",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-082-r3",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 323,
+        "unit_id": "SF-082-r2-H1-S0",
+        "case_id": "SF-082",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-082-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 324,
+        "unit_id": "SF-082-r2-H0",
+        "case_id": "SF-082",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-082-r2",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 325,
+        "unit_id": "SF-012-r1-H0",
+        "case_id": "SF-012",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-012-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 326,
+        "unit_id": "SF-012-r1-H1-S0",
+        "case_id": "SF-012",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-012-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 327,
+        "unit_id": "SF-105-r2-H1-S0",
+        "case_id": "SF-105",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-105-r2",
+        "status": "error",
+        "failure_stage": "no_run_admitted"
+      },
+      {
+        "ordinal": 328,
+        "unit_id": "SF-105-r2-H0",
+        "case_id": "SF-105",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-105-r2",
+        "status": "error",
+        "failure_stage": "no_run_admitted"
+      },
+      {
+        "ordinal": 329,
+        "unit_id": "SF-078-r2-H0",
+        "case_id": "SF-078",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-078-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 330,
+        "unit_id": "SF-078-r2-H1-S0",
+        "case_id": "SF-078",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-078-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 331,
+        "unit_id": "SF-096-r3-H1-S0",
+        "case_id": "SF-096",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-096-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 332,
+        "unit_id": "SF-096-r3-H0",
+        "case_id": "SF-096",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-096-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 333,
+        "unit_id": "SF-054-r2-H1-S0",
+        "case_id": "SF-054",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-054-r2",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 334,
+        "unit_id": "SF-054-r2-H0",
+        "case_id": "SF-054",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-054-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 335,
+        "unit_id": "SF-054-r2-H1-S1",
+        "case_id": "SF-054",
+        "arm": "H1-S1",
+        "repetition": 2,
+        "block_id": "SF-054-r2",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 336,
+        "unit_id": "SF-119-r2-H0",
+        "case_id": "SF-119",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-119-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 337,
+        "unit_id": "SF-119-r2-H1-S0",
+        "case_id": "SF-119",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-119-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 338,
+        "unit_id": "SF-071-r2-H1-S0",
+        "case_id": "SF-071",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-071-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 339,
+        "unit_id": "SF-071-r2-H0",
+        "case_id": "SF-071",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-071-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 340,
+        "unit_id": "SF-046-r1-H1-S0",
+        "case_id": "SF-046",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-046-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 341,
+        "unit_id": "SF-046-r1-H1-S1",
+        "case_id": "SF-046",
+        "arm": "H1-S1",
+        "repetition": 1,
+        "block_id": "SF-046-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 342,
+        "unit_id": "SF-046-r1-H0",
+        "case_id": "SF-046",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-046-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 343,
+        "unit_id": "SF-079-r3-H0",
+        "case_id": "SF-079",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-079-r3",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 344,
+        "unit_id": "SF-079-r3-H1-S0",
+        "case_id": "SF-079",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-079-r3",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 345,
+        "unit_id": "SF-104-r1-H1-S0",
+        "case_id": "SF-104",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-104-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 346,
+        "unit_id": "SF-104-r1-H0",
+        "case_id": "SF-104",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-104-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 347,
+        "unit_id": "SF-045-r2-H1-S1",
+        "case_id": "SF-045",
+        "arm": "H1-S1",
+        "repetition": 2,
+        "block_id": "SF-045-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 348,
+        "unit_id": "SF-045-r2-H0",
+        "case_id": "SF-045",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-045-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 349,
+        "unit_id": "SF-045-r2-H1-S0",
+        "case_id": "SF-045",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-045-r2",
+        "status": "passed",
+        "batch": "SF-B13534-formal-unit-recovery"
+      },
+      {
+        "ordinal": 350,
+        "unit_id": "SF-103-r2-H0",
+        "case_id": "SF-103",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-103-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 351,
+        "unit_id": "SF-103-r2-H1-S0",
+        "case_id": "SF-103",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-103-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 352,
+        "unit_id": "SF-089-r2-H1-S0",
+        "case_id": "SF-089",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-089-r2",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 353,
+        "unit_id": "SF-089-r2-H0",
+        "case_id": "SF-089",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-089-r2",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 354,
+        "unit_id": "SF-120-r2-H0",
+        "case_id": "SF-120",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-120-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 355,
+        "unit_id": "SF-120-r2-H1-S0",
+        "case_id": "SF-120",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-120-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 356,
+        "unit_id": "SF-088-r1-H1-S0",
+        "case_id": "SF-088",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-088-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 357,
+        "unit_id": "SF-088-r1-H0",
+        "case_id": "SF-088",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-088-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 358,
+        "unit_id": "SF-052-r3-H1-S1",
+        "case_id": "SF-052",
+        "arm": "H1-S1",
+        "repetition": 3,
+        "block_id": "SF-052-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 359,
+        "unit_id": "SF-052-r3-H1-S0",
+        "case_id": "SF-052",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-052-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 360,
+        "unit_id": "SF-052-r3-H0",
+        "case_id": "SF-052",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-052-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 361,
+        "unit_id": "SF-077-r3-H0",
+        "case_id": "SF-077",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-077-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 362,
+        "unit_id": "SF-077-r3-H1-S0",
+        "case_id": "SF-077",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-077-r3",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 363,
+        "unit_id": "SF-015-r2-H1-S0",
+        "case_id": "SF-015",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-015-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 364,
+        "unit_id": "SF-015-r2-H0",
+        "case_id": "SF-015",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-015-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 365,
+        "unit_id": "SF-077-r2-H0",
+        "case_id": "SF-077",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-077-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 366,
+        "unit_id": "SF-077-r2-H1-S0",
+        "case_id": "SF-077",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-077-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 367,
+        "unit_id": "SF-024-r3-H1-S0",
+        "case_id": "SF-024",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-024-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 368,
+        "unit_id": "SF-024-r3-H0",
+        "case_id": "SF-024",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-024-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 369,
+        "unit_id": "SF-014-r3-H0",
+        "case_id": "SF-014",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-014-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 370,
+        "unit_id": "SF-014-r3-H1-S0",
+        "case_id": "SF-014",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-014-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 371,
+        "unit_id": "SF-028-r1-H1-S0",
+        "case_id": "SF-028",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-028-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 372,
+        "unit_id": "SF-028-r1-H0",
+        "case_id": "SF-028",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-028-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 373,
+        "unit_id": "SF-011-r3-H0",
+        "case_id": "SF-011",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-011-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 374,
+        "unit_id": "SF-011-r3-H1-S0",
+        "case_id": "SF-011",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-011-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 375,
+        "unit_id": "SF-016-r2-H1-S0",
+        "case_id": "SF-016",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-016-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 376,
+        "unit_id": "SF-016-r2-H0",
+        "case_id": "SF-016",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-016-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 377,
+        "unit_id": "SF-118-r3-H0",
+        "case_id": "SF-118",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-118-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 378,
+        "unit_id": "SF-118-r3-H1-S0",
+        "case_id": "SF-118",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-118-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 379,
+        "unit_id": "SF-042-r3-H0",
+        "case_id": "SF-042",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-042-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 380,
+        "unit_id": "SF-042-r3-H1-S0",
+        "case_id": "SF-042",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-042-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 381,
+        "unit_id": "SF-042-r3-H1-S1",
+        "case_id": "SF-042",
+        "arm": "H1-S1",
+        "repetition": 3,
+        "block_id": "SF-042-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 382,
+        "unit_id": "SF-101-r2-H1-S0",
+        "case_id": "SF-101",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-101-r2",
+        "status": "error",
+        "failure_stage": "no_run_admitted"
+      },
+      {
+        "ordinal": 383,
+        "unit_id": "SF-101-r2-H0",
+        "case_id": "SF-101",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-101-r2",
+        "status": "error",
+        "failure_stage": "no_run_admitted"
+      },
+      {
+        "ordinal": 384,
+        "unit_id": "SF-076-r3-H0",
+        "case_id": "SF-076",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-076-r3",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 385,
+        "unit_id": "SF-076-r3-H1-S0",
+        "case_id": "SF-076",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-076-r3",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 386,
+        "unit_id": "SF-119-r1-H1-S0",
+        "case_id": "SF-119",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-119-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 387,
+        "unit_id": "SF-119-r1-H0",
+        "case_id": "SF-119",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-119-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 388,
+        "unit_id": "SF-011-r2-H0",
+        "case_id": "SF-011",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-011-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 389,
+        "unit_id": "SF-011-r2-H1-S0",
+        "case_id": "SF-011",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-011-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 390,
+        "unit_id": "SF-058-r3-H1-S0",
+        "case_id": "SF-058",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-058-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 391,
+        "unit_id": "SF-058-r3-H0",
+        "case_id": "SF-058",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-058-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 392,
+        "unit_id": "SF-025-r1-H0",
+        "case_id": "SF-025",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-025-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 393,
+        "unit_id": "SF-025-r1-H1-S0",
+        "case_id": "SF-025",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-025-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 394,
+        "unit_id": "SF-099-r1-H1-S0",
+        "case_id": "SF-099",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-099-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 395,
+        "unit_id": "SF-099-r1-H0",
+        "case_id": "SF-099",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-099-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 396,
+        "unit_id": "SF-053-r1-H0",
+        "case_id": "SF-053",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-053-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 397,
+        "unit_id": "SF-053-r1-H1-S1",
+        "case_id": "SF-053",
+        "arm": "H1-S1",
+        "repetition": 1,
+        "block_id": "SF-053-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 398,
+        "unit_id": "SF-053-r1-H1-S0",
+        "case_id": "SF-053",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-053-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 399,
+        "unit_id": "SF-053-r3-H1-S0",
+        "case_id": "SF-053",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-053-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 400,
+        "unit_id": "SF-053-r3-H0",
+        "case_id": "SF-053",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-053-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 401,
+        "unit_id": "SF-053-r3-H1-S1",
+        "case_id": "SF-053",
+        "arm": "H1-S1",
+        "repetition": 3,
+        "block_id": "SF-053-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 402,
+        "unit_id": "SF-105-r1-H0",
+        "case_id": "SF-105",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-105-r1",
+        "status": "error",
+        "failure_stage": "no_run_admitted"
+      },
+      {
+        "ordinal": 403,
+        "unit_id": "SF-105-r1-H1-S0",
+        "case_id": "SF-105",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-105-r1",
+        "status": "error",
+        "failure_stage": "no_run_admitted"
+      },
+      {
+        "ordinal": 404,
+        "unit_id": "SF-052-r1-H1-S0",
+        "case_id": "SF-052",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-052-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 405,
+        "unit_id": "SF-052-r1-H1-S1",
+        "case_id": "SF-052",
+        "arm": "H1-S1",
+        "repetition": 1,
+        "block_id": "SF-052-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 406,
+        "unit_id": "SF-052-r1-H0",
+        "case_id": "SF-052",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-052-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 407,
+        "unit_id": "SF-082-r1-H1-S0",
+        "case_id": "SF-082",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-082-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 408,
+        "unit_id": "SF-082-r1-H0",
+        "case_id": "SF-082",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-082-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 409,
+        "unit_id": "SF-076-r1-H0",
+        "case_id": "SF-076",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-076-r1",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 410,
+        "unit_id": "SF-076-r1-H1-S0",
+        "case_id": "SF-076",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-076-r1",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 411,
+        "unit_id": "SF-085-r2-H1-S0",
+        "case_id": "SF-085",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-085-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 412,
+        "unit_id": "SF-085-r2-H0",
+        "case_id": "SF-085",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-085-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 413,
+        "unit_id": "SF-043-r2-H1-S1",
+        "case_id": "SF-043",
+        "arm": "H1-S1",
+        "repetition": 2,
+        "block_id": "SF-043-r2",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 414,
+        "unit_id": "SF-043-r2-H0",
+        "case_id": "SF-043",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-043-r2",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 415,
+        "unit_id": "SF-043-r2-H1-S0",
+        "case_id": "SF-043",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-043-r2",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 416,
+        "unit_id": "SF-056-r3-H1-S1",
+        "case_id": "SF-056",
+        "arm": "H1-S1",
+        "repetition": 3,
+        "block_id": "SF-056-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 417,
+        "unit_id": "SF-056-r3-H1-S0",
+        "case_id": "SF-056",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-056-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 418,
+        "unit_id": "SF-056-r3-H0",
+        "case_id": "SF-056",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-056-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 419,
+        "unit_id": "SF-097-r1-H0",
+        "case_id": "SF-097",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-097-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 420,
+        "unit_id": "SF-097-r1-H1-S0",
+        "case_id": "SF-097",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-097-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 421,
+        "unit_id": "SF-071-r1-H1-S0",
+        "case_id": "SF-071",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-071-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 422,
+        "unit_id": "SF-071-r1-H0",
+        "case_id": "SF-071",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-071-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 423,
+        "unit_id": "SF-100-r2-H0",
+        "case_id": "SF-100",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-100-r2",
+        "status": "error",
+        "failure_stage": "incomplete_observation"
+      },
+      {
+        "ordinal": 424,
+        "unit_id": "SF-100-r2-H1-S0",
+        "case_id": "SF-100",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-100-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 425,
+        "unit_id": "SF-024-r2-H1-S0",
+        "case_id": "SF-024",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-024-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 426,
+        "unit_id": "SF-024-r2-H0",
+        "case_id": "SF-024",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-024-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 427,
+        "unit_id": "SF-088-r3-H0",
+        "case_id": "SF-088",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-088-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 428,
+        "unit_id": "SF-088-r3-H1-S0",
+        "case_id": "SF-088",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-088-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 429,
+        "unit_id": "SF-015-r1-H1-S0",
+        "case_id": "SF-015",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-015-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 430,
+        "unit_id": "SF-015-r1-H0",
+        "case_id": "SF-015",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-015-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 431,
+        "unit_id": "SF-029-r3-H0",
+        "case_id": "SF-029",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-029-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 432,
+        "unit_id": "SF-029-r3-H1-S0",
+        "case_id": "SF-029",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-029-r3",
+        "status": "passed"
+      },
+      {
+        "ordinal": 433,
+        "unit_id": "SF-020-r2-H1-S0",
+        "case_id": "SF-020",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-020-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 434,
+        "unit_id": "SF-020-r2-H0",
+        "case_id": "SF-020",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-020-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 435,
+        "unit_id": "SF-017-r1-H0",
+        "case_id": "SF-017",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-017-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 436,
+        "unit_id": "SF-017-r1-H1-S0",
+        "case_id": "SF-017",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-017-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 437,
+        "unit_id": "SF-026-r2-H1-S0",
+        "case_id": "SF-026",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-026-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 438,
+        "unit_id": "SF-026-r2-H0",
+        "case_id": "SF-026",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-026-r2",
+        "status": "passed"
+      },
+      {
+        "ordinal": 439,
+        "unit_id": "SF-089-r1-H0",
+        "case_id": "SF-089",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-089-r1",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 440,
+        "unit_id": "SF-089-r1-H1-S0",
+        "case_id": "SF-089",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-089-r1",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 441,
+        "unit_id": "SF-056-r1-H0",
+        "case_id": "SF-056",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-056-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 442,
+        "unit_id": "SF-056-r1-H1-S0",
+        "case_id": "SF-056",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-056-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 443,
+        "unit_id": "SF-056-r1-H1-S1",
+        "case_id": "SF-056",
+        "arm": "H1-S1",
+        "repetition": 1,
+        "block_id": "SF-056-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 444,
+        "unit_id": "SF-079-r1-H1-S0",
+        "case_id": "SF-079",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-079-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 445,
+        "unit_id": "SF-079-r1-H0",
+        "case_id": "SF-079",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-079-r1",
+        "status": "failed",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 446,
+        "unit_id": "SF-043-r3-H0",
+        "case_id": "SF-043",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-043-r3",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 447,
+        "unit_id": "SF-043-r3-H1-S1",
+        "case_id": "SF-043",
+        "arm": "H1-S1",
+        "repetition": 3,
+        "block_id": "SF-043-r3",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 448,
+        "unit_id": "SF-043-r3-H1-S0",
+        "case_id": "SF-043",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-043-r3",
+        "status": "failed",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 449,
+        "unit_id": "SF-117-r1-H0",
+        "case_id": "SF-117",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-117-r1",
+        "status": "passed"
+      },
+      {
+        "ordinal": 450,
+        "unit_id": "SF-117-r1-H1-S0",
+        "case_id": "SF-117",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-117-r1",
+        "status": "passed",
+        "batch": "SF-B13449-formal-unit"
+      },
+      {
+        "ordinal": 451,
+        "unit_id": "SF-027-r3-H1-S0",
+        "case_id": "SF-027",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-027-r3",
+        "status": "passed",
+        "batch": "SF-B13450-formal-unit"
+      },
+      {
+        "ordinal": 452,
+        "unit_id": "SF-027-r3-H0",
+        "case_id": "SF-027",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-027-r3",
+        "status": "passed",
+        "batch": "SF-B13451-formal-unit"
+      },
+      {
+        "ordinal": 453,
+        "unit_id": "SF-053-r2-H1-S0",
+        "case_id": "SF-053",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-053-r2",
+        "status": "passed",
+        "batch": "SF-B13452-formal-unit"
+      },
+      {
+        "ordinal": 454,
+        "unit_id": "SF-053-r2-H0",
+        "case_id": "SF-053",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-053-r2",
+        "status": "passed",
+        "batch": "SF-B13453-formal-unit"
+      },
+      {
+        "ordinal": 455,
+        "unit_id": "SF-053-r2-H1-S1",
+        "case_id": "SF-053",
+        "arm": "H1-S1",
+        "repetition": 2,
+        "block_id": "SF-053-r2",
+        "status": "passed",
+        "batch": "SF-B13454-formal-unit"
+      },
+      {
+        "ordinal": 456,
+        "unit_id": "SF-090-r1-H1-S0",
+        "case_id": "SF-090",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-090-r1",
+        "status": "failed",
+        "batch": "SF-B13455-formal-unit",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 457,
+        "unit_id": "SF-090-r1-H1-S1",
+        "case_id": "SF-090",
+        "arm": "H1-S1",
+        "repetition": 1,
+        "block_id": "SF-090-r1",
+        "status": "passed",
+        "batch": "SF-B13456-formal-unit"
+      },
+      {
+        "ordinal": 458,
+        "unit_id": "SF-090-r1-H0",
+        "case_id": "SF-090",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-090-r1",
+        "status": "failed",
+        "batch": "SF-B13457-formal-unit",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 459,
+        "unit_id": "SF-012-r3-H0",
+        "case_id": "SF-012",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-012-r3",
+        "status": "passed",
+        "batch": "SF-B13458-formal-unit"
+      },
+      {
+        "ordinal": 460,
+        "unit_id": "SF-012-r3-H1-S0",
+        "case_id": "SF-012",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-012-r3",
+        "status": "passed",
+        "batch": "SF-B13459-formal-unit"
+      },
+      {
+        "ordinal": 461,
+        "unit_id": "SF-098-r2-H1-S0",
+        "case_id": "SF-098",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-098-r2",
+        "status": "failed",
+        "batch": "SF-B13460-formal-unit",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 462,
+        "unit_id": "SF-098-r2-H0",
+        "case_id": "SF-098",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-098-r2",
+        "status": "failed",
+        "batch": "SF-B13461-formal-unit",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 463,
+        "unit_id": "SF-017-r3-H0",
+        "case_id": "SF-017",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-017-r3",
+        "status": "passed",
+        "batch": "SF-B13462-formal-unit"
+      },
+      {
+        "ordinal": 464,
+        "unit_id": "SF-017-r3-H1-S0",
+        "case_id": "SF-017",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-017-r3",
+        "status": "passed",
+        "batch": "SF-B13463-formal-unit"
+      },
+      {
+        "ordinal": 465,
+        "unit_id": "SF-041-r2-H1-S1",
+        "case_id": "SF-041",
+        "arm": "H1-S1",
+        "repetition": 2,
+        "block_id": "SF-041-r2",
+        "status": "passed",
+        "batch": "SF-B13464-formal-unit"
+      },
+      {
+        "ordinal": 466,
+        "unit_id": "SF-041-r2-H0",
+        "case_id": "SF-041",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-041-r2",
+        "status": "passed",
+        "batch": "SF-B13465-formal-unit"
+      },
+      {
+        "ordinal": 467,
+        "unit_id": "SF-041-r2-H1-S0",
+        "case_id": "SF-041",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-041-r2",
+        "status": "passed",
+        "batch": "SF-B13466-formal-unit"
+      },
+      {
+        "ordinal": 468,
+        "unit_id": "SF-115-r1-H1-S0",
+        "case_id": "SF-115",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-115-r1",
+        "status": "passed",
+        "batch": "SF-B13467-formal-unit"
+      },
+      {
+        "ordinal": 469,
+        "unit_id": "SF-115-r1-H0",
+        "case_id": "SF-115",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-115-r1",
+        "status": "passed",
+        "batch": "SF-B13468-formal-unit"
+      },
+      {
+        "ordinal": 470,
+        "unit_id": "SF-117-r3-H0",
+        "case_id": "SF-117",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-117-r3",
+        "status": "failed",
+        "batch": "SF-B13469-formal-unit",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 471,
+        "unit_id": "SF-117-r3-H1-S0",
+        "case_id": "SF-117",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-117-r3",
+        "status": "failed",
+        "batch": "SF-B13470-formal-unit",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 472,
+        "unit_id": "SF-051-r2-H1-S1",
+        "case_id": "SF-051",
+        "arm": "H1-S1",
+        "repetition": 2,
+        "block_id": "SF-051-r2",
+        "status": "passed",
+        "batch": "SF-B13471-formal-unit"
+      },
+      {
+        "ordinal": 473,
+        "unit_id": "SF-051-r2-H1-S0",
+        "case_id": "SF-051",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-051-r2",
+        "status": "passed",
+        "batch": "SF-B13472-formal-unit"
+      },
+      {
+        "ordinal": 474,
+        "unit_id": "SF-051-r2-H0",
+        "case_id": "SF-051",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-051-r2",
+        "status": "passed",
+        "batch": "SF-B13473-formal-unit"
+      },
+      {
+        "ordinal": 475,
+        "unit_id": "SF-058-r2-H1-S0",
+        "case_id": "SF-058",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-058-r2",
+        "status": "passed",
+        "batch": "SF-B13474-formal-unit"
+      },
+      {
+        "ordinal": 476,
+        "unit_id": "SF-058-r2-H0",
+        "case_id": "SF-058",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-058-r2",
+        "status": "failed",
+        "batch": "SF-B13475-formal-unit",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 477,
+        "unit_id": "SF-115-r2-H0",
+        "case_id": "SF-115",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-115-r2",
+        "status": "passed",
+        "batch": "SF-B13476-formal-unit"
+      },
+      {
+        "ordinal": 478,
+        "unit_id": "SF-115-r2-H1-S0",
+        "case_id": "SF-115",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-115-r2",
+        "status": "passed",
+        "batch": "SF-B13477-formal-unit"
+      },
+      {
+        "ordinal": 479,
+        "unit_id": "SF-051-r3-H0",
+        "case_id": "SF-051",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-051-r3",
+        "status": "passed",
+        "batch": "SF-B13478-formal-unit"
+      },
+      {
+        "ordinal": 480,
+        "unit_id": "SF-051-r3-H1-S0",
+        "case_id": "SF-051",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-051-r3",
+        "status": "passed",
+        "batch": "SF-B13479-formal-unit"
+      },
+      {
+        "ordinal": 481,
+        "unit_id": "SF-051-r3-H1-S1",
+        "case_id": "SF-051",
+        "arm": "H1-S1",
+        "repetition": 3,
+        "block_id": "SF-051-r3",
+        "status": "passed",
+        "batch": "SF-B13480-formal-unit"
+      },
+      {
+        "ordinal": 482,
+        "unit_id": "SF-049-r2-H0",
+        "case_id": "SF-049",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-049-r2",
+        "status": "passed",
+        "batch": "SF-B13481-formal-unit"
+      },
+      {
+        "ordinal": 483,
+        "unit_id": "SF-049-r2-H1-S1",
+        "case_id": "SF-049",
+        "arm": "H1-S1",
+        "repetition": 2,
+        "block_id": "SF-049-r2",
+        "status": "failed",
+        "batch": "SF-B13482-formal-unit",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 484,
+        "unit_id": "SF-049-r2-H1-S0",
+        "case_id": "SF-049",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-049-r2",
+        "status": "failed",
+        "batch": "SF-B13483-formal-unit",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 485,
+        "unit_id": "SF-014-r2-H1-S0",
+        "case_id": "SF-014",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-014-r2",
+        "status": "passed",
+        "batch": "SF-B13484-formal-unit"
+      },
+      {
+        "ordinal": 486,
+        "unit_id": "SF-014-r2-H0",
+        "case_id": "SF-014",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-014-r2",
+        "status": "passed",
+        "batch": "SF-B13485-formal-unit"
+      },
+      {
+        "ordinal": 487,
+        "unit_id": "SF-016-r1-H0",
+        "case_id": "SF-016",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-016-r1",
+        "status": "passed",
+        "batch": "SF-B13486-formal-unit"
+      },
+      {
+        "ordinal": 488,
+        "unit_id": "SF-016-r1-H1-S0",
+        "case_id": "SF-016",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-016-r1",
+        "status": "passed",
+        "batch": "SF-B13487-formal-unit"
+      },
+      {
+        "ordinal": 489,
+        "unit_id": "SF-116-r1-H1-S0",
+        "case_id": "SF-116",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-116-r1",
+        "status": "passed",
+        "batch": "SF-B13488-formal-unit"
+      },
+      {
+        "ordinal": 490,
+        "unit_id": "SF-116-r1-H0",
+        "case_id": "SF-116",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-116-r1",
+        "status": "passed",
+        "batch": "SF-B13489-formal-unit"
+      },
+      {
+        "ordinal": 491,
+        "unit_id": "SF-048-r3-H1-S0",
+        "case_id": "SF-048",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-048-r3",
+        "status": "passed",
+        "batch": "SF-B13490-formal-unit"
+      },
+      {
+        "ordinal": 492,
+        "unit_id": "SF-048-r3-H0",
+        "case_id": "SF-048",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-048-r3",
+        "status": "passed",
+        "batch": "SF-B13491-formal-unit"
+      },
+      {
+        "ordinal": 493,
+        "unit_id": "SF-048-r3-H1-S1",
+        "case_id": "SF-048",
+        "arm": "H1-S1",
+        "repetition": 3,
+        "block_id": "SF-048-r3",
+        "status": "passed",
+        "batch": "SF-B13492-formal-unit"
+      },
+      {
+        "ordinal": 494,
+        "unit_id": "SF-078-r3-H0",
+        "case_id": "SF-078",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-078-r3",
+        "status": "failed",
+        "batch": "SF-B13493-formal-unit",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 495,
+        "unit_id": "SF-078-r3-H1-S0",
+        "case_id": "SF-078",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-078-r3",
+        "status": "passed",
+        "batch": "SF-B13494-formal-unit"
+      },
+      {
+        "ordinal": 496,
+        "unit_id": "SF-098-r1-H1-S0",
+        "case_id": "SF-098",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-098-r1",
+        "status": "failed",
+        "batch": "SF-B13495-formal-unit",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 497,
+        "unit_id": "SF-098-r1-H0",
+        "case_id": "SF-098",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-098-r1",
+        "status": "failed",
+        "batch": "SF-B13496-formal-unit",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 498,
+        "unit_id": "SF-074-r2-H0",
+        "case_id": "SF-074",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-074-r2",
+        "status": "passed",
+        "batch": "SF-B13497-formal-unit"
+      },
+      {
+        "ordinal": 499,
+        "unit_id": "SF-074-r2-H1-S0",
+        "case_id": "SF-074",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-074-r2",
+        "status": "passed",
+        "batch": "SF-B13498-formal-unit"
+      },
+      {
+        "ordinal": 500,
+        "unit_id": "SF-060-r3-H1-S0",
+        "case_id": "SF-060",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-060-r3",
+        "status": "passed",
+        "batch": "SF-B13499-formal-unit"
+      },
+      {
+        "ordinal": 501,
+        "unit_id": "SF-060-r3-H1-S1",
+        "case_id": "SF-060",
+        "arm": "H1-S1",
+        "repetition": 3,
+        "block_id": "SF-060-r3",
+        "status": "passed",
+        "batch": "SF-B13500-formal-unit"
+      },
+      {
+        "ordinal": 502,
+        "unit_id": "SF-060-r3-H0",
+        "case_id": "SF-060",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-060-r3",
+        "status": "passed",
+        "batch": "SF-B13501-formal-unit"
+      },
+      {
+        "ordinal": 503,
+        "unit_id": "SF-111-r3-H1-S0",
+        "case_id": "SF-111",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-111-r3",
+        "status": "passed",
+        "batch": "SF-B13502-formal-unit"
+      },
+      {
+        "ordinal": 504,
+        "unit_id": "SF-111-r3-H0",
+        "case_id": "SF-111",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-111-r3",
+        "status": "passed",
+        "batch": "SF-B13503-formal-unit"
+      },
+      {
+        "ordinal": 505,
+        "unit_id": "SF-120-r3-H0",
+        "case_id": "SF-120",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-120-r3",
+        "status": "passed",
+        "batch": "SF-B13504-formal-unit"
+      },
+      {
+        "ordinal": 506,
+        "unit_id": "SF-120-r3-H1-S0",
+        "case_id": "SF-120",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-120-r3",
+        "status": "passed",
+        "batch": "SF-B13505-formal-unit"
+      },
+      {
+        "ordinal": 507,
+        "unit_id": "SF-019-r1-H1-S0",
+        "case_id": "SF-019",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-019-r1",
+        "status": "passed",
+        "batch": "SF-B13506-formal-unit"
+      },
+      {
+        "ordinal": 508,
+        "unit_id": "SF-019-r1-H0",
+        "case_id": "SF-019",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-019-r1",
+        "status": "passed",
+        "batch": "SF-B13507-formal-unit"
+      },
+      {
+        "ordinal": 509,
+        "unit_id": "SF-043-r1-H1-S1",
+        "case_id": "SF-043",
+        "arm": "H1-S1",
+        "repetition": 1,
+        "block_id": "SF-043-r1",
+        "status": "failed",
+        "batch": "SF-B13508-formal-unit",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 510,
+        "unit_id": "SF-043-r1-H0",
+        "case_id": "SF-043",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-043-r1",
+        "status": "failed",
+        "batch": "SF-B13509-formal-unit",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 511,
+        "unit_id": "SF-043-r1-H1-S0",
+        "case_id": "SF-043",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-043-r1",
+        "status": "failed",
+        "batch": "SF-B13510-formal-unit",
+        "failure_stage": "independent_score"
+      },
+      {
+        "ordinal": 512,
+        "unit_id": "SF-016-r3-H0",
+        "case_id": "SF-016",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-016-r3",
+        "status": "passed",
+        "batch": "SF-B13511-formal-unit"
+      },
+      {
+        "ordinal": 513,
+        "unit_id": "SF-016-r3-H1-S0",
+        "case_id": "SF-016",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-016-r3",
+        "status": "passed",
+        "batch": "SF-B13512-formal-unit"
+      },
+      {
+        "ordinal": 514,
+        "unit_id": "SF-120-r1-H1-S0",
+        "case_id": "SF-120",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-120-r1",
+        "status": "passed",
+        "batch": "SF-B13513-formal-unit"
+      },
+      {
+        "ordinal": 515,
+        "unit_id": "SF-120-r1-H0",
+        "case_id": "SF-120",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-120-r1",
+        "status": "passed",
+        "batch": "SF-B13514-formal-unit"
+      },
+      {
+        "ordinal": 516,
+        "unit_id": "SF-030-r3-H0",
+        "case_id": "SF-030",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-030-r3",
+        "status": "passed",
+        "batch": "SF-B13515-formal-unit"
+      },
+      {
+        "ordinal": 517,
+        "unit_id": "SF-030-r3-H1-S0",
+        "case_id": "SF-030",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-030-r3",
+        "status": "passed",
+        "batch": "SF-B13516-formal-unit"
+      },
+      {
+        "ordinal": 518,
+        "unit_id": "SF-058-r1-H1-S0",
+        "case_id": "SF-058",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-058-r1",
+        "status": "passed",
+        "batch": "SF-B13517-formal-unit"
+      },
+      {
+        "ordinal": 519,
+        "unit_id": "SF-058-r1-H0",
+        "case_id": "SF-058",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-058-r1",
+        "status": "passed",
+        "batch": "SF-B13518-formal-unit"
+      },
+      {
+        "ordinal": 520,
+        "unit_id": "SF-011-r1-H0",
+        "case_id": "SF-011",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-011-r1",
+        "status": "passed",
+        "batch": "SF-B13519-formal-unit"
+      },
+      {
+        "ordinal": 521,
+        "unit_id": "SF-011-r1-H1-S0",
+        "case_id": "SF-011",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-011-r1",
+        "status": "passed",
+        "batch": "SF-B13520-formal-unit"
+      },
+      {
+        "ordinal": 522,
+        "unit_id": "SF-072-r2-H1-S0",
+        "case_id": "SF-072",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-072-r2",
+        "status": "passed",
+        "batch": "SF-B13521-formal-unit"
+      },
+      {
+        "ordinal": 523,
+        "unit_id": "SF-072-r2-H0",
+        "case_id": "SF-072",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-072-r2",
+        "status": "failed",
+        "batch": "SF-B13522-formal-unit",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 524,
+        "unit_id": "SF-075-r3-H0",
+        "case_id": "SF-075",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-075-r3",
+        "status": "passed",
+        "batch": "SF-B13523-formal-unit"
+      },
+      {
+        "ordinal": 525,
+        "unit_id": "SF-075-r3-H1-S0",
+        "case_id": "SF-075",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-075-r3",
+        "status": "passed",
+        "batch": "SF-B13524-formal-unit"
+      },
+      {
+        "ordinal": 526,
+        "unit_id": "SF-056-r2-H1-S1",
+        "case_id": "SF-056",
+        "arm": "H1-S1",
+        "repetition": 2,
+        "block_id": "SF-056-r2",
+        "status": "passed",
+        "batch": "SF-B13525-formal-unit"
+      },
+      {
+        "ordinal": 527,
+        "unit_id": "SF-056-r2-H1-S0",
+        "case_id": "SF-056",
+        "arm": "H1-S0",
+        "repetition": 2,
+        "block_id": "SF-056-r2",
+        "status": "passed",
+        "batch": "SF-B13526-formal-unit"
+      },
+      {
+        "ordinal": 528,
+        "unit_id": "SF-056-r2-H0",
+        "case_id": "SF-056",
+        "arm": "H0",
+        "repetition": 2,
+        "block_id": "SF-056-r2",
+        "status": "passed",
+        "batch": "SF-B13527-formal-unit"
+      },
+      {
+        "ordinal": 529,
+        "unit_id": "SF-081-r1-H1-S0",
+        "case_id": "SF-081",
+        "arm": "H1-S0",
+        "repetition": 1,
+        "block_id": "SF-081-r1",
+        "status": "failed",
+        "batch": "SF-B13528-formal-unit",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 530,
+        "unit_id": "SF-081-r1-H0",
+        "case_id": "SF-081",
+        "arm": "H0",
+        "repetition": 1,
+        "block_id": "SF-081-r1",
+        "status": "failed",
+        "batch": "SF-B13529-formal-unit",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 531,
+        "unit_id": "SF-098-r3-H0",
+        "case_id": "SF-098",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-098-r3",
+        "status": "failed",
+        "batch": "SF-B13530-formal-unit",
+        "failure_stage": "semantic_review"
+      },
+      {
+        "ordinal": 532,
+        "unit_id": "SF-098-r3-H1-S0",
+        "case_id": "SF-098",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-098-r3",
+        "status": "passed",
+        "batch": "SF-B13531-formal-unit"
+      },
+      {
+        "ordinal": 533,
+        "unit_id": "SF-021-r3-H1-S0",
+        "case_id": "SF-021",
+        "arm": "H1-S0",
+        "repetition": 3,
+        "block_id": "SF-021-r3",
+        "status": "passed",
+        "batch": "SF-B13532-formal-unit"
+      },
+      {
+        "ordinal": 534,
+        "unit_id": "SF-021-r3-H0",
+        "case_id": "SF-021",
+        "arm": "H0",
+        "repetition": 3,
+        "block_id": "SF-021-r3",
+        "status": "passed",
+        "batch": "SF-B13533-formal-unit"
+      }
+    ]
+  },
+  "seen_recheck_21": {
+    "counts": {
+      "passed": 21
+    },
+    "units": [
+      {
+        "unit_id": "SF-089-r2-H1-S0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14800-v9-continuation-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-089-r2-H0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14801-v9-continuation-recheck",
+            "status": "failed"
+          },
+          {
+            "batch": "SF-B14801-v9-continuation-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-077-r3-H1-S0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14802-v9-continuation-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-101-r2-H1-S0",
+        "original_status": "error",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14803-v9-continuation-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-101-r2-H0",
+        "original_status": "error",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14804-v9-continuation-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-076-r3-H0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14805-v9-continuation-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-076-r3-H1-S0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14806-v9-continuation-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-105-r1-H0",
+        "original_status": "error",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14807-v9-continuation-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-105-r1-H1-S0",
+        "original_status": "error",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14808-v9-continuation-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-076-r1-H0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14809-v9-continuation-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-076-r1-H1-S0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14810-v9-continuation-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-043-r2-H1-S1",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14811-v9-continuation-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-043-r2-H0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14812-v9-continuation-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-043-r2-H1-S0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14813-v9-continuation-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-100-r2-H0",
+        "original_status": "error",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14814-v9-continuation-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-089-r1-H0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14815-v9-continuation-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-089-r1-H1-S0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14816-v9-continuation-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-079-r1-H0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14817-v9-continuation-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-043-r3-H0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14818-v9-continuation-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-043-r3-H1-S1",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14819-v9-continuation-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-043-r3-H1-S0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14820-v9-continuation-recheck",
+            "status": "passed"
+          }
+        ]
+      }
+    ]
+  },
+  "seen_recheck_19": {
+    "counts": {
+      "passed": 19
+    },
+    "units": [
+      {
+        "unit_id": "SF-090-r1-H1-S0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B13455-formal-unit",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-090-r1-H0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B13457-formal-unit",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-098-r2-H1-S0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B13460-formal-unit",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-098-r2-H0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B13461-formal-unit",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-117-r3-H0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B13469-formal-unit",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-117-r3-H1-S0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B13470-formal-unit",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-058-r2-H0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14830-v9-final-tail-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-049-r2-H1-S1",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14831-v9-final-tail-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-049-r2-H1-S0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14832-v9-final-tail-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-078-r3-H0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B13493-formal-unit",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-098-r1-H1-S0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B13495-formal-unit",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-098-r1-H0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B13496-formal-unit",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-043-r1-H1-S1",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14833-v9-final-tail-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-043-r1-H0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14834-v9-final-tail-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-043-r1-H1-S0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B14835-v9-final-tail-recheck",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-072-r2-H0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B13522-formal-unit",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-081-r1-H1-S0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B13528-formal-unit",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-081-r1-H0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B13529-formal-unit",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "unit_id": "SF-098-r3-H0",
+        "original_status": "failed",
+        "status": "passed",
+        "attempts": [
+          {
+            "batch": "SF-B13530-formal-unit",
+            "status": "passed"
+          }
+        ]
+      }
+    ]
+  },
+  "python_offline": {
+    "source": "9116de776e791f4b1bc2a109805088ec9a5be61f",
+    "batch": "SF-B14829-v9-final-tail-offline",
+    "passed": 1750,
+    "failed": 0,
+    "error": 0,
+    "skipped": 0
+  }
+}

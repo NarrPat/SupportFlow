@@ -50,6 +50,9 @@ _INVITATION_FACT_GAP = re.compile(
     r"|(?:允许)?域名(?:配置|策略)(?:缺失|缺少|不全)"
     r"|旧邀请(?:链接|记录)?[^。！？]{0,20}当前(?:有效)?邀请"
 )
+_INVITATION_DOMAIN_CASE = re.compile(r"(?:使用|采用|用)(?:了)?子域(?:名)?邮箱[^。！？]{0,24}(?:允许|许可)子域")
+_STATUS_TOOL_TIMEOUT = re.compile(r"状态(?:查询|检查)?工具(?:已|仍|又)?(?:超时|无响应)")
+_EXTERNAL_INCIDENT_REPORT = re.compile(r"(?:外部\s*(?:issue|报告|工单)|github\s*(?:issue|工单))", re.IGNORECASE)
 _POLICY_QUESTION = re.compile(r"一般来说|通常来说|规则是什么|什么是|假设|举例|如果|若遇到")
 _CAPACITY_ONLY = re.compile(r"(?:只|仅)(?:想|需|需要|要)?(?:核对|检查|核查|确认|看|查)(?:一下)?(?:当前)?(?:席位|容量|剩余|是否满员)")
 
@@ -58,7 +61,9 @@ def resolve_customer_invitation_intent(run, intent):
     """Keep specific invitation incidents on the customer read-only path."""
     if enabled(run["config_snapshot"]) and run.get("customer_id") and intent["intent"] == "knowledge_question":
         message = run["message"]
-        concrete = _INVITATION_EVENT.search(message) or _INVITATION_FACT_GAP.search(message)
+        concrete = (_INVITATION_EVENT.search(message) or _INVITATION_FACT_GAP.search(message)
+                    or _INVITATION_DOMAIN_CASE.search(message)
+                    or (_STATUS_TOOL_TIMEOUT.search(message) and _EXTERNAL_INCIDENT_REPORT.search(message)))
         if concrete and not (_POLICY_QUESTION.search(message) or _CAPACITY_ONLY.search(message)):
             return {"intent": "invitation_diagnosis", "knowledge_topic": None,
                     "invitation_email": confirmed_email(run)}

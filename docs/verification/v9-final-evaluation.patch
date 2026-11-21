@@ -1,0 +1,4199 @@
+diff --git a/artifacts/iterations/SF-I001/development-notes/audit-v9-continuation-repair.py b/artifacts/iterations/SF-I001/development-notes/audit-v9-continuation-repair.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..00a1018a2b755c764d44812ec7a0c409aa68f5e6
+--- /dev/null
++++ b/artifacts/iterations/SF-I001/development-notes/audit-v9-continuation-repair.py
+@@ -0,0 +1,99 @@
++"""Independently verify repaired observations and record initial and final outcomes."""
++import argparse
++from collections import Counter
++from pathlib import Path
++import sys
++
++ROOT = Path.cwd()
++NOTES = Path(__file__).resolve().parent
++sys.path.insert(0, str(ROOT / 'tools'))
++from evidence_archive import verify_batch
++from formal_ai_review import packet, validate_judgment
++from formal_results import read_reference, reference, require, write_exclusive
++from formal_unit_material import V9_AFTER_PENDING_REPAIR, V9_CONTINUATION_REPAIR, V9_FINAL_TAIL_REPAIR
++
++
++def review(row, directory):
++    bound = read_reference(ROOT, row['bound_review'])
++    original = read_reference(ROOT, row['original'])
++    require({k: bound['binding'][k] for k in ('unit_id', 'arm', 'repetition', 'case_id', 'common_sha256')}
++            == {k: original['binding'][k] for k in ('unit_id', 'arm', 'repetition', 'case_id', 'common_sha256')},
++            'Repaired result changed the original unit')
++    if bound['mode'] == 'seen_formal_repair_review_only':
++        require(all(original[k] == bound[k] for k in ('binding', 'run_id', 'dispatch_intent',
++                                                      'observation', 'independent_score')),
++                'Review-only projection changed the formal observation or score')
++    else:
++        require(bound['binding']['experiment_id'] != original['binding']['experiment_id'] and
++                bound['mode'] == 'dev_formal_path_calibration', 'Repair is not separated from the original registration')
++    if 'previous_outcome' in row:
++        previous = read_reference(ROOT, row['previous_outcome'])
++        previous_record = read_reference(ROOT, previous['bound_review'])
++        require(all(previous_record[k] == bound[k] for k in ('binding', 'run_id', 'dispatch_intent',
++                                                             'observation', 'independent_score')),
++                'Review-only recheck changed native inputs or independently scored evidence')
++    batch = NOTES.parent / row['batch']
++    verify_batch(batch)
++    obs = read_reference(ROOT, bound['observation'])
++    require(obs['seal'] == reference(ROOT, batch / 'seal.json'), 'Wrong native seal')
++    review_result = read_reference(ROOT, bound['ai_review'])
++    approval = read_reference(ROOT, review_result['provider'])
++    attempt = read_reference(ROOT, review_result['attempt'])
++    pending = ROOT / attempt['pending']['path']
++    require(reference(ROOT, pending) == attempt['pending'], 'Wrong review input bytes')
++    evidence, collected = packet(ROOT, pending)
++    require(attempt['packet'] == evidence and collected['observation'] == bound['observation'] and
++            collected['independent_score'] == bound['independent_score'], 'Review is not bound to collected evidence')
++    verdict = validate_judgment(evidence, approval['content'])
++    require(all(review_result[k] == v for k, v in verdict.items()) and approval['provider_response_id'],
++            'Review differs from validated provider reply')
++    expected = 'error' if obs['collection_error'] else (
++        'passed' if evidence['independent_passed'] and verdict['decision'] == 'approved' else 'failed')
++    require(expected == bound['status'] == row['status'], 'Result differs from observed score and review')
++    return {'source': bound['binding']['source_revision'], 'run_id': bound['run_id'],
++            'batch': row['batch'], 'observation': bound['observation'], 'score': bound['independent_score'],
++            'review': bound['ai_review'], 'record': reference(ROOT, directory / 'outcome.json'),
++            'provider_response_id': approval['provider_response_id']}
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('output', type=Path)
++    parser.add_argument('runs', type=Path, nargs='+')
++    fixtures = {'continuation': V9_CONTINUATION_REPAIR, 'after-pending': V9_AFTER_PENDING_REPAIR,
++                'final-tail': V9_FINAL_TAIL_REPAIR}
++    parser.add_argument('--scope', choices=fixtures, default='continuation')
++    args = parser.parse_args()
++    scope = read_reference(ROOT, reference(ROOT, fixtures[args.scope]))
++    historical = read_reference(ROOT, scope['origin_report'])
++    if args.scope == 'continuation':
++        valid = (historical['recorded'], historical['pending']) == (348, 1)
++    elif args.scope == 'after-pending':
++        valid = (historical['combined_recorded'], historical['combined_pending'], historical['combined_not_run'],
++                 historical['supplemental_recorded']) == (448, 1, 85, 100)
++    else:
++        valid = (historical['recorded'], historical['pending'], historical['not_run']) == (534, 0, 0)
++    require(valid, 'Original matrix boundary changed')
++    units = {u['unit_id']: {**u, 'attempts': []} for u in scope['units']}
++    for path in args.runs:
++        for record in sorted(path.glob('*/outcome.json')):
++            item = read_reference(ROOT, reference(ROOT, record))
++            unit = units[item['unit_id']]
++            require(item['original'] == unit['result'], 'Wrong original result')
++            attempt = {**item, 'outcome': reference(ROOT, record)}
++            if item.get('bound_review'):
++                attempt['verified_evidence'] = review(item, record.parent)
++            unit['attempts'].append(attempt)
++    for unit in units.values():
++        attempts = unit['attempts']
++        unit['status'] = next((a['status'] for a in reversed(attempts) if a['status'] == 'passed'),
++                              attempts[-1]['status'] if attempts else 'not_run')
++    counts = Counter(u['status'] for u in units.values())
++    write_exclusive(args.output, {'origin_report': scope['origin_report'], 'formal_eligible': False,
++                                  'requested': len(units), 'counts': dict(counts), 'units': list(units.values())})
++    print(dict(counts))
++    return int(counts['passed'] != len(units))
++
++
++if __name__ == '__main__':
++    sys.exit(main())
+diff --git a/artifacts/iterations/SF-I001/development-notes/recheck-v9-tail-semantic.py b/artifacts/iterations/SF-I001/development-notes/recheck-v9-tail-semantic.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..c33460f8253ae55168ffe15eddf6f1048958b61c
+--- /dev/null
++++ b/artifacts/iterations/SF-I001/development-notes/recheck-v9-tail-semantic.py
+@@ -0,0 +1,91 @@
++"""Reassess a formal v9 failure only when corrected evidence can be projected."""
++import argparse
++import json
++from pathlib import Path
++from runpy import run_path
++import subprocess
++import sys
++
++NOTES = Path(__file__).resolve().parent
++ROOT = NOTES.parents[3]
++sys.path.insert(0, str(ROOT / 'tools'))
++from formal_ai_review import packet, validate_judgment
++from formal_results import read_reference, reference, require, validate_result, write_exclusive
++from formal_scheduler import assemble, scheduler_owner
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('report', type=Path)
++    parser.add_argument('output', type=Path)
++    parser.add_argument('--unit', action='append', required=True)
++    parser.add_argument('--projection-only', action='store_true')
++    args = parser.parse_args()
++    target = args.output.resolve()
++    require(Path.cwd().resolve() == ROOT and target.is_relative_to(NOTES) and not target.exists(),
++            'New evidence directory in the main checkout required')
++    report_ref = reference(ROOT, args.report)
++    report = read_reference(ROOT, report_ref)
++    manifest = read_reference(ROOT, report['manifest'])
++    picked = set(args.unit)
++    rows = [row for row in report['units'] if row['unit_id'] in picked]
++    require(len(rows) == len(picked) == len(args.unit) and all(
++        row['ordinal'] >= 450 and row['failure']['stage'] == 'semantic_review' for row in rows),
++        'Only identified review-only failures in the final original tail are eligible')
++    review_unit = run_path(str(NOTES / 'run-v9-remaining-sample.py'))['review_unit']
++    source = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
++    if not args.projection_only:
++        require(not subprocess.check_output(['git', 'diff', 'HEAD', '--name-only'], cwd=ROOT, text=True).strip(),
++                'Commit the reviewer changes before an online recheck')
++    outcomes = []
++    with scheduler_owner(target):
++        for row in rows:
++            uid = row['unit_id']
++            original = read_reference(ROOT, row['result'])
++            validate_result(ROOT, manifest, manifest['units'][row['ordinal'] - 1], original)
++            original_dir = (ROOT / row['result']['path']).parent
++            previous_pending = reference(ROOT, original_dir / 'collected/pending-review.json')
++            pending = read_reference(ROOT, previous_pending)
++            prior_review = read_reference(ROOT, original['ai_review'])
++            prior_packet = read_reference(ROOT, prior_review['attempt'])['packet']
++            directory = target / uid.lower()
++            directory.mkdir()
++            candidate = directory / 'pending-review.json'
++            write_exclusive(candidate, {**pending, 'review_packet_version': 10,
++                                        'review_input': reference(ROOT, original_dir / 'input.json')})
++            observed, _ = packet(ROOT, candidate)
++            require(observed['independent_passed'] and not observed['collection_error'] and
++                    observed['requirements'] == prior_packet['requirements'] and observed['actual'] != prior_packet['actual'],
++                    'Corrected projection is missing or does not bind the same requirements')
++            write_exclusive(directory / 'projection.json', observed)
++            outcome = {'unit_id': uid, 'original': row['result'], 'run_id': original['run_id'], 'batch': row['batch'],
++                       'original_pending': previous_pending, 'review_source_revision': source,
++                       'reviewer_code': reference(ROOT, 'tools/formal_ai_review.py'),
++                       'packet': reference(ROOT, directory / 'projection.json'), 'status': 'offline_projection'}
++            if not args.projection_only:
++                output = review_unit(directory, candidate, directory / 'ai-review.json')
++                outcome['status'] = 'pending'
++                if output is not None:
++                    result = assemble(ROOT, manifest, candidate, output)
++                    review = read_reference(ROOT, result['ai_review'])
++                    reply = read_reference(ROOT, review['provider'])
++                    attempt = read_reference(ROOT, review['attempt'])
++                    judgment = validate_judgment(observed, reply['content'])
++                    require(attempt['pending'] == reference(ROOT, candidate) and attempt['packet'] == observed and
++                            all(review[k] == value for k, value in judgment.items()) and
++                            all(original[k] == result[k] for k in ('binding', 'run_id', 'dispatch_intent',
++                                                                  'observation', 'independent_score')),
++                            'Review-only recheck changed the formal observation or score')
++                    result['mode'] = 'seen_formal_repair_review_only'
++                    write_exclusive(directory / 'recheck.json', result)
++                    outcome.update(status=result['status'], bound_review=reference(ROOT, directory / 'recheck.json'))
++            write_exclusive(directory / 'outcome.json', outcome)
++            outcomes.append(outcome)
++            print(json.dumps(outcome, ensure_ascii=False), flush=True)
++    write_exclusive(target / 'outcomes.json', {'origin_report': report_ref, 'source_revision': source,
++                                               'formal_eligible': False, 'units': outcomes})
++    return int(any(row['status'] not in ('passed', 'offline_projection') for row in outcomes))
++
++
++if __name__ == '__main__':
++    sys.exit(main())
+diff --git a/artifacts/iterations/SF-I001/development-notes/run-v9-after-pending.py b/artifacts/iterations/SF-I001/development-notes/run-v9-after-pending.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..423b2b19be7e5d8d62f2b3b2af2a238e63676ab5
+--- /dev/null
++++ b/artifacts/iterations/SF-I001/development-notes/run-v9-after-pending.py
+@@ -0,0 +1,179 @@
++"""Execute a registered continuation after a preserved pending v9 reservation."""
++import argparse
++from collections import Counter
++from datetime import datetime, timezone
++import json
++from pathlib import Path
++from runpy import run_path
++import subprocess
++import sys
++from uuid import uuid4
++
++ROOT = Path.cwd().resolve()
++NOTES = Path('artifacts/iterations/SF-I001/development-notes')
++ORIGINAL = NOTES / 'formal-native-20261117-v9'
++LEDGER = ROOT / NOTES / 'formal-native-20261117-v9-ledger'
++WORK = ROOT / NOTES / 'formal-native-20261117-v9-work'
++BEGIN, END = 349, 449  # zero-based, end exclusive
++sys.path.insert(0, str(ROOT / 'tools'))
++from formal_results import (pending_intent, read_reference, read_results, reference, require,
++                            unit_binding, validate_gate, validate_intent, write_exclusive)
++from formal_scheduler import assemble, native_command, scheduler_owner
++from formal_unit_material import build
++from formal_unit_result import collect
++
++
++def batch(index):
++    return f'SF-B{13000 + index}-formal-unit'
++
++
++def read(path):
++    return json.loads(path.read_bytes())
++
++
++def basis():
++    manifest_ref = reference(ROOT, ORIGINAL / 'manifest.json')
++    manifest = read_reference(ROOT, manifest_ref)
++    validate_gate(ROOT, manifest)
++    original_rows = read_results(ROOT, manifest, LEDGER)
++    require(len(original_rows) == BEGIN - 1, 'Original ledger boundary changed')
++    pending = pending_intent(ROOT, manifest, LEDGER, len(original_rows))
++    require(pending and manifest['units'][BEGIN - 1]['unit_id'] == 'SF-045-r2-H1-S0',
++            'Expected the original held reservation')
++    original_records = [reference(ROOT, LEDGER / f'{i:04d}.json') for i in range(len(original_rows))]
++    units = [{'ordinal': i + 1, 'unit_id': manifest['units'][i]['unit_id'],
++              'arm': manifest['units'][i]['arm'], 'batch': batch(i)} for i in range(BEGIN, END)]
++    plan = {'kind': 'v9_continuation_after_pending', 'manifest': manifest_ref,
++            'original_records': original_records, 'held_reservation': pending,
++            'held_batch_seal': reference(ROOT, Path('artifacts/iterations/SF-I001') / batch(BEGIN - 1) / 'seal.json'),
++            'registered_units': units, 'original_denominator': len(manifest['units'])}
++    return plan, manifest, original_rows
++
++
++def verify_context(plan, manifest):
++    require(subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
++            == manifest['source_revision'], 'Wrong frozen source')
++    require(not subprocess.check_output(['git', 'diff', 'HEAD', '--name-only'], text=True).strip(),
++            'Frozen product source changed')
++    require(not (WORK / '.scheduler.lock').exists(), 'Original scheduler active')
++    for ref in (*plan['original_records'], plan['held_reservation'], plan['held_batch_seal']):
++        require(ref == reference(ROOT, ref['path']), 'Original evidence changed')
++
++
++def existing_result(manifest, index, folder, seen):
++    record = read(folder / 'result.json')
++    require(record == assemble(ROOT, manifest, folder / 'collected/pending-review.json',
++                               folder / 'ai-review.json'), 'Stored result differs from its sealed review')
++    require(record['binding'] == unit_binding(manifest, manifest['units'][index]), 'Result on the wrong unit')
++    require(record['dispatch_intent'] == reference(ROOT, folder / 'intent.json'), 'Reservation differs')
++    run_id = record['run_id']
++    if run_id is not None:
++        require(run_id not in seen, 'Run reused across v9 units')
++        seen.add(run_id)
++    return record
++
++
++def execute(path, plan, manifest, original_rows):
++    verify_context(plan, manifest)
++    frozen = run_path(str(ROOT / NOTES / 'run-formal-v9-continuation.py'))
++    seen = {row['run_id'] for row in original_rows if row['run_id'] is not None}
++    with scheduler_owner(path):
++        registration = path / 'registration.json'
++        if not registration.exists():
++            require(all(not (ROOT / 'artifacts/iterations/SF-I001' / u['batch']).exists()
++                        for u in plan['registered_units']), 'A target already has a native batch')
++            write_exclusive(registration, plan)
++        require(read(registration) == plan, 'Supplemental continuation registration differs')
++        for index in range(BEGIN, END):
++            unit = manifest['units'][index]
++            folder = path / f'{index:04d}'
++            folder.mkdir(exist_ok=True)
++            if not (folder / 'result.json').exists():
++                run_unit(plan, manifest, index, folder, frozen)
++            result = existing_result(manifest, index, folder, seen)
++            print(json.dumps({'ordinal': index + 1, 'unit_id': unit['unit_id'],
++                              'status': result['status'], 'batch': batch(index)}), flush=True)
++
++
++def run_unit(plan, manifest, index, folder, frozen, *, batch_id=None, previous_batch=None):
++    unit = manifest['units'][index]
++    binding = unit_binding(manifest, unit)
++    intent = folder / 'intent.json'
++    launch = folder / 'launch.json'
++    batch_id = batch_id or batch(index)
++    batch_dir = ROOT / 'artifacts/iterations/SF-I001' / batch_id
++    if not intent.exists():
++        require(not launch.exists() and not batch_dir.exists(), 'Native launch without reservation')
++        observed = frozen['preflight'](ROOT)
++        write_exclusive(folder / ('preflight-' + uuid4().hex + '.json'), observed)
++        require(observed['status'] == 'passed', 'Host preflight blocked before reservation')
++        write_exclusive(intent, {'schema_version': 1, 'state': 'reserved', 'binding': binding,
++                                 'nonce': uuid4().hex, 'reserved_at': datetime.now(timezone.utc).isoformat()})
++    validate_intent(binding, read(intent))
++    input_path = folder / 'input.json'
++    prepared = build(ROOT, plan['manifest'], reference(ROOT, intent))
++    if not input_path.exists():
++        require(not launch.exists() and not batch_dir.exists(), 'Missing prepared input after launch')
++        write_exclusive(input_path, prepared)
++    require(read(input_path) == prepared, 'Prepared input changed')
++    if not launch.exists():
++        require(not batch_dir.exists() and not (folder / 'started.json').exists(), 'Native batch already started')
++        command = native_command(ROOT, batch_id, previous_batch or batch(index - 1), unit['arm'], input_path)
++        write_exclusive(launch, {'command': command, 'intent': reference(ROOT, intent)})
++        with (folder / 'console.log').open('xb') as log:
++            code = subprocess.run(command, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT).returncode
++        write_exclusive(folder / 'exit.json', {'exit_code': code})
++    require((batch_dir / 'seal.json').is_file(), 'No seal for reserved execution. Keep pending.')
++    collected = folder / 'collected'
++    pending = collected / 'pending-review.json'
++    if not collected.exists():
++        collect(ROOT, input_path, batch_dir, collected)
++    require(pending.is_file(), 'Partial collection. Keep pending.')
++    review = folder / 'ai-review.json'
++    if not review.exists():
++        frozen['reviewer'](ROOT, pending, review)
++    result = assemble(ROOT, manifest, pending, review)
++    write_exclusive(folder / 'result.json', result)
++
++
++def report(path, plan, manifest, original_rows):
++    if (path / 'registration.json').exists():
++        require(read(path / 'registration.json') == plan, 'Supplemental registration differs')
++    seen = {row['run_id'] for row in original_rows if row['run_id'] is not None}
++    units = []
++    for index, entry in enumerate(plan['registered_units'], BEGIN):
++        folder = path / f'{index:04d}'
++        if (folder / 'result.json').exists():
++            status = existing_result(manifest, index, folder, seen)['status']
++            units.append({**entry, 'status': status, 'result': reference(ROOT, folder / 'result.json')})
++        else:
++            status = 'pending' if (folder / 'intent.json').exists() else 'not_run'
++            units.append({**entry, 'status': status})
++    counts = Counter(row['status'] for row in units)
++    completed = sum(counts[s] for s in ('passed', 'failed', 'error'))
++    return {'registration': plan, 'supplemental_counts': dict(counts), 'supplemental_recorded': completed,
++            'combined_recorded': len(original_rows) + completed, 'combined_pending': 1 + counts['pending'],
++            'combined_not_run': len(manifest['units']) - len(original_rows) - completed - 1 - counts['pending'],
++            'units': units}
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('operation', choices=('plan', 'run', 'report'))
++    parser.add_argument('--work', required=True, type=Path)
++    parser.add_argument('--output', type=Path)
++    args = parser.parse_args()
++    path = args.work.resolve()
++    require(path.is_relative_to((ROOT / NOTES).resolve()), 'Work outside frozen project evidence')
++    plan, manifest, original_rows = basis()
++    if args.operation == 'run':
++        execute(path, plan, manifest, original_rows)
++        return
++    result = plan if args.operation == 'plan' else report(path, plan, manifest, original_rows)
++    if args.output is not None:
++        write_exclusive(args.output, result)
++    print(json.dumps({k: v for k, v in result.items() if k not in ('original_records', 'registration', 'units', 'registered_units')}))
++
++
++if __name__ == '__main__':
++    main()
+diff --git a/artifacts/iterations/SF-I001/development-notes/run-v9-continuation-repair.py b/artifacts/iterations/SF-I001/development-notes/run-v9-continuation-repair.py
+index 6628dcd4778aff0472eb2a72098eece5d7ce7e11..37da99dfe60bfbbf827135cf3cf7d086e29fc440 100644
+--- a/artifacts/iterations/SF-I001/development-notes/run-v9-continuation-repair.py
++++ b/artifacts/iterations/SF-I001/development-notes/run-v9-continuation-repair.py
+@@ -11,7 +11,39 @@ NOTES = Path(__file__).resolve().parent
+ sys.path.insert(0, str(ROOT / 'tools'))
+ from formal_results import create_manifest, read_reference, reference, require, write_exclusive
+ from formal_scheduler import scheduler_owner
+-from formal_unit_material import V9_CONTINUATION_REPAIR
++from formal_unit_material import V9_AFTER_PENDING_REPAIR, V9_CONTINUATION_REPAIR, V9_FINAL_TAIL_REPAIR
++
++
++SCOPES = {'continuation': V9_CONTINUATION_REPAIR, 'after-pending': V9_AFTER_PENDING_REPAIR,
++          'final-tail': V9_FINAL_TAIL_REPAIR}
++
++
++def repair_rows(scope, spec, history):
++    if scope == 'continuation':
++        rows = history['units'][222:348]
++        fields = ('unit_id', 'arm', 'repetition', 'result')
++        counts = (35, 28)
++    elif scope == 'after-pending':
++        rows = history['units']
++        fields = ('ordinal', 'unit_id', 'arm', 'result')
++        counts = (21, 16)
++    else:
++        require(history['execution_complete'] and history['recorded'] == history['planned'] == 534,
++                'The final original report must be complete')
++        rows = [u for u in history['units'] if u['ordinal'] == 349 or 450 <= u['ordinal'] <= 534]
++        fields = ('ordinal', 'unit_id', 'arm', 'result')
++        counts = (sum(history['last_86_counts'].get(s, 0) for s in ('failed', 'error')),
++                  history['last_86_counts'].get('failed', 0))
++    rows = [u for u in rows if u['status'] in ('failed', 'error')]
++    require((len(rows), sum(u['status'] == 'failed' for u in rows)) == counts,
++            'Historical continuation scope differs')
++    expected = [{**{key: u[key] for key in fields}, 'original_status': u['status']} for u in rows]
++    if scope == 'continuation':
++        for item, unit in zip(expected, rows, strict=True):
++            item['stage'] = unit['failure']['stage']
++    require(spec['unit_ids'] == [u['unit_id'] for u in rows] and spec['units'] == expected,
++            'Repair scope does not match the frozen records')
++    return rows
+ 
+ 
+ def main():
+@@ -20,23 +52,18 @@ def main():
+     parser.add_argument('--first-batch', type=int, required=True)
+     parser.add_argument('--previous-batch', required=True)
+     parser.add_argument('--unit', action='append')
++    parser.add_argument('--scope', choices=SCOPES, default='continuation')
+     args = parser.parse_args()
+     target = args.output.resolve()
+     require(target.is_relative_to(NOTES) and not target.exists(), 'New evidence directory required')
+     require(not subprocess.check_output(['git', 'diff', 'HEAD', '--name-only'], text=True).strip(),
+             'Tracked source differs from registered commit')
+     source = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+-    spec = read_reference(ROOT, reference(ROOT, V9_CONTINUATION_REPAIR))
++    spec = read_reference(ROOT, reference(ROOT, SCOPES[args.scope]))
+     history = read_reference(ROOT, spec['origin_report'])
+     original = read_reference(ROOT, spec['origin_manifest'])
+     require(history['manifest'] == spec['origin_manifest'], 'History points to another manifest')
+-    rows = [u for u in history['units'][222:348] if u['status'] in ('failed', 'error')]
+-    require(len(rows) == 35 and sum(u['status'] == 'failed' for u in rows) == 28,
+-            'Historical continuation scope differs')
+-    require(spec['unit_ids'] == [u['unit_id'] for u in rows] and spec['units'] == [
+-        {'unit_id': u['unit_id'], 'arm': u['arm'], 'repetition': u['repetition'],
+-         'original_status': u['status'], 'stage': u['failure']['stage'], 'result': u['result']}
+-        for u in rows], 'Repair scope does not match the frozen records')
++    rows = repair_rows(args.scope, spec, history)
+     selected = set(args.unit or spec['unit_ids'])
+     require(selected and selected <= set(spec['unit_ids']), 'Unknown unit in repair scope')
+     manifest = create_manifest(ROOT, spec['experiment_prefix'] + target.name, source)
+@@ -50,7 +77,8 @@ def main():
+         write_exclusive(target / 'manifest.json', manifest)
+         for index, row in enumerate(u for u in rows if u['unit_id'] in selected):
+             uid = row['unit_id']
+-            batch = f'SF-B{args.first_batch + index}-v9-continuation-recheck'
++            label = 'v9-final-tail-recheck' if args.scope == 'final-tail' else 'v9-continuation-recheck'
++            batch = f'SF-B{args.first_batch + index}-{label}'
+             outcome = run_unit(target, manifest, units[uid], batch, previous)
+             outcome['original'] = row['result']
+             write_exclusive(target / uid.lower() / 'outcome.json', outcome)
+diff --git a/artifacts/iterations/SF-I001/development-notes/run-v9-final-tail.py b/artifacts/iterations/SF-I001/development-notes/run-v9-final-tail.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..f0d43fac5c75f45744769f08b6b63c08f2ce7d8e
+--- /dev/null
++++ b/artifacts/iterations/SF-I001/development-notes/run-v9-final-tail.py
+@@ -0,0 +1,119 @@
++"""Run the original v9 final tail after a proved pre-collector launch failure."""
++import argparse
++import inspect
++import json
++from pathlib import Path
++from runpy import run_path
++import sys
++
++NOTES = Path('artifacts/iterations/SF-I001/development-notes')
++ROOT = Path.cwd().resolve()
++ITERATION = NOTES.parent
++OPERATION = Path(__file__).resolve().parent
++sys.path.insert(0, str(ROOT / 'tools'))
++from evidence_archive import verify_batch
++from formal_results import read_reference, reference, require, unit_binding, write_exclusive
++from formal_scheduler import scheduler_owner
++
++HELD = 348
++TAIL = 449
++RECOVERY_BATCH = 'SF-B13534-formal-unit-recovery'
++PRIOR_DIR = NOTES / 'v9-after-pending-20261121'
++
++
++def replacement_proof(old_plan, manifest):
++    """Verify the specific Docker timeout occurred before the collector could start."""
++    batch = ITERATION / 'SF-B13348-formal-unit'
++    require(old_plan['held_batch_seal'] == reference(ROOT, batch / 'seal.json'), 'Held seal changed')
++    require(verify_batch(ROOT / batch)['counts']['error'] == 1, 'Expected one sealed execution error')
++    folder = NOTES / 'formal-native-20261117-v9-work' / f'{HELD:04d}'
++    files = {name: reference(ROOT, folder / f'{name}.json') for name in ('started', 'input', 'launch', 'exit')}
++    started = read_reference(ROOT, files['started'])
++    launch = read_reference(ROOT, files['launch'])
++    prior_input = read_reference(ROOT, files['input'])
++    binding = unit_binding(manifest, manifest['units'][HELD])
++    require(started['binding'] == binding and started['input'] == files['input'] and
++            prior_input['formal_unit'] == {'binding': binding, 'dispatch_intent': old_plan['held_reservation']} and
++            launch['intent'] == old_plan['held_reservation'] and read_reference(ROOT, files['exit'])['exit_code'] != 0,
++            'Original attempt is not bound to the held unit')
++    log = batch / 'raw/runner.log'
++    lines = (ROOT / log).read_text(encoding='utf-8-sig', errors='replace')
++    require(all(text in lines for text in ('in run_native', 'actual = host_observation(',
++            "subprocess.TimeoutExpired: Command '['docker', 'info'", 'timed out after 20 seconds',
++            f'Drain OK for {binding["namespace"]} (temporary PGDATA and loopback port 18080).',
++            'SF_WINDOW_RELEASED ')), 'Cannot prove the pre-collector failure and drain')
++    require(not any((ROOT / batch / 'raw').rglob('five-case-native.json')) and
++            not any((ROOT / batch / 'raw').rglob('formal-recovery-observation.json')),
++            'Unexpected native observations require reconciliation')
++    from five_case_matrix_runtime import run_native
++    source = inspect.getsource(run_native)
++    require(source.index('actual = host_observation(') < source.index('"run", "--name", name'),
++            'Frozen runner order changed')
++    return {'original_batch': batch.name, 'original_batch_seal': old_plan['held_batch_seal'],
++            'original_intent': old_plan['held_reservation'], 'original_launch_files': files,
++            'runner_log': reference(ROOT, log), 'runner_source': reference(ROOT, 'tools/five_case_matrix_runtime.py'),
++            'observed_failure': 'docker_info_timeout_before_collector_launch',
++            'sql_recovery_observation': None, 'old_reservation_replay_allowed': False,
++            'replacement_scope': 'new batch and nonce in a newly provisioned disposable database'}
++
++
++def make_plan(previous, manifest):
++    prior_registration = reference(ROOT, PRIOR_DIR / 'registration.json')
++    require(read_reference(ROOT, prior_registration) == previous, 'Prior 100 registration changed')
++    require(len(manifest['units']) == 534, 'Wrong matrix denominator')
++    prior = [reference(ROOT, PRIOR_DIR / f'{index:04d}/result.json') for index in range(HELD + 1, TAIL)]
++    entries = [{'ordinal': index + 1, 'unit_id': manifest['units'][index]['unit_id'],
++                'arm': manifest['units'][index]['arm'],
++                'batch': RECOVERY_BATCH if index == HELD else f'SF-B{13000+index}-formal-unit'}
++               for index in (HELD, *range(TAIL, len(manifest['units'])))]
++    return {'kind': 'original_v9_final_tail', 'manifest': previous['manifest'],
++            'previous_registration': prior_registration, 'prior_supplemental_results': prior,
++            'held_attempt_disposition': replacement_proof(previous, manifest), 'registered_units': entries}
++
++
++def run(target, continuation, previous, plan, manifest, original_rows, *, held_only):
++    continuation['verify_context'](previous, manifest)
++    require(not (ROOT / PRIOR_DIR / '.scheduler.lock').exists(), 'Prior continuation is active')
++    frozen = run_path(str(ROOT / NOTES / 'run-formal-v9-continuation.py'))
++    prior = [*original_rows, *(read_reference(ROOT, ref) for ref in plan['prior_supplemental_results'])]
++    seen = {row['run_id'] for row in prior if row['run_id'] is not None}
++    with scheduler_owner(target):
++        registration = target / 'registration.json'
++        if not registration.exists():
++            require(all(not (ROOT / ITERATION / row['batch']).exists() for row in plan['registered_units']),
++                    'Native batch collision before registration')
++            write_exclusive(registration, plan)
++        require(read_reference(ROOT, reference(ROOT, registration)) == plan, 'Final tail registration changed')
++        entries = plan['registered_units'][:1] if held_only else plan['registered_units']
++        for entry in entries:
++            index = entry['ordinal'] - 1
++            folder = target / f'{index:04d}'
++            folder.mkdir(exist_ok=True)
++            print(json.dumps({**entry, 'stage': 'starting_or_resuming'}), flush=True)
++            if not (folder / 'result.json').exists():
++                continuation['run_unit'](plan, manifest, index, folder, frozen, batch_id=entry['batch'],
++                    previous_batch='SF-B13348-formal-unit' if index == HELD else None)
++            record = continuation['existing_result'](manifest, index, folder, seen)
++            print(json.dumps({**entry, 'status': record['status']}), flush=True)
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('operation', choices=('plan', 'held', 'run'))
++    parser.add_argument('--work', required=True, type=Path)
++    parser.add_argument('--output', type=Path)
++    args = parser.parse_args()
++    target = args.work.resolve()
++    require(target.is_relative_to((ROOT / NOTES).resolve()), 'Work outside project evidence')
++    continuation = run_path(str(OPERATION / 'run-v9-after-pending.py'))
++    previous, manifest, original_rows = continuation['basis']()
++    plan = make_plan(previous, manifest)
++    if args.operation == 'plan':
++        require(args.output is not None, 'Output required for registration')
++        write_exclusive(args.output, plan)
++        return
++    run(target, continuation, previous, plan, manifest, original_rows, held_only=args.operation == 'held')
++
++
++if __name__ == '__main__':
++    main()
+diff --git a/artifacts/iterations/SF-I001/development-notes/sync-v9-final-tail.py b/artifacts/iterations/SF-I001/development-notes/sync-v9-final-tail.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..b73471e2a344efe8dd59cb112a6952d7b36343da
+--- /dev/null
++++ b/artifacts/iterations/SF-I001/development-notes/sync-v9-final-tail.py
+@@ -0,0 +1,150 @@
++"""Verify and merge original v9 ledger segments without overwriting evidence."""
++import argparse
++from collections import Counter, defaultdict
++import json
++from pathlib import Path
++from runpy import run_path
++import sys
++
++NOTES = Path(__file__).resolve().parent
++ROOT = NOTES.parents[3]
++sys.path.insert(0, str(ROOT / 'tools'))
++from evidence_archive import verify_batch
++from formal_results import read_reference, read_results, reference, require, validate_result, write_exclusive
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--work', type=Path, required=True)
++    parser.add_argument('--plan', type=Path, required=True)
++    parser.add_argument('--output', type=Path, required=True)
++    parser.add_argument('--require-complete', action='store_true')
++    args = parser.parse_args()
++    require(Path.cwd().resolve() == ROOT, 'Run synchronization from the main checkout')
++    sync = run_path(str(NOTES / 'sync-v9-after-pending.py'))
++    base = run_path(str(NOTES / 'sync-formal-v9-resume.py'))
++    report = run_path(str(NOTES / 'report-formal-v9.py'))
++    source, iteration = base['SOURCE'], base['ITERATION']
++    work = args.work
++    require(not work.is_absolute() and work.parts[:len(base['NOTES'].parts)] == base['NOTES'].parts and
++            (ROOT / work).resolve().is_relative_to(NOTES), 'Final evidence directory outside project')
++    plan = json.loads(args.plan.read_bytes())
++    require(plan == json.loads((source / work / 'registration.json').read_bytes()), 'Executed plan differs')
++    sync['copy_verified'](source, work / 'registration.json')
++    manifest = read_reference(ROOT, plan['manifest'])
++    gold = read_reference(ROOT, manifest['material']['gold'])['cases']
++    fixture = read_reference(ROOT, manifest['material']['fixture'])['cases']
++    original = read_results(ROOT, manifest, ROOT / base['LEDGER'])
++    require(len(original) == 348 and len(manifest['units']) == 534, 'Original inventory changed')
++    previous = read_reference(ROOT, plan['previous_registration'])
++    require(len(previous['registered_units']) == len(plan['prior_supplemental_results']) == 100,
++            'Previous continuation changed')
++    original_refs = previous['original_records']
++    require(original_refs == [reference(ROOT, base['LEDGER'] / f'{i:04d}.json') for i in range(348)],
++            'Historical ledger changed')
++    disposition = plan['held_attempt_disposition']
++    for migration_ref in (disposition['original_intent'], disposition['original_batch_seal'],
++                          *disposition['original_launch_files'].values()):
++        read_reference(ROOT, migration_ref)
++    entries = {r['ordinal'] - 1: r for r in plan['registered_units']}
++    require(list(entries) == [348, *range(449, 534)], 'Unexpected final tail scope')
++    units = []
++    all_runs, all_reviews = set(), set()
++    counts, failure_stages = Counter(), Counter()
++    arms, blocks = defaultdict(Counter), defaultdict(dict)
++    categories = defaultdict(lambda: defaultdict(Counter))
++    usage_by_arm, review_usage = defaultdict(Counter), Counter()
++    new_counts = Counter()
++    for i, unit in enumerate(manifest['units']):
++        item = {**{k: unit[k] for k in ('unit_id', 'case_id', 'arm', 'repetition', 'block_id')},
++                'ordinal': i + 1, 'category': fixture[unit['case_id']]['category'], 'status': 'not_run'}
++        result = None
++        if i < 348:
++            result, ref = original[i], original_refs[i]
++            review_id = report['verify_review'](i, result)
++        elif 349 <= i < 449:
++            ref = plan['prior_supplemental_results'][i - 349]
++            result = read_reference(ROOT, ref)
++            directory = (ROOT / ref['path']).parent
++            require(result['dispatch_intent'] == reference(ROOT, directory / 'intent.json'), 'Wrong prior reservation')
++            sync['verify_review'](directory, result)
++            review_id = review_response_id(result)
++        else:
++            entry = entries[i]
++            require((entry['unit_id'], entry['arm']) == (unit['unit_id'], unit['arm']), 'Wrong tail unit')
++            directory = work / f'{i:04d}'
++            if (source / directory / 'result.json').exists():
++                batch = iteration / entry['batch']
++                old_seal = verify_batch(source / batch)
++                sync['copy_tree'](source, batch)
++                require(verify_batch(ROOT / batch) == old_seal, 'Mirrored batch changed')
++                sync['copy_tree'](source, directory)
++                ref = reference(ROOT, directory / 'result.json')
++                result = read_reference(ROOT, ref)
++                require(result['dispatch_intent'] == reference(ROOT, directory / 'intent.json'), 'Unregistered attempt')
++                observation = read_reference(ROOT, result['observation'])
++                require(observation['seal'] == reference(ROOT, batch / 'seal.json'), 'Wrong formal batch seal')
++                sync['verify_review'](ROOT / directory, result)
++                review_id = review_response_id(result)
++                item['batch'] = entry['batch']
++            elif i == 348 or (source / directory / 'intent.json').exists():
++                item['status'] = 'pending'
++        if result is not None:
++            validate_result(ROOT, manifest, unit, result)
++            run_id = result['run_id']
++            require(not run_id or run_id not in all_runs, 'Duplicate run ID')
++            if run_id:
++                all_runs.add(run_id)
++            require(review_id not in all_reviews, 'Duplicate review response ID')
++            all_reviews.add(review_id)
++            item.update(status=result['status'], result=ref, run_id=run_id, review_response_id=review_id)
++            observation = read_reference(ROOT, result['observation'])
++            requests = observation['provider_requests']
++            usage = usage_by_arm[unit['arm']]
++            usage['recorded_product_requests'] += len(requests)
++            for request in requests:
++                if request.get('usage') is None:
++                    usage['unknown_product_token_requests'] += 1
++                else:
++                    usage['known_product_tokens'] += request['usage']['total_tokens']
++            review_usage['bound_responses'] += 1
++            provider = read_reference(ROOT, read_reference(ROOT, result['ai_review'])['provider'])
++            if provider.get('usage') is None:
++                review_usage['unknown_token_responses'] += 1
++            else:
++                review_usage['known_tokens'] += provider['usage']['total_tokens']
++            if item['status'] != 'passed':
++                item['failure'] = report['failure_evidence'](result, gold[unit['case_id']])
++                failure_stages[item['failure']['stage']] += 1
++        if i in entries:
++            new_counts[item['status']] += 1
++        counts[item['status']] += 1
++        arms[unit['arm']][item['status']] += 1
++        categories[unit['arm']][item['category']][item['status']] += 1
++        blocks[unit['block_id']][unit['arm']] = item['status']
++        units.append(item)
++    comparison = report['comparison']
++    quality_pairs = Counter(comparison(row['H0'], row['H1-S0']) for row in blocks.values())
++    qp_pairs = Counter(comparison(row['H1-S0'], row['H1-S1']) for row in blocks.values() if 'H1-S1' in row)
++    complete = len(all_reviews) == len(units) and counts['pending'] == counts['not_run'] == 0
++    require(complete or not args.require_complete, 'Formal matrix still has open units')
++    result = {'manifest': plan['manifest'], 'source_revision': manifest['source_revision'],
++              'experiment_id': manifest['experiment_id'], 'exposure': manifest['exposure'],
++              'registration': reference(ROOT, work / 'registration.json'), 'original_held_attempt': disposition,
++              'planned': len(units), 'recorded': len(all_reviews), 'pending': counts['pending'],
++              'not_run': counts['not_run'], 'execution_complete': complete, 'counts': dict(counts),
++              'last_86_counts': dict(new_counts), 'provider_reviews_revalidated': len(all_reviews),
++              'statuses_by_arm': dict(arms), 'statuses_by_arm_category': dict(categories),
++              'recorded_product_usage_by_arm': dict(usage_by_arm), 'bound_review_usage': dict(review_usage),
++              'H0_vs_H1-S0_block_counts': dict(quality_pairs),
++              'S0_vs_S1_QP_block_counts': dict(qp_pairs), 'failure_stage_counts': dict(failure_stages)}
++    write_exclusive(args.output, {**result, 'units': units})
++    print(json.dumps(result, ensure_ascii=False))
++
++
++def review_response_id(result):
++    return read_reference(ROOT, read_reference(ROOT, result['ai_review'])['provider'])['provider_response_id']
++
++
++if __name__ == '__main__':
++    main()
+diff --git a/evals/fixtures/supportflow/quality/v9-after-pending-repair-v1.json b/evals/fixtures/supportflow/quality/v9-after-pending-repair-v1.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..a44b89cc79d9289fb7e7d660136f6afefc6bc00c
+--- /dev/null
++++ b/evals/fixtures/supportflow/quality/v9-after-pending-repair-v1.json
+@@ -0,0 +1,247 @@
++{
++  "schema_version": 1,
++  "experiment_prefix": "sf-calibration-v9-after-pending-repair-",
++  "origin_report": {
++    "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-final-0100.json",
++    "sha256": "f93d499d611d3aab5f85c00adcf3bfb9e282b2c5c29b73ca9d7adee90031357d"
++  },
++  "origin_manifest": {
++    "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9/manifest.json",
++    "sha256": "66c1556c5ecc51b4a8ffd41d6690ce99b9611d624417dd72828b1e9bd68583d8"
++  },
++  "unit_ids": [
++    "SF-089-r2-H1-S0",
++    "SF-089-r2-H0",
++    "SF-077-r3-H1-S0",
++    "SF-101-r2-H1-S0",
++    "SF-101-r2-H0",
++    "SF-076-r3-H0",
++    "SF-076-r3-H1-S0",
++    "SF-105-r1-H0",
++    "SF-105-r1-H1-S0",
++    "SF-076-r1-H0",
++    "SF-076-r1-H1-S0",
++    "SF-043-r2-H1-S1",
++    "SF-043-r2-H0",
++    "SF-043-r2-H1-S0",
++    "SF-100-r2-H0",
++    "SF-089-r1-H0",
++    "SF-089-r1-H1-S0",
++    "SF-079-r1-H0",
++    "SF-043-r3-H0",
++    "SF-043-r3-H1-S1",
++    "SF-043-r3-H1-S0"
++  ],
++  "units": [
++    {
++      "ordinal": 352,
++      "unit_id": "SF-089-r2-H1-S0",
++      "arm": "H1-S0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0351/result.json",
++        "sha256": "47ec76572a5f0efa98fadac7bbebd3a1372a12ba3d4b8b3accf4665ec07660e7"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 353,
++      "unit_id": "SF-089-r2-H0",
++      "arm": "H0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0352/result.json",
++        "sha256": "362941aad8809b6810a1a58c14c6ef0a885d067d3df898009d29b5681444f6f5"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 362,
++      "unit_id": "SF-077-r3-H1-S0",
++      "arm": "H1-S0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0361/result.json",
++        "sha256": "c703a250e460d8110231d1b98cd5e4d2a9fc42e0baa5f22a565ca20a085249da"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 382,
++      "unit_id": "SF-101-r2-H1-S0",
++      "arm": "H1-S0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0381/result.json",
++        "sha256": "7be7582ac1875856e27276be4e80cc9f2f088e0d83d000acc3df41992b7f75eb"
++      },
++      "original_status": "error"
++    },
++    {
++      "ordinal": 383,
++      "unit_id": "SF-101-r2-H0",
++      "arm": "H0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0382/result.json",
++        "sha256": "021677a5c2d90c2bb328b7a8cf14ef93c30e5e6fadfae3174809ab02811ceeb6"
++      },
++      "original_status": "error"
++    },
++    {
++      "ordinal": 384,
++      "unit_id": "SF-076-r3-H0",
++      "arm": "H0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0383/result.json",
++        "sha256": "e45c8f492007555e31dfb87eb985b6289fc1fbf6f23719a998204b2115836719"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 385,
++      "unit_id": "SF-076-r3-H1-S0",
++      "arm": "H1-S0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0384/result.json",
++        "sha256": "034d7cb88d307014e84120f74af3e4394747707fcfb18fca928cbc2c8f23f13d"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 402,
++      "unit_id": "SF-105-r1-H0",
++      "arm": "H0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0401/result.json",
++        "sha256": "5206f181b371096d316b17dca3e8a496711252f0633e02ab9baffe0740fdf4d7"
++      },
++      "original_status": "error"
++    },
++    {
++      "ordinal": 403,
++      "unit_id": "SF-105-r1-H1-S0",
++      "arm": "H1-S0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0402/result.json",
++        "sha256": "62f6f786729ad11fd166de94398451023d4156690f2fcd3349964fc750f5a5a3"
++      },
++      "original_status": "error"
++    },
++    {
++      "ordinal": 409,
++      "unit_id": "SF-076-r1-H0",
++      "arm": "H0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0408/result.json",
++        "sha256": "3e7f38a8fcb2537428721ba500499587e491e7231fc318edb4a41a99a7eb5c9c"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 410,
++      "unit_id": "SF-076-r1-H1-S0",
++      "arm": "H1-S0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0409/result.json",
++        "sha256": "d6b564c1e89040c32a022ce2559aae64756f4d6497ee77b6292514719eaee07b"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 413,
++      "unit_id": "SF-043-r2-H1-S1",
++      "arm": "H1-S1",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0412/result.json",
++        "sha256": "9257d4e03deda928ca9689e14d110883606c9f2469ac4053181f649d5f511e56"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 414,
++      "unit_id": "SF-043-r2-H0",
++      "arm": "H0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0413/result.json",
++        "sha256": "5ba4c865bb2cdad14295159b53dc56f3aad91d9c1f1548b4a30b79c935f88bb0"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 415,
++      "unit_id": "SF-043-r2-H1-S0",
++      "arm": "H1-S0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0414/result.json",
++        "sha256": "8f9ca37fe9e2be12f23bdb148754af1c6980801528c1d3caf2dd2ac19bea072f"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 423,
++      "unit_id": "SF-100-r2-H0",
++      "arm": "H0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0422/result.json",
++        "sha256": "61171dc34229b339efc408a083a1a73a52cd1f5fe481b315fa28c5b9a6f536fe"
++      },
++      "original_status": "error"
++    },
++    {
++      "ordinal": 439,
++      "unit_id": "SF-089-r1-H0",
++      "arm": "H0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0438/result.json",
++        "sha256": "ac41bef9e99bfd2bace373c90215a430956ca2eab3d993638b73ce40123a5304"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 440,
++      "unit_id": "SF-089-r1-H1-S0",
++      "arm": "H1-S0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0439/result.json",
++        "sha256": "744e2764a404dcdad50268dfae17d1a8bcbfb9bc4652aad1a2d5453ed812cc9d"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 445,
++      "unit_id": "SF-079-r1-H0",
++      "arm": "H0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0444/result.json",
++        "sha256": "d9f93f8f0e45828d200a6a9797b85e252b140e5612803e0471b4891273c3e8d3"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 446,
++      "unit_id": "SF-043-r3-H0",
++      "arm": "H0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0445/result.json",
++        "sha256": "399c09c7926c2a96109c92234654d84cd5a521cbafc8e556506b95995796fbef"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 447,
++      "unit_id": "SF-043-r3-H1-S1",
++      "arm": "H1-S1",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0446/result.json",
++        "sha256": "fbcde4b30ac3a07384180b2273e689324f22f1b91b5e55a83f9fb5f1db603f78"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 448,
++      "unit_id": "SF-043-r3-H1-S0",
++      "arm": "H1-S0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0447/result.json",
++        "sha256": "71daf7eb1699180e7f6ae3302af8677b656557cca6417043a9aba608f2d0e390"
++      },
++      "original_status": "failed"
++    }
++  ]
++}
+diff --git a/evals/fixtures/supportflow/quality/v9-final-tail-repair-v1.json b/evals/fixtures/supportflow/quality/v9-final-tail-repair-v1.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..8a42382d1102f128996aec48303ca70a2c9e7c3a
+--- /dev/null
++++ b/evals/fixtures/supportflow/quality/v9-final-tail-repair-v1.json
+@@ -0,0 +1,225 @@
++{
++  "schema_version": 1,
++  "experiment_prefix": "sf-calibration-v9-final-tail-repair-",
++  "origin_report": {
++    "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-formal-0534.json",
++    "sha256": "3548ee1a54e7983a3dbeb9fbc877ac0ab50a75e76be742ce977cbe9cd4414c61"
++  },
++  "origin_manifest": {
++    "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9/manifest.json",
++    "sha256": "66c1556c5ecc51b4a8ffd41d6690ce99b9611d624417dd72828b1e9bd68583d8"
++  },
++  "unit_ids": [
++    "SF-090-r1-H1-S0",
++    "SF-090-r1-H0",
++    "SF-098-r2-H1-S0",
++    "SF-098-r2-H0",
++    "SF-117-r3-H0",
++    "SF-117-r3-H1-S0",
++    "SF-058-r2-H0",
++    "SF-049-r2-H1-S1",
++    "SF-049-r2-H1-S0",
++    "SF-078-r3-H0",
++    "SF-098-r1-H1-S0",
++    "SF-098-r1-H0",
++    "SF-043-r1-H1-S1",
++    "SF-043-r1-H0",
++    "SF-043-r1-H1-S0",
++    "SF-072-r2-H0",
++    "SF-081-r1-H1-S0",
++    "SF-081-r1-H0",
++    "SF-098-r3-H0"
++  ],
++  "units": [
++    {
++      "ordinal": 456,
++      "unit_id": "SF-090-r1-H1-S0",
++      "arm": "H1-S0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0455/result.json",
++        "sha256": "c3d4ee39b6e580fe205e387080a24711a1d79ac4b3cfec4be23937ad7ec322b7"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 458,
++      "unit_id": "SF-090-r1-H0",
++      "arm": "H0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0457/result.json",
++        "sha256": "c35b602bc2214184ee85cb5052575461d08df4aab82486f410184f2c5aff0ccc"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 461,
++      "unit_id": "SF-098-r2-H1-S0",
++      "arm": "H1-S0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0460/result.json",
++        "sha256": "1165c93f44d4e849838eb39236afd99b2b22e16e00546507e9090bdf957636bb"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 462,
++      "unit_id": "SF-098-r2-H0",
++      "arm": "H0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0461/result.json",
++        "sha256": "2737693475588174c9f20b54f8415e20e10ad7470c08a7dfe96d012b70a9affb"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 470,
++      "unit_id": "SF-117-r3-H0",
++      "arm": "H0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0469/result.json",
++        "sha256": "5bff46e1930a7a70da115194e6ca93fea399fc1b468cbcfd2f99963c5114d12a"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 471,
++      "unit_id": "SF-117-r3-H1-S0",
++      "arm": "H1-S0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0470/result.json",
++        "sha256": "96f6639d36218f47091d455d7974d3ed5c6c8b3f3fd19e169c4eb409ee2880ff"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 476,
++      "unit_id": "SF-058-r2-H0",
++      "arm": "H0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0475/result.json",
++        "sha256": "d878aa236c5d48b48137706a77893564e22df1c31611f830039d8640eea9455c"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 483,
++      "unit_id": "SF-049-r2-H1-S1",
++      "arm": "H1-S1",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0482/result.json",
++        "sha256": "025389694532fbc094f09e4fd34efd741b6744ae7f771e9cc85be6fb06c86a51"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 484,
++      "unit_id": "SF-049-r2-H1-S0",
++      "arm": "H1-S0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0483/result.json",
++        "sha256": "a9bd9fd3609cc3f26f82262f42fc7076e48dfb54b1f009314012cb4bee45fedc"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 494,
++      "unit_id": "SF-078-r3-H0",
++      "arm": "H0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0493/result.json",
++        "sha256": "8a53469848b7879c030797d4dc891cc9e089e99f1bdd3191d720046b1c2cab78"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 496,
++      "unit_id": "SF-098-r1-H1-S0",
++      "arm": "H1-S0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0495/result.json",
++        "sha256": "e95e21d34979fd2d4d73a06d2c5f6c0279e7235d980e9187de3356d074f8d3d8"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 497,
++      "unit_id": "SF-098-r1-H0",
++      "arm": "H0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0496/result.json",
++        "sha256": "8d2bc108b6aacdd45dc9210c1fe1d723e99d8b9c93fd1589575d1c68fb68d40b"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 509,
++      "unit_id": "SF-043-r1-H1-S1",
++      "arm": "H1-S1",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0508/result.json",
++        "sha256": "f4232defcbc003a03c59318e44a3f549c8faededa7660b8e48d2331103519512"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 510,
++      "unit_id": "SF-043-r1-H0",
++      "arm": "H0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0509/result.json",
++        "sha256": "09cabd827adc8c542efab1a4b8284fddd1d86951d0a54bb202cbd7683eef391e"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 511,
++      "unit_id": "SF-043-r1-H1-S0",
++      "arm": "H1-S0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0510/result.json",
++        "sha256": "cef0e48865b9f8b749d33fc17396f5ca6eaa748f1b4856dc6f2c563ac0b7cf7b"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 523,
++      "unit_id": "SF-072-r2-H0",
++      "arm": "H0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0522/result.json",
++        "sha256": "f281185de87443f080236b70929480294f7cc345c85069ce08da8fbb940bf193"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 529,
++      "unit_id": "SF-081-r1-H1-S0",
++      "arm": "H1-S0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0528/result.json",
++        "sha256": "727f03bd1c48320578e375f768e41c84346526d8e6f43b046d9c3e4097a51a61"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 530,
++      "unit_id": "SF-081-r1-H0",
++      "arm": "H0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0529/result.json",
++        "sha256": "e96fdefd1e6712809d5d2507574ae69755b88744dd54b9fcdae30fde50287c7f"
++      },
++      "original_status": "failed"
++    },
++    {
++      "ordinal": 531,
++      "unit_id": "SF-098-r3-H0",
++      "arm": "H0",
++      "result": {
++        "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0530/result.json",
++        "sha256": "36e62e21fb3166bd338ef34760f81575107e5821c63593400f84b89bdc65c121"
++      },
++      "original_status": "failed"
++    }
++  ]
++}
+diff --git a/evals/registrations/supportflow/quality-holdout-v39.json b/evals/registrations/supportflow/quality-holdout-v39.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..f60e4b3e61379c6f68a31a83ed51754436084414
+--- /dev/null
++++ b/evals/registrations/supportflow/quality-holdout-v39.json
+@@ -0,0 +1,1269 @@
++{
++  "schema_version": 1,
++  "registration_id": "sf-quality-holdout-v39",
++  "status": "registered_not_executable",
++  "human_reviewed": false,
++  "case_ids": [
++    "SF-011",
++    "SF-012",
++    "SF-013",
++    "SF-014",
++    "SF-015",
++    "SF-016",
++    "SF-017",
++    "SF-018",
++    "SF-019",
++    "SF-020",
++    "SF-021",
++    "SF-022",
++    "SF-023",
++    "SF-024",
++    "SF-025",
++    "SF-026",
++    "SF-027",
++    "SF-028",
++    "SF-029",
++    "SF-030",
++    "SF-041",
++    "SF-042",
++    "SF-043",
++    "SF-044",
++    "SF-045",
++    "SF-046",
++    "SF-047",
++    "SF-048",
++    "SF-049",
++    "SF-050",
++    "SF-051",
++    "SF-052",
++    "SF-053",
++    "SF-054",
++    "SF-055",
++    "SF-056",
++    "SF-057",
++    "SF-058",
++    "SF-059",
++    "SF-060",
++    "SF-071",
++    "SF-072",
++    "SF-073",
++    "SF-074",
++    "SF-075",
++    "SF-076",
++    "SF-077",
++    "SF-078",
++    "SF-079",
++    "SF-080",
++    "SF-081",
++    "SF-082",
++    "SF-083",
++    "SF-084",
++    "SF-085",
++    "SF-086",
++    "SF-087",
++    "SF-088",
++    "SF-089",
++    "SF-090",
++    "SF-096",
++    "SF-097",
++    "SF-098",
++    "SF-099",
++    "SF-100",
++    "SF-101",
++    "SF-102",
++    "SF-103",
++    "SF-104",
++    "SF-105",
++    "SF-111",
++    "SF-112",
++    "SF-113",
++    "SF-114",
++    "SF-115",
++    "SF-116",
++    "SF-117",
++    "SF-118",
++    "SF-119",
++    "SF-120"
++  ],
++  "source_design": {
++    "path": "evals/data/supportflow/holdout/design-snapshot-v1.json",
++    "sha256": "253164ed7ca1e14ac721630d14650d8a3d9cf6d79441dc91c8d7c83705e363fc"
++  },
++  "fixture": {
++    "path": "evals/data/supportflow/holdout/fixture-v1.json",
++    "sha256": "9868aa4df347fd6b2fe79e8fcc8f7789b3dbb7e418ac5d6dad2c588ba6080e3c"
++  },
++  "gold": {
++    "path": "evals/data/supportflow/holdout/gold-v2.json",
++    "sha256": "a973805b704f1c04a7968dc3b5f63169c784dbfa2464e4f8463ef2483b276bdd"
++  },
++  "review": {
++    "path": "evals/reviews/supportflow/holdout-material-review-v2.json",
++    "sha256": "047b3b0f993906f5a3bd89dc07572063f0b63a15b39dafb14cc5e101408470a6"
++  },
++  "issues": {
++    "path": "evals/data/supportflow/holdout/dataset-issues-v1.json",
++    "sha256": "b69cfe6c1dd3fcdb95ac1462b1aebc17a9481d45ef2c0621c57c5816173799cc"
++  },
++  "exposure": {
++    "path": "evals/data/supportflow/holdout/exposure-v1.json",
++    "sha256": "49a07725e23fd04466601b738be561a685e6132c81be1ecd85087d0e5cc56562"
++  },
++  "catalog": {
++    "path": "evals/data/supportflow/cases-v8.jsonl",
++    "sha256": "a13f0af5776c599ee4fc866ee770e222cf341a5413d01bb7280efafbe5ff9645"
++  },
++  "review_policy": {
++    "path": "evals/policies/supportflow/ai-review-unlimited-v1.json",
++    "sha256": "16152b4449d3956204bd59147a146b57f718ccfcf72bfaf91c44c95e9155699f"
++  },
++  "locked_product_sources": [
++    {
++      "path": "apps/supportflow/agent/approval_graph.py",
++      "sha256": "cd28a1eda5edda50140bea6c01b33463928ba864eff801898f6279e967bcaee6"
++    },
++    {
++      "path": "apps/supportflow/agent/clarification_graph.py",
++      "sha256": "f4c13e9e3b34ef4bb71db8bd11b9c05c5200e930d993f7199c13703d9082f574"
++    },
++    {
++      "path": "apps/supportflow/agent/diagnosis_graph.py",
++      "sha256": "4126312b76e3785448e2afdc33b53d92d4c8d6b6896d2970f5a9ccffb9e4e14d"
++    },
++    {
++      "path": "apps/supportflow/agent/execution_graph.py",
++      "sha256": "039b556d7e45e8a0c1748901b7d95fcb60808dfeba3e1ea87b8bd2ee5865a81f"
++    },
++    {
++      "path": "apps/supportflow/agent/grant_graph.py",
++      "sha256": "d1019c08e8df71e1e2c7ede87c05636ec99bc2a636950ac4053b94c9e5f52faf"
++    },
++    {
++      "path": "apps/supportflow/agent/grant_reply.py",
++      "sha256": "531014f667cdc0fb5e79b4083e2f1c5923b61cee97618fe516d664d62cab0238"
++    },
++    {
++      "path": "apps/supportflow/agent/input_tokens.py",
++      "sha256": "adba0e3e57a22767833196ac9fbc9dba9de853b386404e784e4a0f66d2b12e67"
++    },
++    {
++      "path": "apps/supportflow/agent/models.py",
++      "sha256": "100aa3a91db886bfaed1b48df8a906402d327ce3428a1581ede7d2af77376a66"
++    },
++    {
++      "path": "apps/supportflow/agent/rag_graph.py",
++      "sha256": "93d5a743408b613438563b901313152567d5b0bf463cb1ae74a96fedc5b6892f"
++    },
++    {
++      "path": "apps/supportflow/agent/run_graph.py",
++      "sha256": "fca5d1c531c115722b0e4beaac1aaa53e35b1372b026d431e4cad168643337b3"
++    },
++    {
++      "path": "apps/supportflow/agent/spike_graph.py",
++      "sha256": "fcf3c520217f77a4eb7c900184d215c1dd6f75c65c2cc288c168c67088906707"
++    },
++    {
++      "path": "apps/supportflow/api/approvals.py",
++      "sha256": "3637905b8d1db5f929b72cf60545808cc5cb93008999e94a0f9b063aeb5cd82b"
++    },
++    {
++      "path": "apps/supportflow/api/auth.py",
++      "sha256": "d1e15f5cded197395429445a43710b798c3fea332a3e2bbe98c91381ab7f9196"
++    },
++    {
++      "path": "apps/supportflow/api/clarifications.py",
++      "sha256": "c1698291740b6df32cd4bfcecdecb2c20f08ec9b73716c0ff2cc951f58f44609"
++    },
++    {
++      "path": "apps/supportflow/api/control.py",
++      "sha256": "13f2a2dcc4d00ca665b85ff5feedcec208915427a6d750aa6963f4bba976636f"
++    },
++    {
++      "path": "apps/supportflow/api/documents.py",
++      "sha256": "366b334d399d037439fcbc7b3585b5b821abd32d8c9cd094a6a3d4b63cd1575a"
++    },
++    {
++      "path": "apps/supportflow/api/evaluation.py",
++      "sha256": "97f34250839580a5ce2c97f2b9ea7391f524ff93b3029ebc0ab03abb6461289d"
++    },
++    {
++      "path": "apps/supportflow/api/events.py",
++      "sha256": "2d5af6a47b1e27f498125a51f125dfae0faa14e285b22917c492eb077f56b95c"
++    },
++    {
++      "path": "apps/supportflow/api/input_refusal.py",
++      "sha256": "18311c65468342272f56eb4af008e4c085dcad653fdf290c64163f2398f48650"
++    },
++    {
++      "path": "apps/supportflow/api/main.py",
++      "sha256": "70ef8843161afda2890b28b2857b33c8e77b910d13a8d6ff4eab1261ee9f3f14"
++    },
++    {
++      "path": "apps/supportflow/api/objects.py",
++      "sha256": "c190f66f1310b554098cf28a86ba23cd36434698f0fcfa5ea2ac86afdc48a743"
++    },
++    {
++      "path": "apps/supportflow/api/runs.py",
++      "sha256": "b7694849ad9711ccde130763a52e6fc7098028816e17e44e1b2d4c53cd7376f8"
++    },
++    {
++      "path": "apps/supportflow/api/runtime.py",
++      "sha256": "377b668f5652f4b4846e75db0dfdcce12889fe8428ef3eb2e09bad9f20101f05"
++    },
++    {
++      "path": "apps/supportflow/db/checkpoints.py",
++      "sha256": "072682316be8e9dcdbb605492702ef771ecec8392f0f93c4b8a4df84847f5b79"
++    },
++    {
++      "path": "apps/supportflow/db/demo_data.py",
++      "sha256": "8099102f19edbd6e3287bdf92f76512695393fc221ecd62642022c919ae0ab1e"
++    },
++    {
++      "path": "apps/supportflow/db/demo_state.py",
++      "sha256": "c35bd3c54c1c167414df6729e49beba7498f8877c23d170059a1e3d26d8e9578"
++    },
++    {
++      "path": "apps/supportflow/db/manage.py",
++      "sha256": "a4c95924f21cb7e007d1b106deb1d6fb14c31c94f65a43b781f211e1530fd7f4"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0001_identity_and_customers.py",
++      "sha256": "f86688bccb9770b5ff465ec3c8af42e972556c93214d93d531c87bb732c95ae5"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0002_sessions.py",
++      "sha256": "fc34eaa8640715f5d65aa20895350e72250a125201765712f51a622d271a5b5c"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0003_tickets_and_threads.py",
++      "sha256": "332a893ff6c7bc410d98a31e22e9b0c37741bd63c7fdd2d7bfe3ee4b762511c9"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0004_runs.py",
++      "sha256": "40ca00e227f57d9ed78cb7d1aa44ee3f52c9615751b2ee814b7c7bef099c3c73"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0005_dispatch.py",
++      "sha256": "b1892dadea82d8fe209816b3b852f5a1d80e635cde14d6a6e395bef5d982d3a5"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0006_tool_observations.py",
++      "sha256": "4281bff1eea9b70041d94041cd9bb469476342370d0b38a4db847e623c9295b8"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0007_knowledge.py",
++      "sha256": "f68050eba44f621fbb90d9aef9747cf0806087c8ed5ee7b8792e5bc90404d629"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0008_waiting.py",
++      "sha256": "2cab1899398c54d828cc1813349170cd47d663f07ff4414d392aa9aa343350b0"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0009_proposals.py",
++      "sha256": "bd9c11dedb5d760c2e3ba59dad4d496e28c108db123456f2bbfb41df0cc95695"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0010_proposal_waits.py",
++      "sha256": "5385dc27191abd3d0b69b3b080a817237f755c7d7118948db85fba43c0842de8"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0011_approval_decisions.py",
++      "sha256": "63eb8037914ba2f85c6a3c8d91fb79f15e1fd501325ea0eeb67ec7c8832a747b"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0012_grant_execution.py",
++      "sha256": "20f9a15b748c9908b4169068892f1816f51d6170265b7a19af8bafd7032437f2"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0013_human_ticket_note.py",
++      "sha256": "86389fe69acac8c7d73ddc97ac19e4da5a16bbbd769edd6106e6f7335ce74883"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0014_external_issue_observations.py",
++      "sha256": "0756e66dac6df63190d3842f7d54ecb5106784bb2d5d4c83319ccf4bd05be61c"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0015_readonly_finalization.py",
++      "sha256": "5c7341674461f2f2c5bab9216b87fad8e6b1faa52977cf66260559de1af2547b"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0016_execution_retry_budget.py",
++      "sha256": "668453a490349de395986bdb934cc53fc075fe471951628075bed47f4561bae5"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0017_external_read_budget.py",
++      "sha256": "ebd5ff098d2d49b896aafb885e2b0cecb060c00cfe7756dd19e379135ced19b8"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0018_clarification_refusal.py",
++      "sha256": "b5d64605378d7a22c6004458483f6cccd972a8940ebf4345cb84c02328069f75"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/env.py",
++      "sha256": "773a65f313bf0b0117ec9b1e3fb0df2b04b68828c6723da90b5ce3f5d68577a4"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/sandbox/0001_subscriptions.py",
++      "sha256": "8f6999fe1629c635b9ae8f362f2f1d6cfd74e95c519f2c08f921341751a99a4e"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/sandbox/0002_readonly_diagnosis.py",
++      "sha256": "814c8ab30bb7e583961e267733a4e02f40080484add1b9556cae26253c2fa23a"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/sandbox/0003_grant_history.py",
++      "sha256": "23fa84ba8b06aabf02a60ab96e462c5d84005923e68ea7b1f0ceda7d59f90e7d"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/sandbox/0004_grant_commands.py",
++      "sha256": "3323efcfc6de36a1beed3e76d3a91dc903ce983d511162c52b6b3c88890670c0"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/sandbox/0005_invitation_history.py",
++      "sha256": "0347eb77bd110f8b574ff71acb0768fcd5b411329490265d10c5cd776c74fb3d"
++    },
++    {
++      "path": "apps/supportflow/db/proposal_startup_probe.py",
++      "sha256": "d1cb8c63fc021da86eee1a69c4f2dd6bbdf9c8ca6c8a6c6c831b5d005cf6effc"
++    },
++    {
++      "path": "apps/supportflow/db/seed_data.py",
++      "sha256": "8c20faf8d9939f9aa26117ced4fef2e4c6ea720dcb5ccbe261c1040398f5b26d"
++    },
++    {
++      "path": "apps/supportflow/domain/approvals.py",
++      "sha256": "a7072fc954db3d8fee1eb4cf27325d38fe54d3b26e6315897b6df005db2872f3"
++    },
++    {
++      "path": "apps/supportflow/domain/capacity_diagnosis.py",
++      "sha256": "4c93077e4ba9efdcbb02577cf436492a573ee15ce8b78957346d095bd5f2be1c"
++    },
++    {
++      "path": "apps/supportflow/domain/clock.py",
++      "sha256": "fb227d1269f25de2196649a0fb897a7b065a793b8b816a1dccad8dac58ce1940"
++    },
++    {
++      "path": "apps/supportflow/domain/contracts.py",
++      "sha256": "d952e7f304c82b690ea677ae5f1b169842678fee04cab1572dce04e26d973b36"
++    },
++    {
++      "path": "apps/supportflow/domain/diagnosis_routing.py",
++      "sha256": "cf6bd99850f2a5936e221a05ac7323762bb7a01c9c1132e932fb50af99027cd9"
++    },
++    {
++      "path": "apps/supportflow/domain/github_access.py",
++      "sha256": "d748e2e7b6c65abd2349ae902d2028950a44e81100d1a33610c47ec37e1c9506"
++    },
++    {
++      "path": "apps/supportflow/domain/github_clues.py",
++      "sha256": "9d4438425d6b9cd38895bc453b258126e6b7018a2d269e0aca7221d3fc4271ab"
++    },
++    {
++      "path": "apps/supportflow/domain/grant_commands.py",
++      "sha256": "cc9e0f905b2ea8afde9450946e2c04b2dabde3d3e344b1f1d4f7574e8525d525"
++    },
++    {
++      "path": "apps/supportflow/domain/grant_contracts.py",
++      "sha256": "a8fc9951e86ae14a2d4c11a142e4812a702703eaabd0de7718434a87fb54d631"
++    },
++    {
++      "path": "apps/supportflow/domain/grant_effects.py",
++      "sha256": "a63e1aa7486072efb7faff4accb807b6c0951773125de014749d280371845c5a"
++    },
++    {
++      "path": "apps/supportflow/domain/grant_policy.py",
++      "sha256": "c66c6f5177bb7a01edfad6281fc7886fc7d656780372e69c3165364c4b8363fc"
++    },
++    {
++      "path": "apps/supportflow/domain/grant_policy_reply.py",
++      "sha256": "b681e19b2b8b42d795ac5af7accc69cdfa9dc531d144afeee4c5336dccf85ff9"
++    },
++    {
++      "path": "apps/supportflow/domain/input_refusal.py",
++      "sha256": "5f8bd996f04db803a179782755fc3c33f84235c062a65bc3b3f98ee8aad6efaa"
++    },
++    {
++      "path": "apps/supportflow/domain/knowledge_answers.py",
++      "sha256": "407d03749aa5ce874d242630ea01a144e8f2bd403edab669e8b59366cb1df7b6"
++    },
++    {
++      "path": "apps/supportflow/domain/proposals.py",
++      "sha256": "518410db5ddbaffcb00302d3c14edfa350a133139fd9d813396df0059673b733"
++    },
++    {
++      "path": "apps/supportflow/domain/recovered_diagnosis.py",
++      "sha256": "ca5fabe7c96f7f6dfc9f6370d97aa6ce0992dc18b8b14fae055f886e4ec951a5"
++    },
++    {
++      "path": "apps/supportflow/domain/rules.py",
++      "sha256": "ff63b402f4c19030de840da756a3ae9a4ddd4150ef7c95235b94c855648d0927"
++    },
++    {
++      "path": "apps/supportflow/jobs/action_effects.py",
++      "sha256": "a1dbec087a84c6ba948a707b562e6c5042a50210d6a485c860387285c9dcc356"
++    },
++    {
++      "path": "apps/supportflow/jobs/approval_dispatch.py",
++      "sha256": "68c35547c9efeb8c8b8b99ffaaf17b4b8f1f70e0418aec3bbdced1d9c856afc0"
++    },
++    {
++      "path": "apps/supportflow/jobs/capacity_diagnosis.py",
++      "sha256": "2c99ab66e795919e6cbc6beb4689cb7f31695794e7c9815e3ec4e37270a0145c"
++    },
++    {
++      "path": "apps/supportflow/jobs/contracts.py",
++      "sha256": "d537e49c328219a6d8d01858a73bc15b5421fdf9c6b03a9ac7cc72bab00d0f68"
++    },
++    {
++      "path": "apps/supportflow/jobs/core.py",
++      "sha256": "215969edc5b44c5a4d9b16c359acfec86002978ff94a32a812893249cfaf03d6"
++    },
++    {
++      "path": "apps/supportflow/jobs/dispatcher.py",
++      "sha256": "3482f5b2e1b8fa443a7246b8614e13ff1154a045d41e69c72488fb9ce19c600e"
++    },
++    {
++      "path": "apps/supportflow/jobs/event_hints.py",
++      "sha256": "93de69744d07fb1b9a4156eb20a626eadc1d8335f44ea8edb4bf575cc62bfb70"
++    },
++    {
++      "path": "apps/supportflow/jobs/event_retention.py",
++      "sha256": "01ae9a0607309356fc4ddeb6c18dac763cf7643d86498f68dd8eebe6ed40c026"
++    },
++    {
++      "path": "apps/supportflow/jobs/grant_effects.py",
++      "sha256": "4e5e058dcd7d93ff8a1674431e0ff72d434a30b0a6cb21105e7eae505553e640"
++    },
++    {
++      "path": "apps/supportflow/jobs/grant_policy_reply.py",
++      "sha256": "c2974a3e87c08fa984da7ee552ee30bfc90436b7546ef6f16cf2c9c8141d8589"
++    },
++    {
++      "path": "apps/supportflow/jobs/grant_reconciliation.py",
++      "sha256": "8be528c7cbf315898110c3c5ea68ff220d7740c92a3fad623cb3ae1dfed48e91"
++    },
++    {
++      "path": "apps/supportflow/jobs/grant_transport.py",
++      "sha256": "025f8934a72a96f2f18220514de281e0064173f96309b8429ec41dfd0d0df99a"
++    },
++    {
++      "path": "apps/supportflow/jobs/health.py",
++      "sha256": "b0cb43eaaf7e9591b9d9c5fd5ce6e9b6162b78f9d055fbb751aa1a477a06766d"
++    },
++    {
++      "path": "apps/supportflow/jobs/knowledge_answers.py",
++      "sha256": "9b00a17c0df93e82e38eed60d06591f2f1503a73ef22cf2f0838c5ca40c5bbfe"
++    },
++    {
++      "path": "apps/supportflow/jobs/proposal_waiting.py",
++      "sha256": "f1da10175fde38cec4b211d35c88494b5e8e3ac4082cfbccc2d05aefe6be00b3"
++    },
++    {
++      "path": "apps/supportflow/jobs/public_text.py",
++      "sha256": "96d06fdd85b19b61304eafbbaeb1e7f6062d03c0189e477594db0100c2d4651e"
++    },
++    {
++      "path": "apps/supportflow/jobs/runtime.py",
++      "sha256": "2931d98495a06fcc8b050891d55730d3563dffc040450d51bc4fef424b88d253"
++    },
++    {
++      "path": "apps/supportflow/jobs/safe_connection.py",
++      "sha256": "fa30590f8968cc0660c070c61a0fc251fe3ece1200d5aac548051db1425e47c7"
++    },
++    {
++      "path": "apps/supportflow/jobs/scanner.py",
++      "sha256": "7f4c51fb9e545e8dd690eb3220933abcd07d2e8d47160f7c16f1a34f48543e9b"
++    },
++    {
++      "path": "apps/supportflow/jobs/waiting.py",
++      "sha256": "50db9b7ad7d5d9d61f5f2697ef73306ec43bc486c46ed39f9c4fe8b2443145d5"
++    },
++    {
++      "path": "apps/supportflow/jobs/worker.py",
++      "sha256": "eefd45a65c58f5a3a3cfb1f320c7151c38a87b48018a0f67b220715961633653"
++    },
++    {
++      "path": "apps/supportflow/knowledge/cli.py",
++      "sha256": "8fa7b0dd2d168e191a69cc0b51a1e053fb75ca03174736a82e138d66b08a8064"
++    },
++    {
++      "path": "apps/supportflow/knowledge/reviewed.py",
++      "sha256": "d6539268ae9e22716cbd8c8f6de5307745a06b3a0b10f2b50c4ba2d056dc9179"
++    },
++    {
++      "path": "apps/supportflow/retrieval/contracts.py",
++      "sha256": "5745e8169bf378fdb4b81efaea9d622fc7d52a73e1078e6e1cadfeb3bc63c733"
++    },
++    {
++      "path": "apps/supportflow/retrieval/embedding.py",
++      "sha256": "2d27867334392b821932e2acc0a6f88876649b0d081f52f43018e6b407edbec2"
++    },
++    {
++      "path": "apps/supportflow/retrieval/ingest.py",
++      "sha256": "0d02d0e55410ae80d087c872244d44c24dee876c75664d0b1dfb0fa64b2a086f"
++    },
++    {
++      "path": "apps/supportflow/retrieval/lexical.py",
++      "sha256": "183767793dc5b5919928b2d3637a0d3ed37a5190d109b84223b267267156f0d2"
++    },
++    {
++      "path": "apps/supportflow/retrieval/parsing.py",
++      "sha256": "0289d2fdea5cfbc5afda2ad321a68be483f586b2213def710adbfad3bfa75fca"
++    },
++    {
++      "path": "apps/supportflow/retrieval/service.py",
++      "sha256": "8c5d233905c1f829211a33c172400ca74b75a5caa3f4c0bb8e4bbf28e6defcc3"
++    },
++    {
++      "path": "apps/supportflow/sandbox/app.py",
++      "sha256": "4dd1e86f0094491d9b6e7f9605edeb7ffdc64f5cf043ce684bc32bbb44e1f9d4"
++    },
++    {
++      "path": "apps/supportflow/sandbox/grants.py",
++      "sha256": "1c0a71f0210edccee4348408998026621b1f31e3f1c86351a2c15c9f52b729f1"
++    },
++    {
++      "path": "apps/supportflow/tools/github.py",
++      "sha256": "8db4dd14e779540d3611f1311cb3bebcfbf81fe47871f6e30807f4b9bc984353"
++    },
++    {
++      "path": "apps/supportflow/tools/readonly.py",
++      "sha256": "efe3a45023330520b116ba64a5f010e6176df116656be9a95d7f8433455c2ac8"
++    },
++    {
++      "path": "apps/supportflow/web/generate_types.py",
++      "sha256": "2caf5a557cccc8b51e4b8732c8c40cd33707137d2aa5f3d6e4705b896152409c"
++    },
++    {
++      "path": "apps/supportflow/knowledge/reviewed_sections.json",
++      "sha256": "798e4b22a4e8acdf4e58683b4ac103ac8c95ef55cf8fc336cd085b0555e56ec7"
++    },
++    {
++      "path": "apps/supportflow/retrieval/topics.py",
++      "sha256": "68bbef076ae7c42f301ffabbd5440938f59991c035be89015ad54c9f35fda67e"
++    }
++  ],
++  "locked_dependencies": [
++    {
++      "path": "uv.lock",
++      "sha256": "637d974865869932516e3ec9f25b9adad933ddbb991a9617b7b3784a5c818f5c"
++    },
++    {
++      "path": "apps/supportflow/web/package-lock.json",
++      "sha256": "1831633f9323a01a79bfa8817d830ca674cb492b5e2913aab55b9f3258618211"
++    },
++    {
++      "path": "deploy/supportflow/embedding-model.lock.json",
++      "sha256": "6ef8af60d53773d60901dd7e36570ee86bd61f27a2add7882c8803a366d554c6"
++    },
++    {
++      "path": "apps/supportflow/knowledge/corpus.json",
++      "sha256": "e0152e05e2ceb064ad1b8d486f2b1fc2593fdb42d564abe121f61d384eebbe44"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/access-revocation.md",
++      "sha256": "1aa15b7a87bb6e6c15d3351be036e4e6064e06965db66ecb2010d28b5ae752bf"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/approval-boundary.md",
++      "sha256": "6932f34bdc6b9581a227d8930098401fcc41e03a5f10f73236e85a08f34ad63a"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/customer-binding.md",
++      "sha256": "2d8df0fdbc4ecd3f25cdf71e3e5c505922347730ae886debcab27051be457ab3"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/diagnosis-meaning.md",
++      "sha256": "264d1ea30f613b7bb6049a2985f4e3a25528228f3f5c689eacf80b47b984a425"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/domain-boundary.md",
++      "sha256": "893f0b0acd28180d84c0339b0f6ef94b7fe3f267cc3b24ddcc5704d2504f273e"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/injection-text.md",
++      "sha256": "3245de07c25ba5b9a69102f72adb0816dd84ce912bc04e84c0b3f7a47064a92a"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/invitation-current.md",
++      "sha256": "0c7de0d60800324f569b839370c5f70dd38bbf1fb6782990e94b8e55e76b4d15"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/invitation-status.md",
++      "sha256": "76d42a3be30255b38bb2b1d7340e3e634f711890430df2d81742cf790bbcc1ec"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/knowledge-publish.md",
++      "sha256": "4bd1b1301c28b7e624a2c38d23d78f820c14970d1f50ab8989d8a515b9c91b23"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/manual-handoff.md",
++      "sha256": "e6cc6099f10f9021faeca5f8e5afe3edcac893ec3251701f781f34ae90290550"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/noise-billing.md",
++      "sha256": "fc7cfb52dcf432a64f64c4f25207ba8467027cc53b14181119f3b25528e5b936"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/noise-contact.md",
++      "sha256": "92511f7bbd4233d494b9da4b4915b83d69f6d4c3c0db6bdf86e7d4c8b2143bc5"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/noise-export.md",
++      "sha256": "1549468f9e02af23c743d5a0093f07b3d8b29e303c5ec1b6c1408dfe09fc5d07"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/noise-theme.md",
++      "sha256": "2ded5d4afc1e4f5a6fbd33a51e42e7aa1e64c4d86480cf8f9df871021f951ec8"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/noise-timezone.md",
++      "sha256": "63cff6e878ce319d6ca6e6bb2a545e50b68f877d8f7f6c48d99bda5ad3bb1dfa"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/old-invitation.md",
++      "sha256": "cd3f4d0d0149fb1b240d26c7b39bdfca3eb9e9c7b80d96df9924a9c76f82dc83"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/other-billing.md",
++      "sha256": "f796e657b8582ef9bbd4a74f2868ddafa2c0639d72904fe96aaf654f7f6d67da"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/other-invitation.md",
++      "sha256": "a6764189e3aef5f81e69b6a1634aec2517de194f1cfd48e251ed3ccf9861f60a"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/other-noise.md",
++      "sha256": "77a42bf7585580c237b3476c1a5a5479a344555ebfb7e5829b53b4527b5250e5"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/other-private.md",
++      "sha256": "090f47037d91689817e8848586c054fbd271f27d3df8020b1b824d459bbb48a4"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/other-service.md",
++      "sha256": "74d3b72dfc1ef94b728038591c8639fba77197f0d3ffcab5f2daf1a2033d791b"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/private-audit.md",
++      "sha256": "27a6c3a54ff0bcc19260100b64bbd87b8cd0123889f7fe101624052100e10c35"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/private-operations.md",
++      "sha256": "a0a4085b91e8b51b2f1bf73a3b6772ea2aec6f618a455cb1068b443e3070de36"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/reference-history.md",
++      "sha256": "fad97519d9a55dafc26f9d009f60118ea3b497fafbef0c29081013acde691ca7"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/run-timeout.md",
++      "sha256": "414b3358873a7a85fdb6b83a45849e6ce82ab7b95bc7301a082576f241f28408"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/service-observation.md",
++      "sha256": "1770a6ddb4b524b7add447182ecf4aaa94238db00c9a8ef2da2f53a9aaafa24e"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/subscription-status.md",
++      "sha256": "ccf60e206a2f62114ee4681e0e3399a7d9a3cb0935ea6f369b8537f6e71e9f71"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/temporary-expiry.md",
++      "sha256": "24ff922d93e5bfb111602d48f21601273e6c147100e1c76a41ee8e31bf9ebffa"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/temporary-seat-policy-v1.md",
++      "sha256": "8945cb9feee439a43a05106decec20d9d49b69e62d2ad9366da2fdca67ddda4b"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/unknown-fields.md",
++      "sha256": "d38cc170eb9a0082b60c6c5a4a3a377bc9c0c242cbaf17f566ce3079c1ac7e19"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/upload-format.md",
++      "sha256": "8c796cd06fb135eb2529f5a02b21fc47b17b1734f4197a537a690d7ce0b7df9c"
++    },
++    {
++      "path": "apps/supportflow/agent/assets/deepseek-v41-tokenizer.json",
++      "sha256": "81f64d1248a68ce3663e07ab3ee48b851e5df0e32d27cb98e4c9a268151e8d99"
++    }
++  ],
++  "subsets": {
++    "Q_R": [
++      "SF-011",
++      "SF-012",
++      "SF-013",
++      "SF-014",
++      "SF-015",
++      "SF-016",
++      "SF-017",
++      "SF-018",
++      "SF-019",
++      "SF-020",
++      "SF-021",
++      "SF-022",
++      "SF-023",
++      "SF-024",
++      "SF-025",
++      "SF-026",
++      "SF-027",
++      "SF-028",
++      "SF-029"
++    ],
++    "Q_P": [
++      "SF-041",
++      "SF-042",
++      "SF-043",
++      "SF-045",
++      "SF-046",
++      "SF-047",
++      "SF-048",
++      "SF-049",
++      "SF-051",
++      "SF-052",
++      "SF-053",
++      "SF-054",
++      "SF-055",
++      "SF-056",
++      "SF-057",
++      "SF-059",
++      "SF-060",
++      "SF-090"
++    ],
++    "Q_I": [
++      "SF-073",
++      "SF-088",
++      "SF-090",
++      "SF-111",
++      "SF-112",
++      "SF-113",
++      "SF-114",
++      "SF-115",
++      "SF-116",
++      "SF-117",
++      "SF-118",
++      "SF-119",
++      "SF-120"
++    ]
++  },
++  "subset_decisions": {
++    "SF-011": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-012": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-013": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-014": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-015": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-016": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-017": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-018": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-019": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-020": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-021": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-022": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-023": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-024": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-025": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-026": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-027": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-028": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-029": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-030": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-041": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-042": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-043": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-044": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-045": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-046": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-047": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-048": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-049": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-050": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-051": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-052": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-053": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-054": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-055": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-056": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-057": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-058": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-059": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-060": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-071": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-072": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-073": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "included: exactly one target business commit required"
++    },
++    "SF-074": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-075": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-076": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-077": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-078": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-079": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-080": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-081": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-082": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-083": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-084": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-085": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-086": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-087": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-088": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "included: exactly one target business commit required"
++    },
++    "SF-089": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-090": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "included: exactly one target business commit required"
++    },
++    "SF-096": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-097": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-098": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-099": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-100": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-101": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-102": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-103": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-104": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-105": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-111": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "included: exactly one target business commit required"
++    },
++    "SF-112": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "included: exactly one target business commit required"
++    },
++    "SF-113": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "included: exactly one target business commit required"
++    },
++    "SF-114": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "included: exactly one target business commit required"
++    },
++    "SF-115": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "included: exactly one target business commit required"
++    },
++    "SF-116": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "included: exactly one target business commit required"
++    },
++    "SF-117": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "included: exactly one target business commit required"
++    },
++    "SF-118": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "included: exactly one target business commit required"
++    },
++    "SF-119": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "included: exactly one target business commit required"
++    },
++    "SF-120": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "included: exactly one target business commit required"
++    }
++  },
++  "repetitions": 3,
++  "schedule_seed": 20261115,
++  "request_concurrency": 1,
++  "worker_prefork": 2,
++  "arms": {
++    "H0": {
++      "scope": "all",
++      "graph": "bounded_tool_loop",
++      "schedule": "serial",
++      "context": "full",
++      "implementation": null
++    },
++    "H1-S0": {
++      "scope": "all",
++      "graph": "business_graph",
++      "schedule": "serial",
++      "context": "full",
++      "implementation": null
++    },
++    "H1-S1": {
++      "scope": "Q_P",
++      "graph": "business_graph",
++      "schedule": "independent_read_parallel_2",
++      "context": "compact",
++      "implementation": null
++    }
++  },
++  "common": {
++    "provider": "deepseek",
++    "requested_model": "deepseek-flash",
++    "temperature": 0,
++    "thinking": "disabled",
++    "max_output_tokens": 512,
++    "max_model_calls_per_run": 8,
++    "tool_round_limit": 10,
++    "execution_contract_version": 2,
++    "processing_seconds": 90,
++    "case_wall_seconds": 180,
++    "application_cache": "off",
++    "provider_cache": "record_observed_cached_tokens",
++    "retrieval": "hybrid_rrf",
++    "vector_k": 20,
++    "lexical_k": 20,
++    "rrf_constant": 60,
++    "final_k": 5,
++    "max_batch_provider_calls": null,
++    "max_batch_tokens": null,
++    "max_batch_cost": null,
++    "price": null,
++    "producer_window_seconds": 1800,
++    "drain_seconds": 180,
++    "tools": "recorded_external_github; real isolated internal reads and writes",
++    "security": "same_policy_approval_and_executor_all_arms",
++    "max_input_tokens": 8192
++  },
++  "counts": {
++    "business_cases": 80,
++    "hp_units": 534,
++    "retrieval_units": 38,
++    "reliability_units": 39
++  },
++  "runtime_prerequisites": {
++    "native_case_selfchecks": null,
++    "independent_business_scorer": null,
++    "arm_dev_calibration": null,
++    "actual_environment": null,
++    "runtime_window": null
++  },
++  "latency_publication": {
++    "minimum_common_cases": 20,
++    "minimum_samples": 40,
++    "algorithm": "nearest_rank",
++    "quality_scope": "entire_Q_P_first",
++    "current_max_cases": 18
++  },
++  "failure_policy": {
++    "missing_units": "not_run; never remove from denominator",
++    "observed_failure": "retain; never overwrite",
++    "dataset_correction": "new manifest; invalidate paired arms together",
++    "tuning_after_exposure": "relabel as seen regression"
++  },
++  "actual_model_runs": 0,
++  "formal_results": [],
++  "supersedes": {
++    "path": "evals/registrations/supportflow/quality-holdout-v38.json",
++    "sha256": "3d9a475ce8387b9f90c9ed5616e6ecd8f2d57ea27dd0e57938b0eaa8b73b7d7c"
++  },
++  "source_refresh_note": "Lock customer-specific subdomain invitation diagnosis routing for seen v9 regression. Frozen case text, gold, schedule and common parameters remain unchanged.",
++  "development_only_arm_bindings": {
++    "formal_activation": false,
++    "sources": [
++      {
++        "path": "artifacts/iterations/SF-I001/SF-B350-exact-h0-registered/seal.json",
++        "sha256": "c0b48cc6b819eab389e4514ff08447610f09c46f0ac3daebb3a63604495259f3"
++      },
++      {
++        "path": "artifacts/iterations/SF-I001/SF-B351-exact-s0/seal.json",
++        "sha256": "4bbb5d0ef3877ffd01d6201afb9a6b8a12265eea659fb5ceea245f7e1d5da255"
++      },
++      {
++        "path": "artifacts/iterations/SF-I001/SF-B352-exact-s1/seal.json",
++        "sha256": "78be5546f44096339c698ee688591af5ed3234064ad80fc97f7e6606a5ad1e3a"
++      }
++    ],
++    "common_contract": {
++      "path": "evals/fixtures/supportflow/quality/arm-binding-v2.json",
++      "sha256": "029b72dbafc2091317012cd807a9879e3e1ec107c6538f9d0e393ad50e73458d"
++    },
++    "boundary": "All three dev five-case bindings verified with exact full-request token count. Not full-category formal calibration or holdout native selfchecks."
++  },
++  "material_amendment": {
++    "id": "SF-087-cancel-before-customer-citation-v1",
++    "authorization": {
++      "path": "artifacts/iterations/SF-I001/development-notes/SF087-authorized-amendment.md",
++      "sha256": "4e681b43a23a023bf762579c3a66628d50930ac5a9dc9f0481d30bbf0ae3b02f"
++    }
++  }
++}
+diff --git a/evals/registrations/supportflow/quality-holdout-v40.json b/evals/registrations/supportflow/quality-holdout-v40.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..99d453ae77ad15cbf81c80bbf60a4bb42b8637c6
+--- /dev/null
++++ b/evals/registrations/supportflow/quality-holdout-v40.json
+@@ -0,0 +1,1269 @@
++{
++  "schema_version": 1,
++  "registration_id": "sf-quality-holdout-v40",
++  "status": "registered_not_executable",
++  "human_reviewed": false,
++  "case_ids": [
++    "SF-011",
++    "SF-012",
++    "SF-013",
++    "SF-014",
++    "SF-015",
++    "SF-016",
++    "SF-017",
++    "SF-018",
++    "SF-019",
++    "SF-020",
++    "SF-021",
++    "SF-022",
++    "SF-023",
++    "SF-024",
++    "SF-025",
++    "SF-026",
++    "SF-027",
++    "SF-028",
++    "SF-029",
++    "SF-030",
++    "SF-041",
++    "SF-042",
++    "SF-043",
++    "SF-044",
++    "SF-045",
++    "SF-046",
++    "SF-047",
++    "SF-048",
++    "SF-049",
++    "SF-050",
++    "SF-051",
++    "SF-052",
++    "SF-053",
++    "SF-054",
++    "SF-055",
++    "SF-056",
++    "SF-057",
++    "SF-058",
++    "SF-059",
++    "SF-060",
++    "SF-071",
++    "SF-072",
++    "SF-073",
++    "SF-074",
++    "SF-075",
++    "SF-076",
++    "SF-077",
++    "SF-078",
++    "SF-079",
++    "SF-080",
++    "SF-081",
++    "SF-082",
++    "SF-083",
++    "SF-084",
++    "SF-085",
++    "SF-086",
++    "SF-087",
++    "SF-088",
++    "SF-089",
++    "SF-090",
++    "SF-096",
++    "SF-097",
++    "SF-098",
++    "SF-099",
++    "SF-100",
++    "SF-101",
++    "SF-102",
++    "SF-103",
++    "SF-104",
++    "SF-105",
++    "SF-111",
++    "SF-112",
++    "SF-113",
++    "SF-114",
++    "SF-115",
++    "SF-116",
++    "SF-117",
++    "SF-118",
++    "SF-119",
++    "SF-120"
++  ],
++  "source_design": {
++    "path": "evals/data/supportflow/holdout/design-snapshot-v1.json",
++    "sha256": "253164ed7ca1e14ac721630d14650d8a3d9cf6d79441dc91c8d7c83705e363fc"
++  },
++  "fixture": {
++    "path": "evals/data/supportflow/holdout/fixture-v1.json",
++    "sha256": "9868aa4df347fd6b2fe79e8fcc8f7789b3dbb7e418ac5d6dad2c588ba6080e3c"
++  },
++  "gold": {
++    "path": "evals/data/supportflow/holdout/gold-v2.json",
++    "sha256": "a973805b704f1c04a7968dc3b5f63169c784dbfa2464e4f8463ef2483b276bdd"
++  },
++  "review": {
++    "path": "evals/reviews/supportflow/holdout-material-review-v2.json",
++    "sha256": "047b3b0f993906f5a3bd89dc07572063f0b63a15b39dafb14cc5e101408470a6"
++  },
++  "issues": {
++    "path": "evals/data/supportflow/holdout/dataset-issues-v1.json",
++    "sha256": "b69cfe6c1dd3fcdb95ac1462b1aebc17a9481d45ef2c0621c57c5816173799cc"
++  },
++  "exposure": {
++    "path": "evals/data/supportflow/holdout/exposure-v1.json",
++    "sha256": "49a07725e23fd04466601b738be561a685e6132c81be1ecd85087d0e5cc56562"
++  },
++  "catalog": {
++    "path": "evals/data/supportflow/cases-v8.jsonl",
++    "sha256": "a13f0af5776c599ee4fc866ee770e222cf341a5413d01bb7280efafbe5ff9645"
++  },
++  "review_policy": {
++    "path": "evals/policies/supportflow/ai-review-unlimited-v1.json",
++    "sha256": "16152b4449d3956204bd59147a146b57f718ccfcf72bfaf91c44c95e9155699f"
++  },
++  "locked_product_sources": [
++    {
++      "path": "apps/supportflow/agent/approval_graph.py",
++      "sha256": "cd28a1eda5edda50140bea6c01b33463928ba864eff801898f6279e967bcaee6"
++    },
++    {
++      "path": "apps/supportflow/agent/clarification_graph.py",
++      "sha256": "f4c13e9e3b34ef4bb71db8bd11b9c05c5200e930d993f7199c13703d9082f574"
++    },
++    {
++      "path": "apps/supportflow/agent/diagnosis_graph.py",
++      "sha256": "4126312b76e3785448e2afdc33b53d92d4c8d6b6896d2970f5a9ccffb9e4e14d"
++    },
++    {
++      "path": "apps/supportflow/agent/execution_graph.py",
++      "sha256": "039b556d7e45e8a0c1748901b7d95fcb60808dfeba3e1ea87b8bd2ee5865a81f"
++    },
++    {
++      "path": "apps/supportflow/agent/grant_graph.py",
++      "sha256": "d1019c08e8df71e1e2c7ede87c05636ec99bc2a636950ac4053b94c9e5f52faf"
++    },
++    {
++      "path": "apps/supportflow/agent/grant_reply.py",
++      "sha256": "531014f667cdc0fb5e79b4083e2f1c5923b61cee97618fe516d664d62cab0238"
++    },
++    {
++      "path": "apps/supportflow/agent/input_tokens.py",
++      "sha256": "adba0e3e57a22767833196ac9fbc9dba9de853b386404e784e4a0f66d2b12e67"
++    },
++    {
++      "path": "apps/supportflow/agent/models.py",
++      "sha256": "100aa3a91db886bfaed1b48df8a906402d327ce3428a1581ede7d2af77376a66"
++    },
++    {
++      "path": "apps/supportflow/agent/rag_graph.py",
++      "sha256": "93d5a743408b613438563b901313152567d5b0bf463cb1ae74a96fedc5b6892f"
++    },
++    {
++      "path": "apps/supportflow/agent/run_graph.py",
++      "sha256": "fca5d1c531c115722b0e4beaac1aaa53e35b1372b026d431e4cad168643337b3"
++    },
++    {
++      "path": "apps/supportflow/agent/spike_graph.py",
++      "sha256": "fcf3c520217f77a4eb7c900184d215c1dd6f75c65c2cc288c168c67088906707"
++    },
++    {
++      "path": "apps/supportflow/api/approvals.py",
++      "sha256": "3637905b8d1db5f929b72cf60545808cc5cb93008999e94a0f9b063aeb5cd82b"
++    },
++    {
++      "path": "apps/supportflow/api/auth.py",
++      "sha256": "d1e15f5cded197395429445a43710b798c3fea332a3e2bbe98c91381ab7f9196"
++    },
++    {
++      "path": "apps/supportflow/api/clarifications.py",
++      "sha256": "c1698291740b6df32cd4bfcecdecb2c20f08ec9b73716c0ff2cc951f58f44609"
++    },
++    {
++      "path": "apps/supportflow/api/control.py",
++      "sha256": "13f2a2dcc4d00ca665b85ff5feedcec208915427a6d750aa6963f4bba976636f"
++    },
++    {
++      "path": "apps/supportflow/api/documents.py",
++      "sha256": "366b334d399d037439fcbc7b3585b5b821abd32d8c9cd094a6a3d4b63cd1575a"
++    },
++    {
++      "path": "apps/supportflow/api/evaluation.py",
++      "sha256": "97f34250839580a5ce2c97f2b9ea7391f524ff93b3029ebc0ab03abb6461289d"
++    },
++    {
++      "path": "apps/supportflow/api/events.py",
++      "sha256": "2d5af6a47b1e27f498125a51f125dfae0faa14e285b22917c492eb077f56b95c"
++    },
++    {
++      "path": "apps/supportflow/api/input_refusal.py",
++      "sha256": "18311c65468342272f56eb4af008e4c085dcad653fdf290c64163f2398f48650"
++    },
++    {
++      "path": "apps/supportflow/api/main.py",
++      "sha256": "70ef8843161afda2890b28b2857b33c8e77b910d13a8d6ff4eab1261ee9f3f14"
++    },
++    {
++      "path": "apps/supportflow/api/objects.py",
++      "sha256": "c190f66f1310b554098cf28a86ba23cd36434698f0fcfa5ea2ac86afdc48a743"
++    },
++    {
++      "path": "apps/supportflow/api/runs.py",
++      "sha256": "b7694849ad9711ccde130763a52e6fc7098028816e17e44e1b2d4c53cd7376f8"
++    },
++    {
++      "path": "apps/supportflow/api/runtime.py",
++      "sha256": "377b668f5652f4b4846e75db0dfdcce12889fe8428ef3eb2e09bad9f20101f05"
++    },
++    {
++      "path": "apps/supportflow/db/checkpoints.py",
++      "sha256": "072682316be8e9dcdbb605492702ef771ecec8392f0f93c4b8a4df84847f5b79"
++    },
++    {
++      "path": "apps/supportflow/db/demo_data.py",
++      "sha256": "8099102f19edbd6e3287bdf92f76512695393fc221ecd62642022c919ae0ab1e"
++    },
++    {
++      "path": "apps/supportflow/db/demo_state.py",
++      "sha256": "c35bd3c54c1c167414df6729e49beba7498f8877c23d170059a1e3d26d8e9578"
++    },
++    {
++      "path": "apps/supportflow/db/manage.py",
++      "sha256": "a4c95924f21cb7e007d1b106deb1d6fb14c31c94f65a43b781f211e1530fd7f4"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0001_identity_and_customers.py",
++      "sha256": "f86688bccb9770b5ff465ec3c8af42e972556c93214d93d531c87bb732c95ae5"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0002_sessions.py",
++      "sha256": "fc34eaa8640715f5d65aa20895350e72250a125201765712f51a622d271a5b5c"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0003_tickets_and_threads.py",
++      "sha256": "332a893ff6c7bc410d98a31e22e9b0c37741bd63c7fdd2d7bfe3ee4b762511c9"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0004_runs.py",
++      "sha256": "40ca00e227f57d9ed78cb7d1aa44ee3f52c9615751b2ee814b7c7bef099c3c73"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0005_dispatch.py",
++      "sha256": "b1892dadea82d8fe209816b3b852f5a1d80e635cde14d6a6e395bef5d982d3a5"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0006_tool_observations.py",
++      "sha256": "4281bff1eea9b70041d94041cd9bb469476342370d0b38a4db847e623c9295b8"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0007_knowledge.py",
++      "sha256": "f68050eba44f621fbb90d9aef9747cf0806087c8ed5ee7b8792e5bc90404d629"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0008_waiting.py",
++      "sha256": "2cab1899398c54d828cc1813349170cd47d663f07ff4414d392aa9aa343350b0"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0009_proposals.py",
++      "sha256": "bd9c11dedb5d760c2e3ba59dad4d496e28c108db123456f2bbfb41df0cc95695"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0010_proposal_waits.py",
++      "sha256": "5385dc27191abd3d0b69b3b080a817237f755c7d7118948db85fba43c0842de8"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0011_approval_decisions.py",
++      "sha256": "63eb8037914ba2f85c6a3c8d91fb79f15e1fd501325ea0eeb67ec7c8832a747b"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0012_grant_execution.py",
++      "sha256": "20f9a15b748c9908b4169068892f1816f51d6170265b7a19af8bafd7032437f2"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0013_human_ticket_note.py",
++      "sha256": "86389fe69acac8c7d73ddc97ac19e4da5a16bbbd769edd6106e6f7335ce74883"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0014_external_issue_observations.py",
++      "sha256": "0756e66dac6df63190d3842f7d54ecb5106784bb2d5d4c83319ccf4bd05be61c"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0015_readonly_finalization.py",
++      "sha256": "5c7341674461f2f2c5bab9216b87fad8e6b1faa52977cf66260559de1af2547b"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0016_execution_retry_budget.py",
++      "sha256": "668453a490349de395986bdb934cc53fc075fe471951628075bed47f4561bae5"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0017_external_read_budget.py",
++      "sha256": "ebd5ff098d2d49b896aafb885e2b0cecb060c00cfe7756dd19e379135ced19b8"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/app/0018_clarification_refusal.py",
++      "sha256": "b5d64605378d7a22c6004458483f6cccd972a8940ebf4345cb84c02328069f75"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/env.py",
++      "sha256": "773a65f313bf0b0117ec9b1e3fb0df2b04b68828c6723da90b5ce3f5d68577a4"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/sandbox/0001_subscriptions.py",
++      "sha256": "8f6999fe1629c635b9ae8f362f2f1d6cfd74e95c519f2c08f921341751a99a4e"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/sandbox/0002_readonly_diagnosis.py",
++      "sha256": "814c8ab30bb7e583961e267733a4e02f40080484add1b9556cae26253c2fa23a"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/sandbox/0003_grant_history.py",
++      "sha256": "23fa84ba8b06aabf02a60ab96e462c5d84005923e68ea7b1f0ceda7d59f90e7d"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/sandbox/0004_grant_commands.py",
++      "sha256": "3323efcfc6de36a1beed3e76d3a91dc903ce983d511162c52b6b3c88890670c0"
++    },
++    {
++      "path": "apps/supportflow/db/migrations/sandbox/0005_invitation_history.py",
++      "sha256": "0347eb77bd110f8b574ff71acb0768fcd5b411329490265d10c5cd776c74fb3d"
++    },
++    {
++      "path": "apps/supportflow/db/proposal_startup_probe.py",
++      "sha256": "d1cb8c63fc021da86eee1a69c4f2dd6bbdf9c8ca6c8a6c6c831b5d005cf6effc"
++    },
++    {
++      "path": "apps/supportflow/db/seed_data.py",
++      "sha256": "8c20faf8d9939f9aa26117ced4fef2e4c6ea720dcb5ccbe261c1040398f5b26d"
++    },
++    {
++      "path": "apps/supportflow/domain/approvals.py",
++      "sha256": "a7072fc954db3d8fee1eb4cf27325d38fe54d3b26e6315897b6df005db2872f3"
++    },
++    {
++      "path": "apps/supportflow/domain/capacity_diagnosis.py",
++      "sha256": "4c93077e4ba9efdcbb02577cf436492a573ee15ce8b78957346d095bd5f2be1c"
++    },
++    {
++      "path": "apps/supportflow/domain/clock.py",
++      "sha256": "fb227d1269f25de2196649a0fb897a7b065a793b8b816a1dccad8dac58ce1940"
++    },
++    {
++      "path": "apps/supportflow/domain/contracts.py",
++      "sha256": "d952e7f304c82b690ea677ae5f1b169842678fee04cab1572dce04e26d973b36"
++    },
++    {
++      "path": "apps/supportflow/domain/diagnosis_routing.py",
++      "sha256": "b3876eb73407d84379457373d6a8afe4dc325901fe180a5194fa8fd6d04058c9"
++    },
++    {
++      "path": "apps/supportflow/domain/github_access.py",
++      "sha256": "d748e2e7b6c65abd2349ae902d2028950a44e81100d1a33610c47ec37e1c9506"
++    },
++    {
++      "path": "apps/supportflow/domain/github_clues.py",
++      "sha256": "9d4438425d6b9cd38895bc453b258126e6b7018a2d269e0aca7221d3fc4271ab"
++    },
++    {
++      "path": "apps/supportflow/domain/grant_commands.py",
++      "sha256": "cc9e0f905b2ea8afde9450946e2c04b2dabde3d3e344b1f1d4f7574e8525d525"
++    },
++    {
++      "path": "apps/supportflow/domain/grant_contracts.py",
++      "sha256": "a8fc9951e86ae14a2d4c11a142e4812a702703eaabd0de7718434a87fb54d631"
++    },
++    {
++      "path": "apps/supportflow/domain/grant_effects.py",
++      "sha256": "a63e1aa7486072efb7faff4accb807b6c0951773125de014749d280371845c5a"
++    },
++    {
++      "path": "apps/supportflow/domain/grant_policy.py",
++      "sha256": "c66c6f5177bb7a01edfad6281fc7886fc7d656780372e69c3165364c4b8363fc"
++    },
++    {
++      "path": "apps/supportflow/domain/grant_policy_reply.py",
++      "sha256": "b681e19b2b8b42d795ac5af7accc69cdfa9dc531d144afeee4c5336dccf85ff9"
++    },
++    {
++      "path": "apps/supportflow/domain/input_refusal.py",
++      "sha256": "5f8bd996f04db803a179782755fc3c33f84235c062a65bc3b3f98ee8aad6efaa"
++    },
++    {
++      "path": "apps/supportflow/domain/knowledge_answers.py",
++      "sha256": "407d03749aa5ce874d242630ea01a144e8f2bd403edab669e8b59366cb1df7b6"
++    },
++    {
++      "path": "apps/supportflow/domain/proposals.py",
++      "sha256": "518410db5ddbaffcb00302d3c14edfa350a133139fd9d813396df0059673b733"
++    },
++    {
++      "path": "apps/supportflow/domain/recovered_diagnosis.py",
++      "sha256": "ca5fabe7c96f7f6dfc9f6370d97aa6ce0992dc18b8b14fae055f886e4ec951a5"
++    },
++    {
++      "path": "apps/supportflow/domain/rules.py",
++      "sha256": "ff63b402f4c19030de840da756a3ae9a4ddd4150ef7c95235b94c855648d0927"
++    },
++    {
++      "path": "apps/supportflow/jobs/action_effects.py",
++      "sha256": "a1dbec087a84c6ba948a707b562e6c5042a50210d6a485c860387285c9dcc356"
++    },
++    {
++      "path": "apps/supportflow/jobs/approval_dispatch.py",
++      "sha256": "68c35547c9efeb8c8b8b99ffaaf17b4b8f1f70e0418aec3bbdced1d9c856afc0"
++    },
++    {
++      "path": "apps/supportflow/jobs/capacity_diagnosis.py",
++      "sha256": "2c99ab66e795919e6cbc6beb4689cb7f31695794e7c9815e3ec4e37270a0145c"
++    },
++    {
++      "path": "apps/supportflow/jobs/contracts.py",
++      "sha256": "d537e49c328219a6d8d01858a73bc15b5421fdf9c6b03a9ac7cc72bab00d0f68"
++    },
++    {
++      "path": "apps/supportflow/jobs/core.py",
++      "sha256": "215969edc5b44c5a4d9b16c359acfec86002978ff94a32a812893249cfaf03d6"
++    },
++    {
++      "path": "apps/supportflow/jobs/dispatcher.py",
++      "sha256": "3482f5b2e1b8fa443a7246b8614e13ff1154a045d41e69c72488fb9ce19c600e"
++    },
++    {
++      "path": "apps/supportflow/jobs/event_hints.py",
++      "sha256": "93de69744d07fb1b9a4156eb20a626eadc1d8335f44ea8edb4bf575cc62bfb70"
++    },
++    {
++      "path": "apps/supportflow/jobs/event_retention.py",
++      "sha256": "01ae9a0607309356fc4ddeb6c18dac763cf7643d86498f68dd8eebe6ed40c026"
++    },
++    {
++      "path": "apps/supportflow/jobs/grant_effects.py",
++      "sha256": "4e5e058dcd7d93ff8a1674431e0ff72d434a30b0a6cb21105e7eae505553e640"
++    },
++    {
++      "path": "apps/supportflow/jobs/grant_policy_reply.py",
++      "sha256": "c2974a3e87c08fa984da7ee552ee30bfc90436b7546ef6f16cf2c9c8141d8589"
++    },
++    {
++      "path": "apps/supportflow/jobs/grant_reconciliation.py",
++      "sha256": "8be528c7cbf315898110c3c5ea68ff220d7740c92a3fad623cb3ae1dfed48e91"
++    },
++    {
++      "path": "apps/supportflow/jobs/grant_transport.py",
++      "sha256": "025f8934a72a96f2f18220514de281e0064173f96309b8429ec41dfd0d0df99a"
++    },
++    {
++      "path": "apps/supportflow/jobs/health.py",
++      "sha256": "b0cb43eaaf7e9591b9d9c5fd5ce6e9b6162b78f9d055fbb751aa1a477a06766d"
++    },
++    {
++      "path": "apps/supportflow/jobs/knowledge_answers.py",
++      "sha256": "9b00a17c0df93e82e38eed60d06591f2f1503a73ef22cf2f0838c5ca40c5bbfe"
++    },
++    {
++      "path": "apps/supportflow/jobs/proposal_waiting.py",
++      "sha256": "f1da10175fde38cec4b211d35c88494b5e8e3ac4082cfbccc2d05aefe6be00b3"
++    },
++    {
++      "path": "apps/supportflow/jobs/public_text.py",
++      "sha256": "96d06fdd85b19b61304eafbbaeb1e7f6062d03c0189e477594db0100c2d4651e"
++    },
++    {
++      "path": "apps/supportflow/jobs/runtime.py",
++      "sha256": "2931d98495a06fcc8b050891d55730d3563dffc040450d51bc4fef424b88d253"
++    },
++    {
++      "path": "apps/supportflow/jobs/safe_connection.py",
++      "sha256": "fa30590f8968cc0660c070c61a0fc251fe3ece1200d5aac548051db1425e47c7"
++    },
++    {
++      "path": "apps/supportflow/jobs/scanner.py",
++      "sha256": "7f4c51fb9e545e8dd690eb3220933abcd07d2e8d47160f7c16f1a34f48543e9b"
++    },
++    {
++      "path": "apps/supportflow/jobs/waiting.py",
++      "sha256": "50db9b7ad7d5d9d61f5f2697ef73306ec43bc486c46ed39f9c4fe8b2443145d5"
++    },
++    {
++      "path": "apps/supportflow/jobs/worker.py",
++      "sha256": "eefd45a65c58f5a3a3cfb1f320c7151c38a87b48018a0f67b220715961633653"
++    },
++    {
++      "path": "apps/supportflow/knowledge/cli.py",
++      "sha256": "8fa7b0dd2d168e191a69cc0b51a1e053fb75ca03174736a82e138d66b08a8064"
++    },
++    {
++      "path": "apps/supportflow/knowledge/reviewed.py",
++      "sha256": "d6539268ae9e22716cbd8c8f6de5307745a06b3a0b10f2b50c4ba2d056dc9179"
++    },
++    {
++      "path": "apps/supportflow/retrieval/contracts.py",
++      "sha256": "5745e8169bf378fdb4b81efaea9d622fc7d52a73e1078e6e1cadfeb3bc63c733"
++    },
++    {
++      "path": "apps/supportflow/retrieval/embedding.py",
++      "sha256": "2d27867334392b821932e2acc0a6f88876649b0d081f52f43018e6b407edbec2"
++    },
++    {
++      "path": "apps/supportflow/retrieval/ingest.py",
++      "sha256": "0d02d0e55410ae80d087c872244d44c24dee876c75664d0b1dfb0fa64b2a086f"
++    },
++    {
++      "path": "apps/supportflow/retrieval/lexical.py",
++      "sha256": "183767793dc5b5919928b2d3637a0d3ed37a5190d109b84223b267267156f0d2"
++    },
++    {
++      "path": "apps/supportflow/retrieval/parsing.py",
++      "sha256": "0289d2fdea5cfbc5afda2ad321a68be483f586b2213def710adbfad3bfa75fca"
++    },
++    {
++      "path": "apps/supportflow/retrieval/service.py",
++      "sha256": "8c5d233905c1f829211a33c172400ca74b75a5caa3f4c0bb8e4bbf28e6defcc3"
++    },
++    {
++      "path": "apps/supportflow/sandbox/app.py",
++      "sha256": "4dd1e86f0094491d9b6e7f9605edeb7ffdc64f5cf043ce684bc32bbb44e1f9d4"
++    },
++    {
++      "path": "apps/supportflow/sandbox/grants.py",
++      "sha256": "1c0a71f0210edccee4348408998026621b1f31e3f1c86351a2c15c9f52b729f1"
++    },
++    {
++      "path": "apps/supportflow/tools/github.py",
++      "sha256": "8db4dd14e779540d3611f1311cb3bebcfbf81fe47871f6e30807f4b9bc984353"
++    },
++    {
++      "path": "apps/supportflow/tools/readonly.py",
++      "sha256": "efe3a45023330520b116ba64a5f010e6176df116656be9a95d7f8433455c2ac8"
++    },
++    {
++      "path": "apps/supportflow/web/generate_types.py",
++      "sha256": "2caf5a557cccc8b51e4b8732c8c40cd33707137d2aa5f3d6e4705b896152409c"
++    },
++    {
++      "path": "apps/supportflow/knowledge/reviewed_sections.json",
++      "sha256": "798e4b22a4e8acdf4e58683b4ac103ac8c95ef55cf8fc336cd085b0555e56ec7"
++    },
++    {
++      "path": "apps/supportflow/retrieval/topics.py",
++      "sha256": "68bbef076ae7c42f301ffabbd5440938f59991c035be89015ad54c9f35fda67e"
++    }
++  ],
++  "locked_dependencies": [
++    {
++      "path": "uv.lock",
++      "sha256": "637d974865869932516e3ec9f25b9adad933ddbb991a9617b7b3784a5c818f5c"
++    },
++    {
++      "path": "apps/supportflow/web/package-lock.json",
++      "sha256": "1831633f9323a01a79bfa8817d830ca674cb492b5e2913aab55b9f3258618211"
++    },
++    {
++      "path": "deploy/supportflow/embedding-model.lock.json",
++      "sha256": "6ef8af60d53773d60901dd7e36570ee86bd61f27a2add7882c8803a366d554c6"
++    },
++    {
++      "path": "apps/supportflow/knowledge/corpus.json",
++      "sha256": "e0152e05e2ceb064ad1b8d486f2b1fc2593fdb42d564abe121f61d384eebbe44"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/access-revocation.md",
++      "sha256": "1aa15b7a87bb6e6c15d3351be036e4e6064e06965db66ecb2010d28b5ae752bf"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/approval-boundary.md",
++      "sha256": "6932f34bdc6b9581a227d8930098401fcc41e03a5f10f73236e85a08f34ad63a"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/customer-binding.md",
++      "sha256": "2d8df0fdbc4ecd3f25cdf71e3e5c505922347730ae886debcab27051be457ab3"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/diagnosis-meaning.md",
++      "sha256": "264d1ea30f613b7bb6049a2985f4e3a25528228f3f5c689eacf80b47b984a425"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/domain-boundary.md",
++      "sha256": "893f0b0acd28180d84c0339b0f6ef94b7fe3f267cc3b24ddcc5704d2504f273e"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/injection-text.md",
++      "sha256": "3245de07c25ba5b9a69102f72adb0816dd84ce912bc04e84c0b3f7a47064a92a"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/invitation-current.md",
++      "sha256": "0c7de0d60800324f569b839370c5f70dd38bbf1fb6782990e94b8e55e76b4d15"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/invitation-status.md",
++      "sha256": "76d42a3be30255b38bb2b1d7340e3e634f711890430df2d81742cf790bbcc1ec"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/knowledge-publish.md",
++      "sha256": "4bd1b1301c28b7e624a2c38d23d78f820c14970d1f50ab8989d8a515b9c91b23"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/manual-handoff.md",
++      "sha256": "e6cc6099f10f9021faeca5f8e5afe3edcac893ec3251701f781f34ae90290550"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/noise-billing.md",
++      "sha256": "fc7cfb52dcf432a64f64c4f25207ba8467027cc53b14181119f3b25528e5b936"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/noise-contact.md",
++      "sha256": "92511f7bbd4233d494b9da4b4915b83d69f6d4c3c0db6bdf86e7d4c8b2143bc5"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/noise-export.md",
++      "sha256": "1549468f9e02af23c743d5a0093f07b3d8b29e303c5ec1b6c1408dfe09fc5d07"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/noise-theme.md",
++      "sha256": "2ded5d4afc1e4f5a6fbd33a51e42e7aa1e64c4d86480cf8f9df871021f951ec8"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/noise-timezone.md",
++      "sha256": "63cff6e878ce319d6ca6e6bb2a545e50b68f877d8f7f6c48d99bda5ad3bb1dfa"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/old-invitation.md",
++      "sha256": "cd3f4d0d0149fb1b240d26c7b39bdfca3eb9e9c7b80d96df9924a9c76f82dc83"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/other-billing.md",
++      "sha256": "f796e657b8582ef9bbd4a74f2868ddafa2c0639d72904fe96aaf654f7f6d67da"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/other-invitation.md",
++      "sha256": "a6764189e3aef5f81e69b6a1634aec2517de194f1cfd48e251ed3ccf9861f60a"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/other-noise.md",
++      "sha256": "77a42bf7585580c237b3476c1a5a5479a344555ebfb7e5829b53b4527b5250e5"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/other-private.md",
++      "sha256": "090f47037d91689817e8848586c054fbd271f27d3df8020b1b824d459bbb48a4"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/other-service.md",
++      "sha256": "74d3b72dfc1ef94b728038591c8639fba77197f0d3ffcab5f2daf1a2033d791b"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/private-audit.md",
++      "sha256": "27a6c3a54ff0bcc19260100b64bbd87b8cd0123889f7fe101624052100e10c35"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/private-operations.md",
++      "sha256": "a0a4085b91e8b51b2f1bf73a3b6772ea2aec6f618a455cb1068b443e3070de36"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/reference-history.md",
++      "sha256": "fad97519d9a55dafc26f9d009f60118ea3b497fafbef0c29081013acde691ca7"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/run-timeout.md",
++      "sha256": "414b3358873a7a85fdb6b83a45849e6ce82ab7b95bc7301a082576f241f28408"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/service-observation.md",
++      "sha256": "1770a6ddb4b524b7add447182ecf4aaa94238db00c9a8ef2da2f53a9aaafa24e"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/subscription-status.md",
++      "sha256": "ccf60e206a2f62114ee4681e0e3399a7d9a3cb0935ea6f369b8537f6e71e9f71"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/temporary-expiry.md",
++      "sha256": "24ff922d93e5bfb111602d48f21601273e6c147100e1c76a41ee8e31bf9ebffa"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/temporary-seat-policy-v1.md",
++      "sha256": "8945cb9feee439a43a05106decec20d9d49b69e62d2ad9366da2fdca67ddda4b"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/unknown-fields.md",
++      "sha256": "d38cc170eb9a0082b60c6c5a4a3a377bc9c0c242cbaf17f566ce3079c1ac7e19"
++    },
++    {
++      "path": "apps/supportflow/knowledge/documents/upload-format.md",
++      "sha256": "8c796cd06fb135eb2529f5a02b21fc47b17b1734f4197a537a690d7ce0b7df9c"
++    },
++    {
++      "path": "apps/supportflow/agent/assets/deepseek-v41-tokenizer.json",
++      "sha256": "81f64d1248a68ce3663e07ab3ee48b851e5df0e32d27cb98e4c9a268151e8d99"
++    }
++  ],
++  "subsets": {
++    "Q_R": [
++      "SF-011",
++      "SF-012",
++      "SF-013",
++      "SF-014",
++      "SF-015",
++      "SF-016",
++      "SF-017",
++      "SF-018",
++      "SF-019",
++      "SF-020",
++      "SF-021",
++      "SF-022",
++      "SF-023",
++      "SF-024",
++      "SF-025",
++      "SF-026",
++      "SF-027",
++      "SF-028",
++      "SF-029"
++    ],
++    "Q_P": [
++      "SF-041",
++      "SF-042",
++      "SF-043",
++      "SF-045",
++      "SF-046",
++      "SF-047",
++      "SF-048",
++      "SF-049",
++      "SF-051",
++      "SF-052",
++      "SF-053",
++      "SF-054",
++      "SF-055",
++      "SF-056",
++      "SF-057",
++      "SF-059",
++      "SF-060",
++      "SF-090"
++    ],
++    "Q_I": [
++      "SF-073",
++      "SF-088",
++      "SF-090",
++      "SF-111",
++      "SF-112",
++      "SF-113",
++      "SF-114",
++      "SF-115",
++      "SF-116",
++      "SF-117",
++      "SF-118",
++      "SF-119",
++      "SF-120"
++    ]
++  },
++  "subset_decisions": {
++    "SF-011": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-012": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-013": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-014": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-015": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-016": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-017": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-018": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-019": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-020": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-021": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-022": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-023": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-024": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-025": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-026": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-027": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-028": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-029": {
++      "Q_R": "included: answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-030": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-041": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-042": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-043": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-044": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-045": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-046": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-047": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-048": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-049": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-050": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-051": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-052": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-053": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-054": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-055": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-056": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-057": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-058": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-059": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-060": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-071": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-072": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-073": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "included: exactly one target business commit required"
++    },
++    "SF-074": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-075": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-076": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-077": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-078": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-079": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-080": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-081": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-082": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-083": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-084": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-085": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-086": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-087": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-088": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "included: exactly one target business commit required"
++    },
++    "SF-089": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-090": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "included: ordinary diagnosis or final-confirmation workflow",
++      "Q_I": "included: exactly one target business commit required"
++    },
++    "SF-096": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-097": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-098": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-099": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-100": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-101": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-102": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-103": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-104": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-105": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "excluded: target must not commit"
++    },
++    "SF-111": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "included: exactly one target business commit required"
++    },
++    "SF-112": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "included: exactly one target business commit required"
++    },
++    "SF-113": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "included: exactly one target business commit required"
++    },
++    "SF-114": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "included: exactly one target business commit required"
++    },
++    "SF-115": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "included: exactly one target business commit required"
++    },
++    "SF-116": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "included: exactly one target business commit required"
++    },
++    "SF-117": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "included: exactly one target business commit required"
++    },
++    "SF-118": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "included: exactly one target business commit required"
++    },
++    "SF-119": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "included: exactly one target business commit required"
++    },
++    "SF-120": {
++      "Q_R": "excluded: not registered answerable knowledge query",
++      "Q_P": "excluded: knowledge-only, uncertainty, injected fault, rejection or permission control",
++      "Q_I": "included: exactly one target business commit required"
++    }
++  },
++  "repetitions": 3,
++  "schedule_seed": 20261115,
++  "request_concurrency": 1,
++  "worker_prefork": 2,
++  "arms": {
++    "H0": {
++      "scope": "all",
++      "graph": "bounded_tool_loop",
++      "schedule": "serial",
++      "context": "full",
++      "implementation": null
++    },
++    "H1-S0": {
++      "scope": "all",
++      "graph": "business_graph",
++      "schedule": "serial",
++      "context": "full",
++      "implementation": null
++    },
++    "H1-S1": {
++      "scope": "Q_P",
++      "graph": "business_graph",
++      "schedule": "independent_read_parallel_2",
++      "context": "compact",
++      "implementation": null
++    }
++  },
++  "common": {
++    "provider": "deepseek",
++    "requested_model": "deepseek-flash",
++    "temperature": 0,
++    "thinking": "disabled",
++    "max_output_tokens": 512,
++    "max_model_calls_per_run": 8,
++    "tool_round_limit": 10,
++    "execution_contract_version": 2,
++    "processing_seconds": 90,
++    "case_wall_seconds": 180,
++    "application_cache": "off",
++    "provider_cache": "record_observed_cached_tokens",
++    "retrieval": "hybrid_rrf",
++    "vector_k": 20,
++    "lexical_k": 20,
++    "rrf_constant": 60,
++    "final_k": 5,
++    "max_batch_provider_calls": null,
++    "max_batch_tokens": null,
++    "max_batch_cost": null,
++    "price": null,
++    "producer_window_seconds": 1800,
++    "drain_seconds": 180,
++    "tools": "recorded_external_github; real isolated internal reads and writes",
++    "security": "same_policy_approval_and_executor_all_arms",
++    "max_input_tokens": 8192
++  },
++  "counts": {
++    "business_cases": 80,
++    "hp_units": 534,
++    "retrieval_units": 38,
++    "reliability_units": 39
++  },
++  "runtime_prerequisites": {
++    "native_case_selfchecks": null,
++    "independent_business_scorer": null,
++    "arm_dev_calibration": null,
++    "actual_environment": null,
++    "runtime_window": null
++  },
++  "latency_publication": {
++    "minimum_common_cases": 20,
++    "minimum_samples": 40,
++    "algorithm": "nearest_rank",
++    "quality_scope": "entire_Q_P_first",
++    "current_max_cases": 18
++  },
++  "failure_policy": {
++    "missing_units": "not_run; never remove from denominator",
++    "observed_failure": "retain; never overwrite",
++    "dataset_correction": "new manifest; invalidate paired arms together",
++    "tuning_after_exposure": "relabel as seen regression"
++  },
++  "actual_model_runs": 0,
++  "formal_results": [],
++  "supersedes": {
++    "path": "evals/registrations/supportflow/quality-holdout-v39.json",
++    "sha256": "a2a574e8751a17d70676128713ba2e75c41f65391be18c602c24ecbfd5473305"
++  },
++  "source_refresh_note": "Lock the case-bound timeout and external incident diagnosis route. Preserve frozen v9 source, materials and parameters for original official results.",
++  "development_only_arm_bindings": {
++    "formal_activation": false,
++    "sources": [
++      {
++        "path": "artifacts/iterations/SF-I001/SF-B350-exact-h0-registered/seal.json",
++        "sha256": "c0b48cc6b819eab389e4514ff08447610f09c46f0ac3daebb3a63604495259f3"
++      },
++      {
++        "path": "artifacts/iterations/SF-I001/SF-B351-exact-s0/seal.json",
++        "sha256": "4bbb5d0ef3877ffd01d6201afb9a6b8a12265eea659fb5ceea245f7e1d5da255"
++      },
++      {
++        "path": "artifacts/iterations/SF-I001/SF-B352-exact-s1/seal.json",
++        "sha256": "78be5546f44096339c698ee688591af5ed3234064ad80fc97f7e6606a5ad1e3a"
++      }
++    ],
++    "common_contract": {
++      "path": "evals/fixtures/supportflow/quality/arm-binding-v2.json",
++      "sha256": "029b72dbafc2091317012cd807a9879e3e1ec107c6538f9d0e393ad50e73458d"
++    },
++    "boundary": "All three dev five-case bindings verified with exact full-request token count. Not full-category formal calibration or holdout native selfchecks."
++  },
++  "material_amendment": {
++    "id": "SF-087-cancel-before-customer-citation-v1",
++    "authorization": {
++      "path": "artifacts/iterations/SF-I001/development-notes/SF087-authorized-amendment.md",
++      "sha256": "4e681b43a23a023bf762579c3a66628d50930ac5a9dc9f0481d30bbf0ae3b02f"
++    }
++  }
++}
+diff --git a/tests/supportflow/test_diagnosis_dev.py b/tests/supportflow/test_diagnosis_dev.py
+index a27a0f7fb1539d4a602bde2108f9c939c6e2da80..eaf822fe38ba0e62e1412b8c008511efe1f9adf3 100644
+--- a/tests/supportflow/test_diagnosis_dev.py
++++ b/tests/supportflow/test_diagnosis_dev.py
+@@ -27,6 +27,19 @@ from test_knowledge_answers import bundle as capacity_bundle
+ 
+ 
+ class DiagnosisDevControls(unittest.TestCase):
++    def test_bound_timeout_and_external_report_are_a_diagnosis(self):
++        route = diagnosis_routing.resolve_customer_invitation_intent
++        knowledge = {"intent": "knowledge_question", "knowledge_topic": "service_unknown",
++                     "invitation_email": None}
++        run = {"customer_id": "cus-a", "config_snapshot": {"diagnosis_routing_contract_version": 1},
++               "confirmed_fields": {"invitation_email": "USER@example.com"},
++               "message": "该客户的服务状态工具仍超时，外部报告提到一次故障，请保留不确定性。"}
++        self.assertEqual(route(run, knowledge), {"intent": "invitation_diagnosis", "knowledge_topic": None,
++                                               "invitation_email": "user@example.com"})
++        self.assertEqual(route({**run, "customer_id": None}, knowledge), knowledge)
++        self.assertEqual(route({**run, "message": "如果状态工具超时且外部Issue提到故障，一般应怎么解释？"},
++                               knowledge), knowledge)
++
+     def test_nine_frozen_business_facts_against_product_rules(self):
+         _, source, gold, _ = host.registration(ROOT)
+         for cid, case in source["cases"].items():
+@@ -88,13 +101,15 @@ class DiagnosisDevControls(unittest.TestCase):
+                          {"intent": "invitation_diagnosis", "knowledge_topic": None, "invitation_email": None})
+         for message in ("这位客户的邀请记录的到期时间字段不全，帮忙核对。",
+                         "该客户的允许域名策略缺失，请交接。",
+-                        "帮该客户核查旧邀请记录对应的当前有效邀请。"):
++                        "帮该客户核查旧邀请记录对应的当前有效邀请。",
++                        "该客户采用了子域名邮箱且策略许可子域，请核实。"):
+             with self.subTest(message=message):
+                 self.assertEqual(route({**incident, "message": message}, knowledge)["intent"],
+                                  "invitation_diagnosis")
+         for skip in ({"customer_id": None}, {"config_snapshot": {}},
+                      {"message": "一般来说，邀请刚好到期适用什么规则？"},
+                      {"message": "如果允许域名策略缺失，应该怎么处理？"},
++                     {"message": "如果用子域邮箱且规则允许子域，应该怎么处理？"},
+                      {"message": "邀请刚好到期，我只想确认剩余席位。"}):
+             with self.subTest(skip=skip):
+                 self.assertEqual(route({**incident, **skip}, knowledge), knowledge)
+diff --git a/tests/supportflow/test_formal_ai_review.py b/tests/supportflow/test_formal_ai_review.py
+index 2df19c5a7bc654200197e1b952121a8cb93471ec..b99e3ef7dfbf7f5c2e8f1a7c71b62c51effc9f8a 100644
+--- a/tests/supportflow/test_formal_ai_review.py
++++ b/tests/supportflow/test_formal_ai_review.py
+@@ -7,6 +7,90 @@ ROOT=Path(__file__).resolve().parents[2];sys.path[:0]=[str(Path(__file__).resolv
+ import formal_ai_review as reviewer
+ from formal_ai_review import validate_judgment
+ class ReviewControls(unittest.TestCase):
++ def test_expiry_review_uses_scanner_and_never_treats_wait_as_approval(self):
++  item={'case_id':'SF-072','target_run_id':'target','clock_controls':[
++      {'index':0,'operation':'scan_expiry','proof':{'scanner':{'run_id':'target','outcome':'wait_expired'}}}]}
++  final={'run_id':'target','status':'expired'}
++  values={'ttl':900,'0.before_pending':'awaiting_approval','0.scanner':['target','wait_expired'],
++          '0.scanner_record':True,'0.expired':'expired','0.no_business_write':{},
++          'closed.approvals':['expired'],'closed.actions':['expired'],'no_dispatch':[]}
++  rows=[{'assertion_id':'SF-072.business.SF-072.clock.'+name,'actual':value,'passed':True}
++        for name,value in values.items()]
++  scope, proof=reviewer.approval_expiry_measurements(item,final,rows)
++  self.assertEqual('approval_expired_without_authorization',scope)
++  self.assertEqual(('awaiting_approval','expired'),(proof['before_scan'],proof['after_scan']))
++  self.assertEqual(0,proof['dispatch_authorization_and_dispatch_count'])
++  self.assertNotIn('target',json.dumps(proof))
++  self.assertIsNone(reviewer.approval_expiry_measurements(item,{'run_id':'target','status':'succeeded'},rows))
++
++ def test_subscription_change_requires_binding_and_preserves_old_command(self):
++  proof={'run_id':'target','before':{'business_version':7},'after':{'business_version':8}}
++  item={'case_id':'SF-078','target_run_id':'target','subscription_controls':[proof]}
++  final={'run_id':'target','status':'handoff'}
++  values={'control_sql_proof':proof,'pending_before':'awaiting_approval','old_command':[7,10,3],
++          'refresh_version':8,'immutable_proposal':[],'approved':['approved','approve','exclude-me'],
++          'terminal':['handoff','BUSINESS_VERSION_CHANGED',None,'none'],'closed_action':'cancelled',
++          'no_dispatch':[],'zero_agent_delta':{}}
++  rows=[{'assertion_id':'SF-078.subscription.'+name,'actual':value,'passed':True}
++        for name,value in values.items()]
++  scope, measured=reviewer.subscription_change_measurements(item,final,rows)
++  self.assertEqual('subscription_version_invalidates_proposal',scope)
++  self.assertEqual((7,8),(measured['proposal_version'],measured['refreshed_version']))
++  self.assertEqual(0,measured['dispatch_authorizations_and_dispatches'])
++  self.assertTrue(measured['no_agent_business_change'])
++  self.assertNotIn('exclude-me',json.dumps(measured))
++  self.assertIsNone(reviewer.subscription_change_measurements(item,{'run_id':'other'},rows))
++  rows[-1]['passed']=False
++  self.assertIsNone(reviewer.subscription_change_measurements(item,final,rows))
++
++ def test_refusal_projects_no_customer_bound_before_or_after(self):
++  row={'run_id':'target','confirmed_fields':{}}
++  before={'runs':[row], 'pending_inputs':[{'required_fields':['customer_id']}],
++          'run_tool_observations':[], 'proposals':[], 'actions':[]}
++  after=deepcopy(before)
++  item={'case_id':'SF-089', 'target_run_id':'target', 'reply_control':{'operation':'reply'},
++        'phases':[{'name':'reply_control_before','app':before},{'name':'final','app':after}]}
++  final={'run_id':'target','status':'handoff',
++         'result':{'resolution_code':'INPUT_DECLINED','reply_text':'Refused; handed off.'}}
++  values={'immutable_identity':'target','no_customer_guess':None,'no_guess':{},
++          'no_answer_fabricated':[None]*4,'no_new.run_tool_observations':[],
++          'no_new.proposals':[],'no_new.actions':[],'refusal_statuses':[202,202,409],'stopped_explanation':True}
++  rows=[{'assertion_id':'SF-089.reply.'+name,'actual':value,'passed':True}
++        for name,value in values.items()]
++  scope, proof=reviewer.refusal_measurements(item,final,rows)
++  self.assertEqual('refused_customer_clarification',scope)
++  self.assertTrue(proof['customer_confirmation_required'])
++  self.assertFalse(proof['customer_confirmed_before_refusal'])
++  self.assertFalse(proof['customer_confirmed_after_refusal'])
++  self.assertFalse(proof['final_answer_identifies_customer'])
++  self.assertEqual(0,proof['new_action_count'])
++  self.assertEqual(202,proof['refusal_http_status'])
++  self.assertNotIn('target',json.dumps(proof))
++  after['runs'][0]['run_id']='other'
++  self.assertIsNone(reviewer.refusal_measurements(item,final,rows))
++
++ def test_policy_publication_projects_bound_and_passing_measurements(self):
++  item={'case_id':'SF-077','target_run_id':'target',
++        'integrity_control':{'policy_before':[], 'policy_after':[]}}
++  final={'run_id':'target'}
++  values={'policy_initial':[{'policy_version':'v1','id':'exclude-me'}],
++          'policy_delta':[{'policy_version':'v2'}], 'immutable':{'id':'exclude-me'},
++          'proposal_parameters':[10,3], 'approved':['approved','exclude-me'],
++          'generation_advances':True, 'terminal':['handoff','POLICY_INVALID','none'],
++          'no_authorization':[], 'no_dispatch':[], 'no_grant_http':[], 'zero_agent_write':{}}
++  rows=[{'assertion_id':'SF-077.integrity.'+name,'actual':actual,'passed':True}
++        for name,actual in values.items()]
++  scope, proof=reviewer.policy_publication_measurements(item,final,rows)
++  self.assertEqual('published_policy_invalidates_approval',scope)
++  self.assertEqual(('v1','v2','POLICY_INVALID'),(proof['policy_version_before'],
++                   proof['policy_version_after'],proof['terminal_reason']))
++  self.assertEqual({'seats':10,'days':3},proof['approved_parameters'])
++  self.assertEqual(0,proof['downstream_grant_post_count'])
++  self.assertNotIn('exclude-me',json.dumps(proof))
++  self.assertIsNone(reviewer.policy_publication_measurements(item,{'run_id':'other'},rows))
++  rows[-1]['passed']=False
++  self.assertIsNone(reviewer.policy_publication_measurements(item,final,rows))
++
+  def test_competing_run_receipts_follow_their_action_owner(self):
+   prior={'action_id':'prior','seats':1,'before_version':6,'after_version':7}
+   other_receipt={'action_id':'control-action','seats':5,'before_version':7,'after_version':8}
+diff --git a/tools/formal_ai_review.py b/tools/formal_ai_review.py
+index c5748c81916a966736ec2f4eba645302eeb5cc89..98f4087fd9567c31e7fe4a48355c660559d85250 100644
+--- a/tools/formal_ai_review.py
++++ b/tools/formal_ai_review.py
+@@ -406,8 +406,137 @@ def guarded_write_measurements(item, assertions):
+     return None
+ 
+ 
++def policy_publication_measurements(item, final, assertions):
++    control = item.get('integrity_control') or {}
++    if not {'policy_before', 'policy_after'} <= control.keys():
++        return None
++    if not item.get('target_run_id') or final.get('run_id') != item['target_run_id']:
++        return None
++    prefix = f"{item['case_id']}.integrity."
++    facts = {row['assertion_id'].removeprefix(prefix): row for row in assertions
++             if row['assertion_id'].startswith(prefix)}
++    required = ('policy_initial', 'policy_delta', 'immutable', 'proposal_parameters', 'approved',
++                'generation_advances', 'terminal', 'no_authorization', 'no_dispatch', 'no_grant_http',
++                'zero_agent_write')
++    if not all(facts.get(name, {}).get('passed') is True for name in required):
++        return None
++    seats, days = facts['proposal_parameters']['actual']
++    old_policy, = facts['policy_initial']['actual']
++    new_policy, = facts['policy_delta']['actual']
++    return 'published_policy_invalidates_approval', {
++        'policy_version_before': old_policy['policy_version'],
++        'policy_version_after': new_policy['policy_version'],
++        'new_index_generation_active': facts['generation_advances']['actual'],
++        'approved_parameters': {'seats': seats, 'days': days},
++        'approval_status': facts['approved']['actual'][0],
++        'original_proposal_unchanged': facts['immutable']['passed'],
++        'terminal_reason': facts['terminal']['actual'][1],
++        'dispatch_authorization_count': len(facts['no_authorization']['actual']),
++        'dispatch_count': len(facts['no_dispatch']['actual']),
++        'downstream_grant_post_count': len(facts['no_grant_http']['actual']),
++        'business_state_unchanged_after_policy_publication': facts['zero_agent_write']['passed'],
++    }
++
++
++def refusal_measurements(item, final, assertions):
++    control = item.get('reply_control') or {}
++    run_id = item.get('target_run_id')
++    if not run_id or final.get('run_id') != run_id or control.get('operation') != 'reply':
++        return None
++    prefix = f"{item['case_id']}.reply."
++    facts = {row['assertion_id'].removeprefix(prefix): row for row in assertions
++             if row['assertion_id'].startswith(prefix)}
++    required = ('immutable_identity', 'no_customer_guess', 'no_guess', 'no_answer_fabricated',
++                'no_new.run_tool_observations', 'no_new.proposals', 'no_new.actions', 'refusal_statuses',
++                'stopped_explanation')
++    if not all(facts.get(name, {}).get('passed') is True for name in required):
++        return None
++    phases = {phase['name']: phase['app'] for phase in item['phases']}
++    before = phases['reply_control_before']
++    after = phases['final']
++    if any([row['run_id'] for row in phase['runs']] != [run_id] for phase in (before, after)):
++        return None
++    return 'refused_customer_clarification', {
++        'customer_confirmation_required': any('customer_id' in row['required_fields']
++                                              for row in before['pending_inputs']),
++        'refusal_http_status': facts['refusal_statuses']['actual'][0],
++        'terminal_status': final['status'],
++        'terminal_reason': final['result']['resolution_code'],
++        'customer_confirmed_before_refusal': bool(before['runs'][0]['confirmed_fields'].get('customer_id')),
++        'customer_confirmed_after_refusal': bool(after['runs'][0]['confirmed_fields'].get('customer_id')),
++        'final_answer_identifies_customer': facts['no_customer_guess']['actual'] is not None,
++        'new_tool_observation_count': len(after['run_tool_observations']) - len(before['run_tool_observations']),
++        'new_proposal_count': len(after['proposals']) - len(before['proposals']),
++        'new_action_count': len(after['actions']) - len(before['actions']),
++        'reply_text': final['result']['reply_text'],
++    }
++
++
++def subscription_change_measurements(item, final, assertions):
++    controls = item.get('subscription_controls') or []
++    run_id = item.get('target_run_id')
++    if len(controls) != 1 or not run_id or final.get('run_id') != run_id or controls[0].get('run_id') != run_id:
++        return None
++    prefix = f"{item['case_id']}.subscription."
++    facts = {row['assertion_id'].removeprefix(prefix): row for row in assertions
++             if row['assertion_id'].startswith(prefix)}
++    required = ('control_sql_proof', 'pending_before', 'old_command', 'refresh_version', 'immutable_proposal',
++                'approved', 'terminal', 'closed_action', 'no_dispatch', 'zero_agent_delta')
++    if not all(facts.get(name, {}).get('passed') is True for name in required):
++        return None
++    control = facts['control_sql_proof']['actual']
++    if control != controls[0]:
++        return None
++    version, seats, days = facts['old_command']['actual']
++    return 'subscription_version_invalidates_proposal', {
++        'run_status_during_independent_control': facts['pending_before']['actual'],
++        'version_before_control': control['before']['business_version'],
++        'version_after_control': control['after']['business_version'],
++        'proposal_version': version,
++        'proposal_parameters': {'seats': seats, 'days': days},
++        'original_proposal_unchanged': facts['immutable_proposal']['passed'],
++        'approval_status': facts['approved']['actual'][0],
++        'refreshed_version': facts['refresh_version']['actual'],
++        'terminal_reason': facts['terminal']['actual'][1],
++        'action_status': facts['closed_action']['actual'],
++        'dispatch_authorizations_and_dispatches': len(facts['no_dispatch']['actual']),
++        'no_agent_business_change': facts['zero_agent_delta']['passed'],
++    }
++
++
++def approval_expiry_measurements(item, final, assertions):
++    controls = item.get('clock_controls') or []
++    run_id = item.get('target_run_id')
++    if not controls or not run_id or final.get('run_id') != run_id or final.get('status') != 'expired':
++        return None
++    control = controls[-1]
++    if control.get('operation') != 'scan_expiry' or control['proof']['scanner']['run_id'] != run_id:
++        return None
++    prefix = f"{item['case_id']}.business.{item['case_id']}.clock."
++    facts = {row['assertion_id'].removeprefix(prefix): row for row in assertions
++             if row['assertion_id'].startswith(prefix)}
++    step = f"{control['index']}."
++    step_keys = ('before_pending', 'scanner', 'scanner_record', 'expired', 'no_business_write')
++    required = ('ttl', 'closed.approvals', 'closed.actions', 'no_dispatch', *(step+k for k in step_keys))
++    if not all(facts.get(name, {}).get('passed') is True for name in required):
++        return None
++    if facts[step+'scanner']['actual'] != [run_id, control['proof']['scanner']['outcome']]:
++        return None
++    return 'approval_expired_without_authorization', {
++        'proposal_ttl_seconds': facts['ttl']['actual'],
++        'before_scan': facts[step+'before_pending']['actual'],
++        'scanner_outcome': facts[step+'scanner']['actual'][1],
++        'after_scan': facts[step+'expired']['actual'],
++        'final_approval_statuses': facts['closed.approvals']['actual'],
++        'final_action_statuses': facts['closed.actions']['actual'],
++        'dispatch_authorization_and_dispatch_count': len(facts['no_dispatch']['actual']),
++        'no_business_write': facts[step+'no_business_write']['passed'],
++    }
++
++
+ def packet(root,pending_path,*,include_issue_evidence=True):
+     pending=read_reference(root,reference(root,pending_path))
++    version = pending.get('review_packet_version')
+     raw=read_reference(root,pending['observation']);score=read_reference(root,pending['independent_score'])
+     require(score['observation']==pending['observation'] and score['binding']==pending['binding'],'Unbound score')
+     gold=read_reference(root,score['gold']);cid=pending['binding']['case_id']
+@@ -436,12 +565,11 @@ def packet(root,pending_path,*,include_issue_evidence=True):
+             filter_evidence = recorded_issue_filter(item, final)
+             if filter_evidence is not None:
+                 actual['recorded_issue_filter'] = filter_evidence
+-        version = pending.get('review_packet_version')
+-        if version in (2, 3, 4, 5, 6, 7):
++        if version in range(2, 11):
+             approval_evidence = approval_review_evidence(item, final, version=version)
+             if approval_evidence is not None:
+                 actual['approval_authority'] = approval_evidence
+-        if version in (3, 4, 5, 6, 7):
++        if version in range(3, 11):
+             protected_approval = protected_approval_evidence(item)
+             if protected_approval is not None:
+                 actual['protected_approval'] = protected_approval
+@@ -456,16 +584,16 @@ def packet(root,pending_path,*,include_issue_evidence=True):
+         'independent_assertion_count':len(checks),
+         'independent_passed':bool(checks) and all(c['passed'] is True for c in checks),
+         'failed_assertions':[c for c in checks if c['passed'] is not True]}
+-    if pending.get('review_packet_version') in (2, 3, 4):
++    if version in (2, 3, 4):
+         value['question_scope'] = pending['question_scope']
+-    if pending.get('review_packet_version') in (5, 6, 7):
++    if version in range(5, 11):
+         bundle = read_reference(root, pending['review_input'])
+         require(bundle['formal_unit']['binding'] == pending['binding'] and
+                 bundle['formal_unit']['dispatch_intent'] == pending['dispatch_intent'], 'Unbound review input')
+         case = bundle['case']
+         procedure = case['category'] == 'knowledge' and any(word in case['request'] for word in ('如何', '怎么', '为什么'))
+         value['question_scope'] = 'knowledge_procedure' if procedure else 'case'
+-    if pending.get('review_packet_version') in (5, 6, 7) and actual:
++    if version in range(5, 11) and actual:
+         if 'protected_approval' in actual:
+             value.update(review_scope='protected_approval_decision',
+                          actual={'protected_approval': actual['protected_approval']})
+@@ -481,12 +609,20 @@ def packet(root,pending_path,*,include_issue_evidence=True):
+         parallel_claim = parallel_claim_measurements(item, checks)
+         if parallel_claim is not None:
+             value.update(review_scope='parallel_claim', actual={'parallel_claim': parallel_claim})
+-        if pending['review_packet_version'] in (6, 7):
++        if version in range(6, 11):
+             competing = competing_run_measurements(item, final)
+             if competing is not None:
+                 value.update(review_scope='competing_run', actual={'competing_run': competing})
+-        if pending['review_packet_version'] == 7 and value['independent_passed']:
++        if version in range(7, 11) and value['independent_passed']:
+             control = guarded_write_measurements(item, checks)
++            if version in (8, 9, 10) and control is None:
++                control = policy_publication_measurements(item, final, checks)
++            if version in (9, 10) and control is None:
++                control = refusal_measurements(item, final, checks)
++            if version == 10 and control is None:
++                control = subscription_change_measurements(item, final, checks)
++            if version == 10 and control is None:
++                control = approval_expiry_measurements(item, final, checks)
+             if control is not None:
+                 scope, measurement = control
+                 value.update(review_scope=scope, actual={scope: measurement})
+@@ -519,7 +655,7 @@ def review(root,pending_path,output,model):
+     system = SYSTEM
+     schema = SCHEMA
+     version = pending.get('review_packet_version')
+-    if version in (2, 3, 4, 5, 6, 7):
++    if version in range(2, 11):
+         count = len(value['requirements'])
+         system += REVIEW_V2_GUIDANCE
+         if version >= 3:
+@@ -528,6 +664,10 @@ def review(root,pending_path,output,model):
+             system += EXECUTION_REVIEW_GUIDANCE
+         if version >= 5 and value.get('review_scope'):
+             system += CONTROL_REVIEW_GUIDANCE
++        if version in (9, 10) and value.get('review_scope') == 'refused_customer_clarification':
++            system += (' For a requirement to avoid guessing a customer, assess customer confirmation '
++                       'and selection before and after the refusal. Do not infer a candidate search '
++                       'or require one unless the frozen requirement explicitly calls for it.')
+         system += f' The only valid fact indexes, in order, are {list(range(count))}. Keep each requirement intact.'
+         schema = deepcopy(SCHEMA)
+         schema['properties']['facts'].update(minItems=count,maxItems=count)
+diff --git a/tools/formal_unit_material.py b/tools/formal_unit_material.py
+index 0ec42a4c09ac1f4a1ecd256c0c5c746525be17c4..feeb2f3b2f0e7860d2fc8da57575d7b3b3333439 100644
+--- a/tools/formal_unit_material.py
++++ b/tools/formal_unit_material.py
+@@ -14,11 +14,14 @@ V9_FAILURE_RECHECK = 'evals/fixtures/supportflow/quality/v9-failure-recheck-v1.j
+ V9_REMAINING_SAMPLE = 'evals/fixtures/supportflow/quality/v9-remaining-100-v1.json'
+ V9_EARLIER_FOUR = 'evals/fixtures/supportflow/quality/v9-earlier-four-v1.json'
+ V9_CONTINUATION_REPAIR = 'evals/fixtures/supportflow/quality/v9-continuation-repair-v1.json'
++V9_AFTER_PENDING_REPAIR = 'evals/fixtures/supportflow/quality/v9-after-pending-repair-v1.json'
++V9_FINAL_TAIL_REPAIR = 'evals/fixtures/supportflow/quality/v9-final-tail-repair-v1.json'
+ 
+ 
+ def recheck_spec(root, experiment_id, unit_id):
+     for path in (RECHECK, STAGE1_RECHECK, STAGE2_ACCEPTANCE, V9_FAILURE_RECHECK,
+-                 V9_REMAINING_SAMPLE, V9_EARLIER_FOUR, V9_CONTINUATION_REPAIR):
++                 V9_REMAINING_SAMPLE, V9_EARLIER_FOUR, V9_CONTINUATION_REPAIR, V9_AFTER_PENDING_REPAIR,
++                 V9_FINAL_TAIL_REPAIR):
+         spec = json.loads((root / path).read_bytes())
+         unit_ids = spec['unit_ids'] if 'unit_ids' in spec else [spec['unit_id']]
+         if experiment_id.startswith(spec['experiment_prefix']) and unit_id in unit_ids:
+diff --git a/tools/formal_unit_result.py b/tools/formal_unit_result.py
+index 0e2a3e33ac5c1b3403bbe594cb09c5566133ebaa..6d9f745c06ca62336254aacddf4e6262342ca042 100644
+--- a/tools/formal_unit_result.py
++++ b/tools/formal_unit_result.py
+@@ -25,7 +25,8 @@ def bounded_checks(assess, name):
+ def collect(root,input_path,batch,directory,*,calibration=False):
+     from evidence_archive import verify_batch
+     from formal_case_scoring import assess_unit_directory
+-    from formal_unit_material import V9_CONTINUATION_REPAIR, recheck_spec
++    from formal_unit_material import (V9_AFTER_PENDING_REPAIR, V9_CONTINUATION_REPAIR,
++                                      V9_FINAL_TAIL_REPAIR, recheck_spec)
+     bundle=load_bundle(root,input_path)
+     expected_mode = 'dev_formal_path_calibration' if calibration else 'formal_native'
+     require(bundle['mode']==expected_mode,'Collection mode does not match input')
+@@ -74,8 +75,9 @@ def collect(root,input_path,batch,directory,*,calibration=False):
+     pending={'state':'awaiting_ai_review','binding':binding,'run_id':state['run_id'],
+         'dispatch_intent':bundle['formal_unit']['dispatch_intent'],'observation':score['observation'],
+         'independent_score':reference(root,directory/'score.json'),'redispatch_allowed':False}
+-    repair_packet = calibration and recheck_spec(root, binding['experiment_id'], binding['unit_id']) == V9_CONTINUATION_REPAIR
+-    pending.update(review_packet_version=7 if repair_packet else 6, review_input=reference(root,input_path))
++    scope = recheck_spec(root, binding['experiment_id'], binding['unit_id']) if calibration else None
++    version = {V9_CONTINUATION_REPAIR: 7, V9_AFTER_PENDING_REPAIR: 9, V9_FINAL_TAIL_REPAIR: 10}.get(scope, 6)
++    pending.update(review_packet_version=version, review_input=reference(root,input_path))
+     write_exclusive(directory/'pending-review.json',pending)
+     return pending
+ 
+diff --git a/tools/holdout_registration.py b/tools/holdout_registration.py
+index d4eb31889b4188efd821c3c1a9129afe9c2e92ab..44ba8dc677e7a2c54ef8231319725982b02bd34c 100644
+--- a/tools/holdout_registration.py
++++ b/tools/holdout_registration.py
+@@ -14,7 +14,7 @@ from pathlib import Path
+ import sys
+ 
+ ROOT = Path(__file__).resolve().parents[1]
+-REGISTRATION = 'evals/registrations/supportflow/quality-holdout-v38.json'
++REGISTRATION = 'evals/registrations/supportflow/quality-holdout-v40.json'
+ 
+ 
+ REFRESH_FIELDS={'registration_id','locked_product_sources','locked_dependencies','supersedes','source_refresh_note','development_only_arm_bindings','material_amendment'}

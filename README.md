@@ -48,6 +48,6 @@ pwsh -NoProfile -File tools/build-spring-sandbox.ps1
 
 [Java 实现](apps/supportflow/spring-sandbox) · [Java Compose](deploy/supportflow/compose.spring-java.yaml) · [回执对账](apps/supportflow/jobs/grant_reconciliation.py)
 
-本快照对应开发仓提交 `5d55ea35c873bf99d34211024cc20e8a052347f8`，含应用、依赖锁、启动夹具和可独立运行的 Java 与前端测试。[验收范围、版本与证据批次](docs/verification.md)
+本快照对应开发仓提交 `9116de776e791f4b1bc2a109805088ec9a5be61f`，含运行源码、依赖锁、启动夹具和可独立运行的 Java 与前端测试。
 
-[v9 失败修复与逐项复验摘要](docs/verification.md#v9-失败与错误复验)
+原版 v9 在冻结源码上完成 534 项正式评测，404 项通过、102 项失败、28 项执行错误。末段 19 项失败在修复后均复验通过。当前源码的 1,750 项 Python 离线全量回归全部通过。各版本与证据范围见[验收与复现说明](docs/verification.md)。
