@@ -1,0 +1,2 @@
+# Official PyPI Windows x64 wheel; installs into the project bootstrap directory.
+uv==0.13.7 --hash=sha256:2835e2ab397d0db86323b9975dce75ecd76aa9cfa0d6a2aea84734aae7f8c9b3

@@ -4,7 +4,8 @@
 
 | 范围 | 原开发仓受测提交与批次 | 结果 |
 | --- | --- | --- |
-| 最新开发仓全量回归 | `d5899f82` · `SF-B1795165119768-latest-full-regression` | Python 1,745 项、Node 50 项、Java 6 项通过，零失败、错误或跳过。TypeScript／Vite 构建和 7 条 Compose 配置断言通过。Vite 保留大分包告警。 |
+| 评测页发布版本的 Python 离线回归 | `8cb9a34d` · `SF-B14869-sf-ri-publication-final-offline` | 开发工作区运行 1,752 项，全部通过。较早的 B14867 批次运行 1,722 项，记录 17 项错误，原记录保留。 |
+| Java 联调版本的全量回归 | `d5899f82` · `SF-B1795165119768-latest-full-regression` | Python 1,745 项、Node 50 项、Java 6 项通过，零失败、错误或跳过。TypeScript／Vite 构建和 7 条 Compose 配置断言通过。Vite 保留大分包告警。 |
 | Java HTTP／PostgreSQL | `d5899f82` · `SF-B1795165406367-spring-smoke-regression-contracts` | 21 个用例、183 条断言通过。8 个同动作同参数请求产生一份持久回执。事务内故障回滚。 |
 | 工作台原生回归 | `d5899f82` · `SF-B1795165406367-spring-workbench-regression-*` | 7 个用例、126 条断言通过。浏览器诊断与审批、旧版本零派发、三轮提交后丢响应、默认 Python 对照及 Java 同卷升级通过。原生回归使用脚本模型，真实提供方调用 0 次。 |
 | 真实 DeepSeek Java 工作台演示 | `4591cb1a` 及批次已绑定的验证脚本 · `SF-B1795164690877-spring-workbench-live` | 1 次已见诊断和 1 次明确授予。诊断的两次真实 DeepSeek 请求均成功，浏览器打开引用。独立 SQL 核对批准后 10 席、3 天、版本 7→8 和唯一回执。 |

@@ -1,8 +1,14 @@
 # SupportFlow｜SaaS 工单受控写操作 Agent
 
-SupportFlow 是面向模拟双租户 SaaS 的客服工作台。客服从工单查邀请、订阅与服务事实，查看带版本和行号的知识引用。临时席位授予需主管批准具体提案；执行前重新核对权限和业务版本，提交后按回执对账。
+当客户说「同事收到了邀请，为什么还是加不进来」，客服可以在 SupportFlow 工单中核对邀请状态、域名策略与剩余席位，并打开诊断引用，查看当时使用的政策版本和原文行号。这个工作台运行在模拟双租户 SaaS 数据上。
 
-Python · FastAPI · LangGraph · PostgreSQL / pgvector · Celery / Redis · React / TypeScript · Spring Boot（可选业务服务）
+如果需要临时扩容，客服在当前工单中明确席位数和有效期，另一位主管在独立会话中审批。授予临时席位是系统唯一的业务写动作。工作台会显示执行进度与回执，客服可以追查谁批准了哪些参数、订阅版本如何变化，以及响应丢失后实际是否已经生效。
+
+| 从一张工单看实现 | 代码入口 |
+| --- | --- |
+| React 工作台提交请求，FastAPI 处理会话和权限。运行进度通过 SSE 推送，断线后按事件游标续读。 | [工作台](apps/supportflow/web/product) · [API](apps/supportflow/api) · [事件客户端](apps/supportflow/web/product/event_client.ts) |
+| Python / LangGraph 编排诊断，从业务工具读取事实，在 PostgreSQL / pgvector 中检索有权读取的知识。提案由代码核验政策和参数。 | [Agent](apps/supportflow/agent) · [检索](apps/supportflow/retrieval/service.py) · [提案规则](apps/supportflow/domain/grant_policy.py) |
+| 主管批准后，Celery worker 在写入前重新核对权限与业务版本。可选的 Spring Boot 服务在自己的 PostgreSQL 事务中更新订阅并写入回执。若写请求的响应丢失，Python 按原动作查询回执并核对订阅。 | [派发](apps/supportflow/jobs/approval_dispatch.py) · [Java 业务服务](apps/supportflow/spring-sandbox) · [对账](apps/supportflow/jobs/grant_reconciliation.py) |
 
 ## 快速启动
 
@@ -57,6 +63,10 @@ pwsh -NoProfile -File tools/build-spring-sandbox.ps1
 
 [Java 实现](apps/supportflow/spring-sandbox) · [Java Compose](deploy/supportflow/compose.spring-java.yaml) · [回执对账](apps/supportflow/jobs/grant_reconciliation.py)
 
-本轮评测发布对应开发仓提交 `8cb9a34d8771fb671357a3f9396d39fc57d2ff98`。运行快照，含运行源码、依赖锁、启动夹具和可独立运行的 Java 与前端测试。
+真实 DeepSeek 与 Java 联调演示中，客服完成一次已见诊断、打开知识引用，再发起一次明确授予。独立 SQL 核验了批准后增加 10 席、有效期 3 天、订阅版本由 7 变为 8，并且只产生一份回执。脚本模型下的故障回归另做了三轮提交后丢响应实验。[演示与回归批次](docs/verification.md)
 
-原版 v9 在冻结源码上完成 534 项正式评测，404 项通过、102 项失败、28 项执行错误。末段 19 项失败在修复后均复验通过。采集提交 `76cdbfb6` 的 B14865 Python 离线回归 1,750 项通过。各版本与证据范围见[验收与复现说明](docs/verification.md)。
+## 版本与验证范围
+
+本仓库提供对应开发提交 `8cb9a34d` 的运行快照，含运行源码、依赖锁、演示夹具、前端与 Java 测试。该开发版本的 B14869 批次通过了 1,752 项 Python 离线测试。完整 Python 测试集与原始运行档案保存在开发工作区。[版本与验收记录](docs/verification.md)
+
+原版 v9 在冻结提交 `d4e82ee` 上登记了 534 个正式单元，404 项通过、102 项失败、28 项执行错误。后续修复复验单独登记，正式分母和原始结果均保留。[逐项正式结果](docs/verification/v9-final.json)

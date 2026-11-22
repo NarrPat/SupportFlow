@@ -2,6 +2,7 @@
 .cache/
 .venv/
 .local/
+/汇总内容/
 .env
 .env.*
 !.env.example
