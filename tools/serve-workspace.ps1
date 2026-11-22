@@ -45,6 +45,7 @@ if ($WithGitHubIssues) {
 }
 $filter = "label=com.docker.compose.project=$project"
 $oldJavaSecrets = $env:SF_JAVA_SECRETS_DIR
+$oldReportDirectory = $env:SF_EVALUATION_REPORTS_DIR
 $result = @{failure = $null}
 
 function Invoke-Compose([string[]]$Arguments) {
@@ -66,6 +67,9 @@ function Observe-ProposalPhase([string]$Phase) {
 function Show-Workspace {
     # Only down after preflight has established exclusive ownership of the stack.
     try {
+        if (!$env:SF_EVALUATION_REPORTS_DIR -and !(Test-Path -LiteralPath "$deploy/published-reports/reports.json")) {
+            $env:SF_EVALUATION_REPORTS_DIR = './published-reports/demo'
+        }
         & "$deploy/verify-runtime.ps1" -PreflightOnly -Project $project
         $networks = @(docker network ls -q --filter $filter)
         if ($LASTEXITCODE -or $networks.Count) { throw "The demo requires a clean $project network boundary." }
@@ -151,5 +155,8 @@ try { if (Test-Path -LiteralPath 'F:\work_agent_proj') {
     & "$PSScriptRoot/with-runtime-window.ps1" -CoordinationDirectory 'F:\work_agent_proj\coordination' `
         -Purpose 'Time-limited SupportFlow ticket workspace' -Resources @("$project/18080 web, API, PostgreSQL; npm build", "Worker profile=$WithWorker; when enabled, Redis/Celery/DeepSeek with per-run 90s/8 calls/512 output cap", "Knowledge profile=$WithKnowledge; pinned local CPU embeddings and persistent knowledge volume", "Java profile=$WithJavaSandbox; when enabled, project-owned business PostgreSQL and Java build") `
         -MaxMinutes ($Minutes+15) -ComposeProject $project -Work { Show-Workspace }
-} else { Show-Workspace } } finally { $env:SF_JAVA_SECRETS_DIR = $oldJavaSecrets }
+} else { Show-Workspace } } finally {
+    $env:SF_JAVA_SECRETS_DIR = $oldJavaSecrets
+    $env:SF_EVALUATION_REPORTS_DIR = $oldReportDirectory
+}
 if ($result.failure) { throw $result.failure }

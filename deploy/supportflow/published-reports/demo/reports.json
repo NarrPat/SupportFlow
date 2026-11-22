@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "reports": [
+    {
+      "report_id": "sf-ri-original-retrieval",
+      "title": "原计划检索（38 个单元）",
+      "experiment_id": "sf-ri-original-plan-v1",
+      "generated_at": "2026-11-22T15:41:31.617979+00:00",
+      "scope": "19 道冻结的已见查询分别使用纯向量 R0 和向量＋BM25＋RRF 的 R1。复用 B14202 的 8 个单元，B14862 补齐 30 个单元，B14863 重建索引后复核全部 38 个。两次引用权限探测均拒绝越权读取。SF-025 在两种策略下均未命中。Hit@5 和找齐全部证据分别计量。",
+      "experiment_url": "https://github.com/gushalewo/SupportFlow/blob/main/docs/verification/sf-ri.md",
+      "baseline": null,
+      "metrics": [
+        {
+          "label": "检索单元核验",
+          "numerator": 38,
+          "denominator": 38
+        },
+        {
+          "label": "复用历史证据",
+          "numerator": 8,
+          "denominator": 38
+        },
+        {
+          "label": "补跑登记单元",
+          "numerator": 30,
+          "denominator": 38
+        },
+        {
+          "label": "重建索引后复核一致",
+          "numerator": 38,
+          "denominator": 38
+        },
+        {
+          "label": "纯向量 R0 Hit@5",
+          "numerator": 15,
+          "denominator": 19
+        },
+        {
+          "label": "混合检索 R1 Hit@5",
+          "numerator": 18,
+          "denominator": 19
+        },
+        {
+          "label": "纯向量 R0 找齐全部证据",
+          "numerator": 7,
+          "denominator": 19
+        },
+        {
+          "label": "混合检索 R1 找齐全部证据",
+          "numerator": 6,
+          "denominator": 19
+        }
+      ],
+      "failure_classes": [],
+      "tenant_id": "tenant_a",
+      "allowed_roles": [
+        "support",
+        "supervisor",
+        "admin"
+      ]
+    },
+    {
+      "report_id": "sf-ri-original-reliability",
+      "title": "原计划可靠性（39 个单元）",
+      "experiment_id": "sf-ri-original-plan-v1",
+      "generated_at": "2026-11-22T15:41:31.617979+00:00",
+      "scope": "沿用原 v9 的 H1-S0 隔离运行，13 个应提交一次的场景各三轮。独立核对 PostgreSQL 快照、回执和终态。36 轮成功，3 轮符合预期地在提交后取消，额外副作用 0 次。4 轮的首次审核拒绝记录已保留，均绑定原运行重审通过。",
+      "experiment_url": "https://github.com/gushalewo/SupportFlow/blob/main/docs/verification/sf-ri.md",
+      "baseline": null,
+      "metrics": [
+        {
+          "label": "可靠性单元核验",
+          "numerator": 39,
+          "denominator": 39
+        },
+        {
+          "label": "恰好一次业务提交",
+          "numerator": 39,
+          "denominator": 39
+        },
+        {
+          "label": "符合预期办结",
+          "numerator": 39,
+          "denominator": 39
+        },
+        {
+          "label": "发生重复业务变更的运行",
+          "numerator": 0,
+          "denominator": 39
+        },
+        {
+          "label": "漏执行的运行",
+          "numerator": 0,
+          "denominator": 39
+        },
+        {
+          "label": "业务提交次数无法核定的运行",
+          "numerator": 0,
+          "denominator": 39
+        }
+      ],
+      "failure_classes": [],
+      "tenant_id": "tenant_a",
+      "allowed_roles": [
+        "support",
+        "supervisor",
+        "admin"
+      ]
+    }
+  ]
+}

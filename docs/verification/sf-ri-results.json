@@ -1,0 +1,1498 @@
+{
+  "schema_version": 1,
+  "experiment_id": "sf-ri-original-plan-v1",
+  "archive_timestamp": "2026-11-22T15:41:31.617979+00:00",
+  "source_index": {
+    "path": "artifacts/iterations/SF-I001/development-notes/sf-ri-evidence-index.json",
+    "sha256": "f86a72c40cca73ccd55bbb4c37360bdbb8e2bd1c33f149176e9b6e6efe364910"
+  },
+  "source_ledgers": [
+    {
+      "path": "artifacts/iterations/SF-I001/development-notes/sf-ri-retrieval-final.json",
+      "sha256": "45a19282205be63e2689543e118db595fd52418f3cab68a5e41b4eeab0da6d96"
+    },
+    {
+      "path": "artifacts/iterations/SF-I001/development-notes/sf-ri-reliability-final.json",
+      "sha256": "f8516a72bfed3ece2ada63c3630985c4284069cde61211d502515af05a92d10a"
+    }
+  ],
+  "preserved_formal_report": {
+    "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-formal-0534.json",
+    "sha256": "3548ee1a54e7983a3dbeb9fbc877ac0ab50a75e76be742ce977cbe9cd4414c61"
+  },
+  "preserved_attempts": [
+    {
+      "path": "artifacts/iterations/SF-I001/SF-B14860-sf-r-original/seal.json",
+      "sha256": "0bf610dd406e8917481b6dc8e09e10e91ee1aca7d9a783907e35b2448399d96c"
+    },
+    {
+      "path": "artifacts/iterations/SF-I001/SF-B14861-sf-r-original/seal.json",
+      "sha256": "ff6724cc93bae31922a333b045530819ef42e0d3809adc51b370012c39a149d5"
+    },
+    {
+      "path": "artifacts/iterations/SF-I001/development-notes/sf-ri-retrieval-comparator-first.json",
+      "sha256": "a0f32bef5efd52cfbb00c7482f17d98732c1d8b65021569537583c9d80581790"
+    },
+    {
+      "path": "artifacts/iterations/SF-I001/development-notes/sf-ri-reliability-first.json",
+      "sha256": "afe639a67434766cee7c8c9273b96058cf2e3c7ae207d6ffb8cd53213b65370f"
+    },
+    {
+      "path": "artifacts/iterations/SF-I001/development-notes/sf-ri-reliability-before-review.json",
+      "sha256": "3f80fb57a78da2a1828f2d6aba1b01ee2e5201d9012da1fcb903e98a2c628095"
+    },
+    {
+      "path": "artifacts/iterations/SF-I001/development-notes/sf-ri-reliability-review/outcomes.json",
+      "sha256": "5be120ed686c914db5ba3a4aea0f88296d32ce00eda936640a5378926e596a94"
+    }
+  ],
+  "offline_verification": {
+    "path": "artifacts/iterations/SF-I001/SF-B14865-sf-ri-offline/seal.json",
+    "sha256": "f9bea413fe46b21b1574d9c19990be5b1f04e57d48aa0bc98606fd1da6faadb9"
+  },
+  "oracle_controls": {
+    "path": "artifacts/iterations/SF-I001/development-notes/sf-ri-oracle-controls-final.json",
+    "sha256": "1f2ab47c95f3a523b7a1153e2306fcfd0ff4d2ee94e4da65c92c2e3db3473427"
+  },
+  "retrieval": {
+    "summary": {
+      "planned": 38,
+      "mother_cases": 19,
+      "verified": 38,
+      "reused": 8,
+      "strategies": {
+        "R0": {
+          "queries": 19,
+          "hit_at_5": 15,
+          "all_gold_found": 7
+        },
+        "R1": {
+          "queries": 19,
+          "hit_at_5": 18,
+          "all_gold_found": 6
+        }
+      },
+      "paired_outcomes": {
+        "both_hit": 15,
+        "hybrid_only_hit": 3,
+        "both_missed": 1
+      }
+    },
+    "sources": [
+      {
+        "batch": "SF-B14202-stage3-retrieval-only",
+        "source_revision": "git:69f722079ab08d99d38533ebb54e6ee9839573e3",
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B14202-stage3-retrieval-only/seal.json",
+          "sha256": "bb2dd4da3666485d22e22585f09a922867a60e8fdd72766df0b4302ca7644210"
+        },
+        "score": {
+          "path": "artifacts/iterations/SF-I001/SF-B14202-stage3-retrieval-only/raw/software/supportflow/SF-T106/five_matrix_c2/stage3-hit-at-5.json",
+          "sha256": "d5b99599f900ad2c1401a6176add61791abd6e674f040150a0833160ea3c5b78"
+        }
+      },
+      {
+        "batch": "SF-B14862-sf-r-original",
+        "source_revision": "git:76cdbfb69f4b70f4bb59d5638e22458fac16d39d",
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B14862-sf-r-original/seal.json",
+          "sha256": "2aa3e340da3bdbb775a41b7d72416b6091ef4dd8463a5e859023e1b21886d0df"
+        },
+        "score": {
+          "path": "artifacts/iterations/SF-I001/SF-B14862-sf-r-original/raw/software/supportflow/SF-T106/five_matrix_c2/stage3-hit-at-5.json",
+          "sha256": "49668478f5c0c844ec3a60900d5e8615ddb5cdd1bb068da918513c6783c0cf6d"
+        }
+      },
+      {
+        "batch": "SF-B14863-sf-r-rebuild",
+        "source_revision": "git:76cdbfb69f4b70f4bb59d5638e22458fac16d39d",
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B14863-sf-r-rebuild/seal.json",
+          "sha256": "70567c62a725e55a69d61537c4979208bffd8c0339b7fa33909793d348f88679"
+        },
+        "score": {
+          "path": "artifacts/iterations/SF-I001/SF-B14863-sf-r-rebuild/raw/software/supportflow/SF-T106/five_matrix_c2/stage3-hit-at-5.json",
+          "sha256": "5510d99341ea3c24c04e7e2caa3956863f3fe27e7c853c309c51142c530c4c9c"
+        }
+      }
+    ],
+    "units": [
+      {
+        "unit_id": "SF-011-R0",
+        "case_id": "SF-011",
+        "strategy": "R0",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14202-stage3-retrieval-only",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": true
+      },
+      {
+        "unit_id": "SF-011-R1",
+        "case_id": "SF-011",
+        "strategy": "R1",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14202-stage3-retrieval-only",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": true
+      },
+      {
+        "unit_id": "SF-012-R1",
+        "case_id": "SF-012",
+        "strategy": "R1",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": true,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-012-R0",
+        "case_id": "SF-012",
+        "strategy": "R0",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": true,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-013-R0",
+        "case_id": "SF-013",
+        "strategy": "R0",
+        "status": "verified",
+        "hit_at_5": false,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-013-R1",
+        "case_id": "SF-013",
+        "strategy": "R1",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-014-R1",
+        "case_id": "SF-014",
+        "strategy": "R1",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-014-R0",
+        "case_id": "SF-014",
+        "strategy": "R0",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-015-R0",
+        "case_id": "SF-015",
+        "strategy": "R0",
+        "status": "verified",
+        "hit_at_5": false,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-015-R1",
+        "case_id": "SF-015",
+        "strategy": "R1",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-016-R1",
+        "case_id": "SF-016",
+        "strategy": "R1",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-016-R0",
+        "case_id": "SF-016",
+        "strategy": "R0",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-017-R1",
+        "case_id": "SF-017",
+        "strategy": "R1",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": true,
+        "primary_batch": "SF-B14202-stage3-retrieval-only",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": true
+      },
+      {
+        "unit_id": "SF-017-R0",
+        "case_id": "SF-017",
+        "strategy": "R0",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": true,
+        "primary_batch": "SF-B14202-stage3-retrieval-only",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": true
+      },
+      {
+        "unit_id": "SF-018-R1",
+        "case_id": "SF-018",
+        "strategy": "R1",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-018-R0",
+        "case_id": "SF-018",
+        "strategy": "R0",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-019-R0",
+        "case_id": "SF-019",
+        "strategy": "R0",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-019-R1",
+        "case_id": "SF-019",
+        "strategy": "R1",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-020-R1",
+        "case_id": "SF-020",
+        "strategy": "R1",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-020-R0",
+        "case_id": "SF-020",
+        "strategy": "R0",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-021-R0",
+        "case_id": "SF-021",
+        "strategy": "R0",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-021-R1",
+        "case_id": "SF-021",
+        "strategy": "R1",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-022-R1",
+        "case_id": "SF-022",
+        "strategy": "R1",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": true,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-022-R0",
+        "case_id": "SF-022",
+        "strategy": "R0",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": true,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-023-R0",
+        "case_id": "SF-023",
+        "strategy": "R0",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14202-stage3-retrieval-only",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": true
+      },
+      {
+        "unit_id": "SF-023-R1",
+        "case_id": "SF-023",
+        "strategy": "R1",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14202-stage3-retrieval-only",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": true
+      },
+      {
+        "unit_id": "SF-024-R1",
+        "case_id": "SF-024",
+        "strategy": "R1",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": true,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-024-R0",
+        "case_id": "SF-024",
+        "strategy": "R0",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": true,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-025-R0",
+        "case_id": "SF-025",
+        "strategy": "R0",
+        "status": "verified",
+        "hit_at_5": false,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-025-R1",
+        "case_id": "SF-025",
+        "strategy": "R1",
+        "status": "verified",
+        "hit_at_5": false,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-026-R1",
+        "case_id": "SF-026",
+        "strategy": "R1",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-026-R0",
+        "case_id": "SF-026",
+        "strategy": "R0",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": true,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-027-R0",
+        "case_id": "SF-027",
+        "strategy": "R0",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": true,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-027-R1",
+        "case_id": "SF-027",
+        "strategy": "R1",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": true,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-028-R1",
+        "case_id": "SF-028",
+        "strategy": "R1",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": true,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-028-R0",
+        "case_id": "SF-028",
+        "strategy": "R0",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": true,
+        "primary_batch": "SF-B14862-sf-r-original",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": false
+      },
+      {
+        "unit_id": "SF-029-R1",
+        "case_id": "SF-029",
+        "strategy": "R1",
+        "status": "verified",
+        "hit_at_5": true,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14202-stage3-retrieval-only",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": true
+      },
+      {
+        "unit_id": "SF-029-R0",
+        "case_id": "SF-029",
+        "strategy": "R0",
+        "status": "verified",
+        "hit_at_5": false,
+        "all_gold_found": false,
+        "primary_batch": "SF-B14202-stage3-retrieval-only",
+        "rebuild_batch": "SF-B14863-sf-r-rebuild",
+        "reused": true
+      }
+    ]
+  },
+  "reliability": {
+    "summary": {
+      "planned": 39,
+      "mother_cases": 13,
+      "counts": {
+        "passed": 39
+      },
+      "measured_commit_counts": 39,
+      "duplicate_runs": 0,
+      "recovery_completed": 39,
+      "zero_commit_observations": 0,
+      "unresolved_commit_counts": 0,
+      "extra_effects": 0
+    },
+    "source_revision": "d4e82ee548d16c9562692b4da604e87436822019",
+    "units": [
+      {
+        "unit_id": "SF-073-r1-H1-S0",
+        "case_id": "SF-073",
+        "repetition": 1,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13243-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13243-formal-unit/seal.json",
+          "sha256": "98621ac35e7e4f5e8d3781358a6f0d5601bfcb4ab9685a992f40dadba451fb75"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0243/collected/score.json",
+          "sha256": "a64cd04d364e7648bfae105bc3050d2149e74c6b58f5c5fd53b6c505c260aee9"
+        }
+      },
+      {
+        "unit_id": "SF-073-r2-H1-S0",
+        "case_id": "SF-073",
+        "repetition": 2,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13073-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13073-formal-unit/seal.json",
+          "sha256": "691ba7279a06b517f7359616d21e02b5340bb0702b41f499cfdc0265756aba19"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0073/collected/score.json",
+          "sha256": "8f5ca2926e7540933e6c877c62b735674d743353843fd416a0dee20159e46bb1"
+        }
+      },
+      {
+        "unit_id": "SF-073-r3-H1-S0",
+        "case_id": "SF-073",
+        "repetition": 3,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13263-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13263-formal-unit/seal.json",
+          "sha256": "35c49af1960aa9acf5618c420191ef83b76d204569675f79a89910d2f474479e"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0263/collected/score.json",
+          "sha256": "08afa282f2b2536bc845b5db6a569051cdcfea148bc54f2507c63378bee4e299"
+        }
+      },
+      {
+        "unit_id": "SF-088-r1-H1-S0",
+        "case_id": "SF-088",
+        "repetition": 1,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13355-formal-unit",
+        "terminal": "cancelled",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13355-formal-unit/seal.json",
+          "sha256": "0ee657d37e27e53a706845b25c315b9ec9dd53e728acadf1e31e372c99f3b74d"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0355/collected/score.json",
+          "sha256": "538381a7f7c33ff7ff40f8f4d0d0ce098f234cd790ae8eb0746e699d03cc4bcf"
+        }
+      },
+      {
+        "unit_id": "SF-088-r2-H1-S0",
+        "case_id": "SF-088",
+        "repetition": 2,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13069-formal-unit",
+        "terminal": "cancelled",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13069-formal-unit/seal.json",
+          "sha256": "8753dab034f1e6f9a4f500e0670d99e7f1b93cb48bd075a7081bf636cdf9b958"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0069/collected/score.json",
+          "sha256": "5cea548eda4735ae13c62c647672326fcab3cdca608cee6ec00dc137de1810ef"
+        }
+      },
+      {
+        "unit_id": "SF-088-r3-H1-S0",
+        "case_id": "SF-088",
+        "repetition": 3,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13427-formal-unit",
+        "terminal": "cancelled",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13427-formal-unit/seal.json",
+          "sha256": "83cf100c8fe9d294c7dee6d488d3e2a14d8631abdb2618fd05cd4d81ecc46af2"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0427/collected/score.json",
+          "sha256": "93e5c6a5408054781ae46452d4b7b26dc19d5f43d031fc282eb80e0141dab959"
+        }
+      },
+      {
+        "unit_id": "SF-090-r1-H1-S0",
+        "case_id": "SF-090",
+        "repetition": 1,
+        "status": "passed",
+        "original_status": "failed",
+        "batch": "SF-B13455-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13455-formal-unit/seal.json",
+          "sha256": "a14eb049ebbc58523cc66e83ac749c40b109cdf5a053ed1d0e57124f2a1dc786"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "rejected",
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0455/collected/score.json",
+          "sha256": "d29b874ab1cd9c41404ea784cf9b1c7bad1ec71f395437ebe3525ef05f87f93d"
+        }
+      },
+      {
+        "unit_id": "SF-090-r2-H1-S0",
+        "case_id": "SF-090",
+        "repetition": 2,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13269-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13269-formal-unit/seal.json",
+          "sha256": "608c2cb94f78261e86f4ba38c16974bbef7f88e206f2555b33418a60fcf10f1d"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0269/collected/score.json",
+          "sha256": "678f58ba81a3b047b3237ef4b4b4b72a6854c71d174c70b259a2675db7283ec3"
+        }
+      },
+      {
+        "unit_id": "SF-090-r3-H1-S0",
+        "case_id": "SF-090",
+        "repetition": 3,
+        "status": "passed",
+        "original_status": "failed",
+        "batch": "SF-B13117-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13117-formal-unit/seal.json",
+          "sha256": "01f2bb094d17f2f9d8f701071c462eeb21327f391b85dca4360ec503c19882da"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "rejected",
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0117/collected/score.json",
+          "sha256": "40c5b01f0f2bd4c28253a7e84c2d634b737d7690895823514279e372840c5d41"
+        }
+      },
+      {
+        "unit_id": "SF-111-r1-H1-S0",
+        "case_id": "SF-111",
+        "repetition": 1,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13266-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13266-formal-unit/seal.json",
+          "sha256": "22a337f8109f7c5a8b178be917b37e92dec9f9ed4a39733a260703dda245cd74"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0266/collected/score.json",
+          "sha256": "ffddef9a246fbabea3467eb714a9edc80ca525cf8c8cabd7f7d46a39e40cd259"
+        }
+      },
+      {
+        "unit_id": "SF-111-r2-H1-S0",
+        "case_id": "SF-111",
+        "repetition": 2,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13259-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13259-formal-unit/seal.json",
+          "sha256": "71e0da08003d941dd5df8b70d86bd996eddf71849313e0fd523cebc6eb3d261c"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0259/collected/score.json",
+          "sha256": "88bd4ee3902a6f1cf130cba0a714bfad772eedda7f9544b49a984efb111d07b3"
+        }
+      },
+      {
+        "unit_id": "SF-111-r3-H1-S0",
+        "case_id": "SF-111",
+        "repetition": 3,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13502-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13502-formal-unit/seal.json",
+          "sha256": "a5083fb13dd1fcbaf2b837c0bd68c175732ebf49a0eef9bbb64bba3f8cb59db3"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0502/collected/score.json",
+          "sha256": "9e9fc034b6ad65d7091a585fa72548b712c1f672c0081646018cb5400d849f78"
+        }
+      },
+      {
+        "unit_id": "SF-112-r1-H1-S0",
+        "case_id": "SF-112",
+        "repetition": 1,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13092-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13092-formal-unit/seal.json",
+          "sha256": "5acbc70ad48c6df61875ce1ef201c285eb0521569e42414ec22a569f5ceeefa0"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0092/collected/score.json",
+          "sha256": "7e8c7e04cd0e0dc056c62efe7edec451d24b40e723180407d56d16380b32995f"
+        }
+      },
+      {
+        "unit_id": "SF-112-r2-H1-S0",
+        "case_id": "SF-112",
+        "repetition": 2,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13077-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13077-formal-unit/seal.json",
+          "sha256": "42344cb847e31c8ac92a366ce1b8eed1fccb622468e15e05825c52a7b5610d0b"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0077/collected/score.json",
+          "sha256": "2cda7ba0c138cb00a2e978b0ba0489a53daf54b65ce1a36b705f2331c5f214f9"
+        }
+      },
+      {
+        "unit_id": "SF-112-r3-H1-S0",
+        "case_id": "SF-112",
+        "repetition": 3,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13110-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13110-formal-unit/seal.json",
+          "sha256": "be6aafdb9d0f682333b64a1454ca324ac6781b86cfbcc50e686ea0ee49bc44db"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0110/collected/score.json",
+          "sha256": "afd42536825d06634daa02bdefc2bb8f3934a7e06d638046daf5541bce1488b6"
+        }
+      },
+      {
+        "unit_id": "SF-113-r1-H1-S0",
+        "case_id": "SF-113",
+        "repetition": 1,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13095-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13095-formal-unit/seal.json",
+          "sha256": "0155800962338cec4d71571cd20def9e91c7048767a5a542fb98cadb4a228b9f"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0095/collected/score.json",
+          "sha256": "79cd5f8a5bed0c7e168689a95de4b89686dc6c6b151deafa8ac3e05ae1a35516"
+        }
+      },
+      {
+        "unit_id": "SF-113-r2-H1-S0",
+        "case_id": "SF-113",
+        "repetition": 2,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13136-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13136-formal-unit/seal.json",
+          "sha256": "2d5372dcac258870ea58828cd9f7a83fb46c51ce5a588fd88ee4df043ac1e94f"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0136/collected/score.json",
+          "sha256": "01eaa94aa09bb5fe06f1f6f9015cc42d47c0cd1d843ebd66214d9a3e8cb8233e"
+        }
+      },
+      {
+        "unit_id": "SF-113-r3-H1-S0",
+        "case_id": "SF-113",
+        "repetition": 3,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13246-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13246-formal-unit/seal.json",
+          "sha256": "42a6fd051da532e989af1df09fa984ed5eacb72b8308856d09ecfb5e062a00db"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0246/collected/score.json",
+          "sha256": "d360b2af31510018417c9f5f5b88a55ead7ef0421f8e9452a1c2fc78bc273ac4"
+        }
+      },
+      {
+        "unit_id": "SF-114-r1-H1-S0",
+        "case_id": "SF-114",
+        "repetition": 1,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13209-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13209-formal-unit/seal.json",
+          "sha256": "9eb8a5f5dde587fa3f94fe35a28e4eda80ebabd63ceca248925044b7ea5f0bcb"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0209/collected/score.json",
+          "sha256": "63b39d985df926248db6e7c3a64f9fa1e8e13e9416f35e18b1771e93220d3e67"
+        }
+      },
+      {
+        "unit_id": "SF-114-r2-H1-S0",
+        "case_id": "SF-114",
+        "repetition": 2,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13220-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13220-formal-unit/seal.json",
+          "sha256": "2800d68712477608a7d2529886643f621f54ee33fce31e9017882ac0687c98df"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0220/collected/score.json",
+          "sha256": "38539d3cf677e86b4fe82ee8b7430b88eba8dfab1f6c7ea0d656af2381330bcc"
+        }
+      },
+      {
+        "unit_id": "SF-114-r3-H1-S0",
+        "case_id": "SF-114",
+        "repetition": 3,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13277-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13277-formal-unit/seal.json",
+          "sha256": "1cf95790d9e184d6cc56de7353b16636c468493f0772afc3119216ce5a74adfd"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0277/collected/score.json",
+          "sha256": "78f8e61da62dba8d87dae0a0318e46ac05904483f779552a7345e3e3fef9e47a"
+        }
+      },
+      {
+        "unit_id": "SF-115-r1-H1-S0",
+        "case_id": "SF-115",
+        "repetition": 1,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13467-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13467-formal-unit/seal.json",
+          "sha256": "5423ba2296820ba324832397e4c7c3f5a0518b5d997646e8ba5bacf18eeadd34"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0467/collected/score.json",
+          "sha256": "ba73889a5130a67dfdd9684021e280ccf2e46568aa27f3806f5060ac918487ad"
+        }
+      },
+      {
+        "unit_id": "SF-115-r2-H1-S0",
+        "case_id": "SF-115",
+        "repetition": 2,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13477-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13477-formal-unit/seal.json",
+          "sha256": "bf69734ed15de5a55d4e632e7718a925c51d1d88068f405117120ab175ab1881"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0477/collected/score.json",
+          "sha256": "3fa0710220d8b34c64a17720b01806c9b9ce7ec08a8373f9b0e9b70d740933aa"
+        }
+      },
+      {
+        "unit_id": "SF-115-r3-H1-S0",
+        "case_id": "SF-115",
+        "repetition": 3,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13065-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13065-formal-unit/seal.json",
+          "sha256": "09e0c2353bf0cf6f20003a2f316e9522869ba5f75118818d0c94cf388861046c"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0065/collected/score.json",
+          "sha256": "69a1094887ddeefe400d5aeb38fa253413afb505c7a92d483c054babf7cdce8b"
+        }
+      },
+      {
+        "unit_id": "SF-116-r1-H1-S0",
+        "case_id": "SF-116",
+        "repetition": 1,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13488-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13488-formal-unit/seal.json",
+          "sha256": "dd8cfaaa8dfbceb899552d96b8105e9de99a616c7751f0860e382fb1e2392c8b"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0488/collected/score.json",
+          "sha256": "69b4b1fbd696896276b932207da0b8caa0a31af3c2b4b3abc395e7cf1bad0eff"
+        }
+      },
+      {
+        "unit_id": "SF-116-r2-H1-S0",
+        "case_id": "SF-116",
+        "repetition": 2,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13106-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13106-formal-unit/seal.json",
+          "sha256": "5b71356e99a7fc14036d7c51ab1669cb2c47e31544374f68347391f07abe8e52"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0106/collected/score.json",
+          "sha256": "e31242a0626055a6fe7455940480581eb868f47a7b10dcd4b8bc966e9a4c1b8d"
+        }
+      },
+      {
+        "unit_id": "SF-116-r3-H1-S0",
+        "case_id": "SF-116",
+        "repetition": 3,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13033-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13033-formal-unit/seal.json",
+          "sha256": "854f71ea79175acf1cd1a2dde1a5df10ddfe38cfe2e5d93791ceebdc75c758c8"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0033/collected/score.json",
+          "sha256": "11239666189c4b005cea75c07b970488263825a2afcc9484c46e74cc20395a8d"
+        }
+      },
+      {
+        "unit_id": "SF-117-r1-H1-S0",
+        "case_id": "SF-117",
+        "repetition": 1,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13449-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13449-formal-unit/seal.json",
+          "sha256": "d1f03c9ad80c995ac5b5e07aa12fa4122f19438c2115f3fcd1c4b26ef73ad843"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0449/collected/score.json",
+          "sha256": "dd2f2cbc94593f7cb5ed6df2e7c5ad210ca0b0f08ca8c71b8d033a17d8eab710"
+        }
+      },
+      {
+        "unit_id": "SF-117-r2-H1-S0",
+        "case_id": "SF-117",
+        "repetition": 2,
+        "status": "passed",
+        "original_status": "failed",
+        "batch": "SF-B13311-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13311-formal-unit/seal.json",
+          "sha256": "ea1b9cdf440a5a571c6e664f37ebec1fc2712756b911780b45cc4f12f37bfb4e"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "rejected",
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0311/collected/score.json",
+          "sha256": "61c14b87703fcad74fdcc890d00f32137547d46e0b6c8574599a36977ae274ad"
+        }
+      },
+      {
+        "unit_id": "SF-117-r3-H1-S0",
+        "case_id": "SF-117",
+        "repetition": 3,
+        "status": "passed",
+        "original_status": "failed",
+        "batch": "SF-B13470-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13470-formal-unit/seal.json",
+          "sha256": "42a10b5bd4a1eee21fde6361966b2ec170ec762a01664ab17d980f90a9e2fc16"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "rejected",
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0470/collected/score.json",
+          "sha256": "b992d198a28812acae8c4f75686626fa36aba0b8d344352f1b2abfd452947897"
+        }
+      },
+      {
+        "unit_id": "SF-118-r1-H1-S0",
+        "case_id": "SF-118",
+        "repetition": 1,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13055-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13055-formal-unit/seal.json",
+          "sha256": "20c51ceb3983b2c3b467dff5c05f6a1fbedb61c934276805b242fa2c22629e98"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0055/collected/score.json",
+          "sha256": "c4411603664cf2a3c695ad2298100cb4ed7c7828c3f099c889020b02e49616a8"
+        }
+      },
+      {
+        "unit_id": "SF-118-r2-H1-S0",
+        "case_id": "SF-118",
+        "repetition": 2,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13304-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13304-formal-unit/seal.json",
+          "sha256": "211187f05ad318490bd7b02a607172fc400d522258fcc38f81309977919d1141"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0304/collected/score.json",
+          "sha256": "6c37323b3d7c5959f4a65de78845ca4597320c045700a40f646065e0e1f654d1"
+        }
+      },
+      {
+        "unit_id": "SF-118-r3-H1-S0",
+        "case_id": "SF-118",
+        "repetition": 3,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13377-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13377-formal-unit/seal.json",
+          "sha256": "022b24485e6a6c0e72a609aaed71a13e81f5595d566ae75b3af2068e2670c369"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0377/collected/score.json",
+          "sha256": "ffd94fbb6e6df667db95f949bfc66a96ce6cb6816d866c113b53868cd3c0e1c0"
+        }
+      },
+      {
+        "unit_id": "SF-119-r1-H1-S0",
+        "case_id": "SF-119",
+        "repetition": 1,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13385-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13385-formal-unit/seal.json",
+          "sha256": "2a5c2d8d2f7c05f3df9234976f200e34ef84944bd2938840a7ade27c507bce11"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0385/collected/score.json",
+          "sha256": "7b58a142c54ae84eee3db53853ab293c245dca7ca4448c16ac44896d36db2e62"
+        }
+      },
+      {
+        "unit_id": "SF-119-r2-H1-S0",
+        "case_id": "SF-119",
+        "repetition": 2,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13336-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13336-formal-unit/seal.json",
+          "sha256": "5087c348935e510e8668dea354252bf3288d512fedf0ee7f4979cdee080992a7"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0336/collected/score.json",
+          "sha256": "a72c2bd8451fd34c260aa1a2f499e2947d776beea952a260b796c88f24f2fcd1"
+        }
+      },
+      {
+        "unit_id": "SF-119-r3-H1-S0",
+        "case_id": "SF-119",
+        "repetition": 3,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13161-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13161-formal-unit/seal.json",
+          "sha256": "6efa6c869959287847d0b1fe4ee3313944a01605021aab1bc07a6588fdb7e002"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/formal-native-20261117-v9-work/0161/collected/score.json",
+          "sha256": "a05f4b1301c310bf4831e067c32d8be0130f73b5502bad458528e50bf8e1712d"
+        }
+      },
+      {
+        "unit_id": "SF-120-r1-H1-S0",
+        "case_id": "SF-120",
+        "repetition": 1,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13513-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13513-formal-unit/seal.json",
+          "sha256": "c4a1efb7851051617fb91271fb40a939e26e556620713b28df287227605c7297"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0513/collected/score.json",
+          "sha256": "7eab61d9c8431427016671853c8039b383232708df2e9454c1fcf7c335c69c0c"
+        }
+      },
+      {
+        "unit_id": "SF-120-r2-H1-S0",
+        "case_id": "SF-120",
+        "repetition": 2,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13354-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13354-formal-unit/seal.json",
+          "sha256": "b4abe6fdf8c2adfcc32655a4cb5705aed097ccc03a8b8e147b066816f1bfe553"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/v9-after-pending-20261121/0354/collected/score.json",
+          "sha256": "fb9ddd73fbaa6a78d5e426d62b7974dc41e31b01a22b382ac7a8d134623c2dc2"
+        }
+      },
+      {
+        "unit_id": "SF-120-r3-H1-S0",
+        "case_id": "SF-120",
+        "repetition": 3,
+        "status": "passed",
+        "original_status": "passed",
+        "batch": "SF-B13505-formal-unit",
+        "terminal": "succeeded",
+        "commit_count": 1,
+        "extra_effects": 0,
+        "seal": {
+          "path": "artifacts/iterations/SF-I001/SF-B13505-formal-unit/seal.json",
+          "sha256": "a73267ad21a364f2f7d0efe8b66db5f4fd1d88d89a99b8a21b2136a148099342"
+        },
+        "business_version_before": 7,
+        "business_version_after": 8,
+        "review_decisions": [
+          "approved"
+        ],
+        "original_score": {
+          "path": "artifacts/iterations/SF-I001/development-notes/v9-final-tail-20261121/0505/collected/score.json",
+          "sha256": "db559f387c9f9a9a094cee229aead4023701d8c7ee2973dde6e5f5f62aaee122"
+        }
+      }
+    ]
+  }
+}

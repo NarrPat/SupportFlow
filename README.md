@@ -37,6 +37,15 @@ $ui = @(Get-ChildItem tests/supportflow -Filter 'ui_*.test.mjs' | Sort-Object Na
 node --test @ui
 ```
 
+## 评测结果
+
+在工作台侧边栏打开「评测」，可查看原计划检索和可靠性报告。启动本机演示后可直接打开[评测页](http://127.0.0.1:18080/evaluation)。[逐项结果与证据](docs/verification/sf-ri.md)
+
+| 原计划评测 | 结果 |
+| --- | --- |
+| 检索 38/38 | 19 道查询各运行两种策略。纯向量与混合检索 Hit@5 分别为 **15/19、18/19**，找齐全部必要证据分别为 **7/19、6/19**。复用 8 个单元，补跑 30 个，重建索引后全部复核一致。[检索证据](docs/verification/sf-ri.md#检索) |
+| 可靠性 39/39 | 13 个场景各 3 轮，**39/39 恰好一次提交并符合预期办结**，重复变更 0/39、漏执行 0/39、额外副作用 0 次。[可靠性证据](docs/verification/sf-ri.md#可靠性) |
+
 ## Spring Boot 业务服务
 
 在完整演示命令末尾加 `-WithJavaSandbox`，并准备支持 Java 21 字节码构建的 JDK（本次使用 JDK 25）。脚本用锁定的 Maven 构建 Java 模块。Java 使用独立 PostgreSQL 业务卷；Python 沿固定内部地址读取事实、批准后派发，并在收到回执后核对订阅。演示切换需等前一个运行窗口退出，两种模式都使用端口 18080。
@@ -48,6 +57,6 @@ pwsh -NoProfile -File tools/build-spring-sandbox.ps1
 
 [Java 实现](apps/supportflow/spring-sandbox) · [Java Compose](deploy/supportflow/compose.spring-java.yaml) · [回执对账](apps/supportflow/jobs/grant_reconciliation.py)
 
-本快照对应开发仓提交 `9116de776e791f4b1bc2a109805088ec9a5be61f`，含运行源码、依赖锁、启动夹具和可独立运行的 Java 与前端测试。
+本轮评测发布对应开发仓提交 `8cb9a34d8771fb671357a3f9396d39fc57d2ff98`。运行快照，含运行源码、依赖锁、启动夹具和可独立运行的 Java 与前端测试。
 
-原版 v9 在冻结源码上完成 534 项正式评测，404 项通过、102 项失败、28 项执行错误。末段 19 项失败在修复后均复验通过。当前源码的 1,750 项 Python 离线全量回归全部通过。各版本与证据范围见[验收与复现说明](docs/verification.md)。
+原版 v9 在冻结源码上完成 534 项正式评测，404 项通过、102 项失败、28 项执行错误。末段 19 项失败在修复后均复验通过。采集提交 `76cdbfb6` 的 B14865 Python 离线回归 1,750 项通过。各版本与证据范围见[验收与复现说明](docs/verification.md)。

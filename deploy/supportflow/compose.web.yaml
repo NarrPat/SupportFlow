@@ -21,7 +21,7 @@ services:
       - ../../apps/supportflow/domain:/work/apps/supportflow/domain:ro
       - ../../apps/supportflow/retrieval:/work/apps/supportflow/retrieval:ro
       - ../../apps/supportflow/knowledge:/work/apps/supportflow/knowledge:ro
-      - ./published-reports:/data/evaluation:ro
+      - ${SF_EVALUATION_REPORTS_DIR:-./published-reports}:/data/evaluation:ro
     secrets: [app_runtime_password]
     command: [python, -B, -m, uvicorn, apps.supportflow.api.main:app, --host, "0.0.0.0", --port, "8000", --no-access-log]
     depends_on:
