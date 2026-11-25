@@ -10,9 +10,9 @@ React / TypeScript · FastAPI · LangGraph · PostgreSQL + pgvector · Celery / 
 - **8 个请求同时加席**，直接请求 Java 接口，固定同一动作和参数，全程未调用模型。1 个返回 `201`，7 个返回 `200`，订阅版本只从 7 变到 8。
 - **19 道检索题**，从纯向量换成混合检索，前五条至少命中一条依据的题数从 15 变成 18，找齐全部依据的题数却从 7 降到 6。
 
-![四帧工作台实测截图。Java 联调中打开政策原文，审批后核对加席回执。另一次断线实验中，工作台提示正在重试，同一张工单仍可查看回执。](docs/demo.gif)
+![工单中展开的“邀请排障概览”，显示引用的政策版本和原文第 1–4 行。](docs/policy-citation.png)
 
-*前两帧来自真实 DeepSeek 与 Java 联调，后两帧来自独立的浏览器重连实验。* [看 3 分 19 秒演示：诊断引用、主管审批和 Java 回执](https://narrpat.github.io/SupportFlow/)
+这是客服展开的政策引用。后来主管批准了同一工单里的加席申请，回执中可以核对实际授予的席位数和有效期。[查看这张工单的回执](https://narrpat.github.io/SupportFlow/#receipt)
 
 ## 跑起来
 

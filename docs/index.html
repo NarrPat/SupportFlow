@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#103c34">
   <meta name="description" content="在 SupportFlow 工单里查知识引用，看主管审批和临时席位回执，再看写请求丢失响应后如何核对结果。">
-  <title>工单演示 · SupportFlow</title>
+  <title>工单引用与审批回执 · SupportFlow</title>
   <style>
     :root { color-scheme: light; font: 100%/1.65 "Segoe UI", "Microsoft YaHei", system-ui, sans-serif; color: #18352c; background: #f4f6f1; }
     * { box-sizing: border-box; }
@@ -20,7 +20,11 @@
     main { padding-block: clamp(1.5rem, 4vw, 3rem); }
     h1 { margin: 0; font-size: clamp(1.6rem, 4vw, 2.5rem); line-height: 1.25; letter-spacing: -.035em; }
     p { margin: .7rem 0 1.4rem; max-width: 48rem; }
-    video { width: 100%; aspect-ratio: 16 / 9; display: block; background: #103c34; border-radius: .55rem; }
+    .examples { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: clamp(1rem, 3vw, 2rem); }
+    figure { margin: 0; }
+    figcaption { margin-bottom: .75rem; }
+    figcaption strong { display: block; font-size: 1.18rem; }
+    figure img { display: block; width: 100%; height: auto; border: 1px solid #cbd6cb; border-radius: .35rem; }
     .links { display: flex; flex-wrap: wrap; gap: .5rem 1.6rem; margin-top: 1rem; }
   </style>
 </head>
@@ -28,15 +32,20 @@
   <header><nav aria-label="项目导航"><strong>SupportFlow</strong><a href="https://github.com/NarrPat/SupportFlow">GitHub 仓库</a></nav></header>
   <main>
     <h1>从一张工单追到加席回执</h1>
-    <p>客户收到了邀请，席位却用完了。这段 3 分 19 秒的演示从政策原文讲到主管审批，再查数据库里到底加了几席。中文旁白和字幕配合多个验收批次的真实界面，使用的都是模拟业务数据。</p>
-    <video controls playsinline preload="metadata" poster="demo.gif" aria-label="SupportFlow 项目演示，中文讲解和字幕">
-      <source src="supportflow-demo.mp4" type="video/mp4">
-      <a href="supportflow-demo.mp4">下载 MP4</a>
-    </video>
-    <nav class="links" aria-label="演示相关材料">
+    <p>客户收到了邀请，席位却用完了。下面两张截图来自同一张模拟工单的两次运行。客服先查清原因，随后明确申请临时席位，由另一位主管审批。</p>
+    <div class="examples">
+      <figure>
+        <figcaption><strong>客服查了哪条政策？</strong>点击回答里的引用，可以逐行核对当时使用的政策原文。</figcaption>
+        <img src="policy-citation.png" width="464" height="324" alt="展开的邀请排障概览，包含文档版本和原文第 1 至 4 行。">
+      </figure>
+      <figure id="receipt">
+        <figcaption><strong>实际加了多少席？</strong>同一份回执记录了 10 席、3 天，动作编号和回执编号一致。</figcaption>
+        <img src="seat-receipt.png" width="436" height="208" alt="客户 C-001 的临时席位回执，授予 10 席、有效期 3 天。">
+      </figure>
+    </div>
+    <nav class="links" aria-label="项目相关材料">
       <a href="https://github.com/NarrPat/SupportFlow/blob/main/docs/verification.md">核对验收记录</a>
       <a href="https://github.com/NarrPat/SupportFlow#跑起来">在本机运行</a>
-      <a href="supportflow-demo.mp4" download>下载视频</a>
     </nav>
   </main>
 </body>

@@ -1,6 +1,6 @@
 # SupportFlow 原计划检索与可靠性评测
 
-实验 `sf-ri-original-plan-v1` 于 2026-11-22 归档。38 个检索单元和 39 个可靠性单元均已核验，合计 77/77。数据为合成 SaaS 场景，检索查询和可靠性场景均为冻结的已见样本。[77 个单元的脱敏账本](sf-ri-results.json) · [工作台发布目录](../../deploy/supportflow/published-reports/README.md)
+实验 `sf-ri-original-plan-v1` 共核验 77 个单元，其中检索 38 个、可靠性 39 个。数据为合成 SaaS 场景，检索查询和可靠性场景均为冻结的已见样本。[77 个单元的脱敏账本](sf-ri-results.json) · [工作台发布目录](../../deploy/supportflow/published-reports/README.md)
 
 ## 检索
 
