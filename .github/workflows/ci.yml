@@ -1,0 +1,50 @@
+name: SupportFlow CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  workbench:
+    name: Workbench tests and production build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24.14.0'
+          package-manager-cache: false
+      - name: Install locked web dependencies
+        working-directory: apps/supportflow/web
+        run: |
+          test "$(npm --version)" = "11.9.0"
+          npm ci --no-fund --no-audit
+      - name: Test the browser client logic
+        run: node --test tests/supportflow/ui_*.test.mjs
+      - name: Typecheck and build the workbench
+        working-directory: apps/supportflow/web
+        run: npm run build:product
+
+  java:
+    name: Spring Boot contracts and dependency lock
+    runs-on: windows-2025
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6
+        with:
+          distribution: temurin
+          java-version: '25'
+      - name: Run the Maven build, contract tests and dependency check
+        shell: pwsh
+        run: ./tools/build-spring-sandbox.ps1
