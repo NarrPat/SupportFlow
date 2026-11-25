@@ -1,10 +1,10 @@
 # 验收范围与版本
 
-本轮评测发布对应开发仓 `8cb9a34d8771fb671357a3f9396d39fc57d2ff98`。以下批次保存于开发验收工作区，随快照发布的是结果摘要。源码与配置的当次受测版本逐项列出。
+下表的受测提交来自开发仓。以 B14869 为例，公开快照 `451dded` 中的 `apps/supportflow` 与受测开发版本拥有相同的 Git 树。克隆本仓库后运行 `git rev-parse 451dded:apps/supportflow`，即可与批次摘要内的树哈希比对。表中其他批次保留各自的实际受测版本。[可访问的公开快照](https://github.com/NarrPat/SupportFlow/tree/451dded73b0f80f19ac000839811b7d8197763c2/apps/supportflow) · [B14869 回归摘要](verification/python-offline-b14869.json)
 
 | 范围 | 原开发仓受测提交与批次 | 结果 |
 | --- | --- | --- |
-| 评测页发布版本的 Python 离线回归 | `8cb9a34d` · `SF-B14869-sf-ri-publication-final-offline` | 开发工作区运行 1,752 项，全部通过。较早的 B14867 批次运行 1,722 项，记录 17 项错误，原记录保留。 |
+| 评测页发布版本的 Python 离线回归 | B14869 · [受测源码映射与日志摘要](verification/python-offline-b14869.json) | 开发工作区运行 1,752 项，全部通过。较早的 B14867 批次运行 1,722 项，记录 17 项错误，原记录保留。 |
 | Java 联调版本的全量回归 | `d5899f82` · `SF-B1795165119768-latest-full-regression` | Python 1,745 项、Node 50 项、Java 6 项通过，零失败、错误或跳过。TypeScript／Vite 构建和 7 条 Compose 配置断言通过。Vite 保留大分包告警。 |
 | Java HTTP／PostgreSQL | `d5899f82` · `SF-B1795165406367-spring-smoke-regression-contracts` | 21 个用例、183 条断言通过。8 个同动作同参数请求产生一份持久回执。事务内故障回滚。 |
 | 工作台原生回归 | `d5899f82` · `SF-B1795165406367-spring-workbench-regression-*` | 7 个用例、126 条断言通过。浏览器诊断与审批、旧版本零派发、三轮提交后丢响应、默认 Python 对照及 Java 同卷升级通过。原生回归使用脚本模型，真实提供方调用 0 次。 |

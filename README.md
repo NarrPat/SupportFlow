@@ -2,7 +2,9 @@
 
 「同事收到了邀请，为什么还是加不进来？」我做了一个模拟 SaaS 客服工作台，让客服能查邀请、域名和剩余席位，点开回答里的引用就能读到政策原文。**唯一的业务写动作是授予临时席位**，需要另一位主管批准具体的席位数和有效期。
 
-React / TypeScript · FastAPI · LangGraph · PostgreSQL + pgvector · Celery / Redis · Spring Boot（可选业务服务）　[跳到启动命令](#跑起来)
+React / TypeScript · FastAPI · LangGraph · PostgreSQL + pgvector · Celery / Redis · Spring Boot　[跳到启动命令](#跑起来)
+
+同仓库的 Spring Boot 模拟业务服务负责实际加席。它用 PostgreSQL 事务把席位变更和回执一起提交，用订阅行锁处理并发，用 Flyway 管理业务表结构。[Java 模块](apps/supportflow/spring-sandbox) · [数据库迁移](apps/supportflow/spring-sandbox/src/main/resources/db/migration)
 
 - **提交后丢响应**测了 3 轮。每轮只发出 1 次写请求，数据库留了 1 份回执，重复授予 0 次。
 - **8 个请求同时加席**，直接请求 Java 接口，固定同一动作和参数，全程未调用模型。1 个返回 `201`，7 个返回 `200`，订阅版本只从 7 变到 8。
@@ -10,7 +12,7 @@ React / TypeScript · FastAPI · LangGraph · PostgreSQL + pgvector · Celery / 
 
 ![四帧工作台实测截图。Java 联调中打开政策原文，审批后核对加席回执。另一次断线实验中，工作台提示正在重试，同一张工单仍可查看回执。](docs/demo.gif)
 
-*前两帧来自真实 DeepSeek 与 Java 联调。后两帧来自独立的浏览器重连实验。*
+*前两帧来自真实 DeepSeek 与 Java 联调，后两帧来自独立的浏览器重连实验。* [看 3 分 19 秒演示：诊断引用、主管审批和 Java 回执](https://narrpat.github.io/SupportFlow/)
 
 ## 跑起来
 
@@ -36,7 +38,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools/serve-workspace.ps
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools/serve-workspace.ps1 -Minutes 15 -WithWorker -WithKnowledge -WithProposal -WithApproval -WithExecution -WithDemoData -WithJavaSandbox
 ```
 
-用两个独立浏览器会话打开工作台，分别登录客服 `a_support` 和主管 `a_supervisor`。启动脚本生成的密码在本机 `deploy/supportflow/.secrets/seed-accounts.json`。只想看登录和工单界面时，启动参数可缩成 `-Minutes 5`，无需模型密钥。到时服务自动停止，数据卷保留。[打开本机工作台](http://127.0.0.1:18080/tickets)
+用两个独立浏览器会话打开工作台，分别登录客服 `a_support` 和主管 `a_supervisor`。启动脚本生成的密码在本机 `deploy/supportflow/.secrets/seed-accounts.json`。只想看登录和工单界面时，启动参数可缩成 `-Minutes 5`，无需模型密钥。到时服务自动停止，数据卷保留。[本机启动后打开工作台](http://127.0.0.1:18080/tickets)
 
 **试一张工单。** 为 C-001 建工单，问「member@example.com 加不进来，帮我查一下邀请、域名和席位」。点开一条引用看原文，再明确申请 10 个临时席位、有效期 3 天。若当前订阅符合政策，用主管账号审批，回到客服页查看回执。[提案规则](apps/supportflow/domain/grant_policy.py)
 
@@ -77,6 +79,8 @@ node --test @ui
 
 ## 这些结果能说明什么？
 
-原版 v9 在修复前冻结了 534 个正式单元，原始账本是 **404 个通过、102 个失败、28 个执行错误**。后来的复验单独记账。以末批 19 项为例，6 项重新运行，13 项沿用原运行记录补证据、重新审核，19 项最终均通过。开发提交 `8cb9a34d` 上通过的 **1,752 项**是 Python 离线测试，统计的是代码回归。[原版 v9 账本](docs/verification/v9-final.json) · [按版本查看复验与回归批次](docs/verification.md)
+原版 v9 在修复前冻结了 534 个正式单元，原始账本是 **404 个通过、102 个失败、28 个执行错误**。后来的复验单独记账。以末批 19 项为例，6 项重新运行，13 项沿用原运行记录补证据、重新审核，19 项最终均通过。[原版 v9 账本](docs/verification/v9-final.json) · [按版本查看复验与回归批次](docs/verification.md)
 
-可靠性评测单看原 Python 沙箱的 13 个写入场景，每个场景核了 3 轮数据库。39 轮里重复变更为 0，其中 3 轮在提交后按预期取消。数据都是模拟 SaaS 工单，项目尚无独立盲测准确率。[可靠性记录](docs/verification/sf-ri.md#可靠性) · [打开本机评测页](http://127.0.0.1:18080/evaluation)
+**1,752 项**是开发工作区 B14869 批次通过的 Python 离线测试。这份公开仓库是脱敏运行副本。你可以在公开提交 `451dded` 核对与受测版本一致的 196 个应用文件，也可以运行随仓发布的前端和 Java 测试。完整 Python 测试集、历史夹具和原始日志保存在开发工作区。[公开源码快照](https://github.com/NarrPat/SupportFlow/tree/451dded73b0f80f19ac000839811b7d8197763c2/apps/supportflow) · [批次摘要、日志哈希和核对命令](docs/verification/python-offline-b14869.json) · [公开仓库 CI](https://github.com/NarrPat/SupportFlow/actions/workflows/ci.yml)
+
+可靠性评测单看原 Python 沙箱的 13 个写入场景，每个场景核了 3 轮数据库。39 轮里重复变更为 0，其中 3 轮在提交后按预期取消。数据都是模拟 SaaS 工单，项目尚无独立盲测准确率。[可靠性记录](docs/verification/sf-ri.md#可靠性) · [本机启动后打开评测页](http://127.0.0.1:18080/evaluation)

@@ -1,0 +1,34 @@
+{
+  "batch_id": "SF-B14869-sf-ri-publication-final-offline",
+  "test_id": "SF-T005",
+  "executed_in": "完整开发工作区",
+  "completed_at": "2026-11-22T23:57:33.906672+08:00",
+  "model_mode": "none",
+  "command_from_development_root": ".venv/Scripts/python.exe -I -B -X utf8 -m unittest discover -s tests/supportflow -p \"test_*.py\" -v",
+  "unittest": {
+    "ran": 1752,
+    "passed": 1752,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "exit_code": 0,
+    "runner_footer": ["Ran 1752 tests in 158.821s", "OK"]
+  },
+  "code_binding": {
+    "tested_development_commit": "8cb9a34d8771fb671357a3f9396d39fc57d2ff98",
+    "public_snapshot_commit": "451dded73b0f80f19ac000839811b7d8197763c2",
+    "path": "apps/supportflow",
+    "tracked_files": 196,
+    "git_tree_in_both_commits": "9a256541df4107ef05e85a9483eb620b7101296e",
+    "verify_in_public_clone": "git rev-parse 451dded73b0f80f19ac000839811b7d8197763c2:apps/supportflow"
+  },
+  "evidence_scope": "公开仓库可核对应用源码树，并提供前端和 Java 测试。运行这 1,752 项还需要开发工作区的完整 Python 测试集、历史样本和封存材料。",
+  "development_archive": {
+    "path": "artifacts/iterations/SF-I001/SF-B14869-sf-ri-publication-final-offline",
+    "sha256": {
+      "raw/runner.log": "5c33895175701ac6d49b62035f50e166a0d654a1dc925de098497c45d296c3af",
+      "raw/attempt.json": "7a8b35a010aa1c31a7e215b3cd86bfcb2f65a35e253a1136fc42383205550f75",
+      "manifest.json": "c063e8e2fce2fd6f71e773e849fccc339554ef13a0f2500ce85e458e1ea53c23"
+    }
+  }
+}
